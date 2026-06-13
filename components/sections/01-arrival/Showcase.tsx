@@ -66,10 +66,12 @@ interface ShowcaseProps {
 export function Showcase({ inTv = false }: ShowcaseProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
+  const [isLargestScreen, setIsLargestScreen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
+      setIsLargestScreen(window.innerWidth >= 1536);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -179,7 +181,10 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
             : "min-h-screen pt-12 pb-8 md:pt-24 md:pb-16"
         }`}
       >
-        <div className={inTv ? "h-[56%]" : "h-[56svh]"} />
+        <div
+          className={inTv ? "h-[56%]" : "h-[56svh]"}
+          style={isLargestScreen ? { height: inTv ? "62%" : "64svh" } : undefined}
+        />
 
         {/* Mobile Projects Grid */}
         <div className="block md:hidden pointer-events-auto w-full max-w-[320px] mx-auto px-2 mt-5 mb-4 z-20 order-last">
