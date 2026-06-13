@@ -249,8 +249,8 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
             className="text-xs md:text-sm max-w-[300px] md:max-w-xl leading-relaxed"
             style={{ color: "var(--text-low)" }}
           >
-            We turn bold ideas into useful apps
-            <br />- fast, elegant, intelligent, and built to serve the real world.
+            We turn bold ideas into useful apps -
+            <br />fast, elegant, intelligent, and built to serve the real world.
           </p>
         </motion.div>
       </div>
