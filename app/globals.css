@@ -1,0 +1,2145 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@500,600,700&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   Brand Tokens — Crystal palette (swappable; alternates below)
+   ============================================================ */
+
+:root {
+  /* Ink (canvas surfaces) */
+  --ink-0: #06070D;
+  --ink-1: #0A0C16;
+  --ink-edge: #1A1E2E;
+
+  /* Accent (the jewelry) */
+  --accent-1: #6E56FF;
+  --accent-2: #00E0CB;
+  --accent-3: #FF4FB0;
+  --accent-warm: #FFB454;
+
+  /* Text */
+  --text-hi: #F4F5FA;
+  --text-mid: #B4B9CC;
+  --text-low: #7B8197;
+  --text-faint: #4B5066;
+
+  /* Glass recipe */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.20);
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-fast: 200ms;
+  --dur-base: 400ms;
+  --dur-slow: 700ms;
+  --dur-cinematic: 1200ms;
+  --dur-loop: 8000ms;
+
+  /* Radii */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+}
+
+/* Alternate palettes — uncomment one to swap entire site
+   ----------------------------------------------------------
+   "Atelier" (premium, deeper):
+   :root {
+     --accent-1: #3B82F6; --accent-2: #14B8A6;
+     --accent-3: #F59E0B; --accent-warm: #F97316;
+   }
+
+   "Hearth" (warmer, friendlier):
+   :root {
+     --accent-1: #6366F1; --accent-2: #34D399;
+     --accent-3: #FB7185; --accent-warm: #FBBF24;
+   }
+*/
+
+/* ============================================================
+   Tailwind v4 theme bridge — exposes tokens as Tailwind classes
+   ============================================================ */
+
+@theme inline {
+  --color-ink-0: var(--ink-0);
+  --color-ink-1: var(--ink-1);
+  --color-ink-edge: var(--ink-edge);
+
+  --color-accent-1: var(--accent-1);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --color-accent-warm: var(--accent-warm);
+
+  --color-text-hi: var(--text-hi);
+  --color-text-mid: var(--text-mid);
+  --color-text-low: var(--text-low);
+  --color-text-faint: var(--text-faint);
+
+  --font-display: "General Sans", var(--font-inter), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Custom properties — the animated angle for conic borders
+   ============================================================ */
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ============================================================
+   Base styles
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--ink-0);
+  color: var(--text-hi);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent-1) 35%, transparent);
+  color: var(--text-hi);
+}
+
+/* ============================================================
+   Glass surface classes — three variants
+   ============================================================ */
+
+.glass-light {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 16px 40px -16px rgba(0, 0, 0, 0.4);
+}
+
+.glass-medium {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 24px 60px -20px rgba(0, 0, 0, 0.5);
+}
+
+.glass-heavy {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  backdrop-filter: blur(32px) saturate(150%);
+  -webkit-backdrop-filter: blur(32px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    0 32px 80px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Primary-button surface — visibly violet-tinted glass.
+   Distinct from .glass-light/medium/heavy at rest AND when dimmed (disabled). */
+.glass-primary {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent-1) 28%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 10%, transparent) 100%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 40%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 24px 60px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   Custom cursor (arrow + click shockwave)
+   ============================================================ */
+
+.cursor-dot {
+  width: 32px;
+  height: 32px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 200ms;
+}
+
+/* Stylized neon custom arrow - rotated 15deg clockwise at rest */
+.cursor-arrow-svg {
+  transform-origin: 4px 4px;
+  transform: rotate(15deg);
+  filter: drop-shadow(0 0 4px var(--accent-2)) drop-shadow(0 0 8px var(--accent-1));
+  transition: 
+    transform 250ms var(--ease-out-soft), 
+    filter 300ms, 
+    opacity 200ms, 
+    scale 250ms var(--ease-out-soft);
+}
+
+/* Keep 15deg rotation on link/button hover and scale up slightly */
+.cursor-dot--active .cursor-arrow-svg {
+  transform: rotate(15deg) scale(1.1);
+  filter: drop-shadow(0 0 6px var(--accent-3)) drop-shadow(0 0 12px var(--accent-warm));
+}
+
+/* Keep 15deg rotation on click and scale down slightly */
+.cursor-dot--click .cursor-arrow-svg {
+  transform: rotate(15deg) scale(0.9);
+  filter: drop-shadow(0 0 12px var(--accent-3)) drop-shadow(0 0 24px var(--accent-3));
+}
+
+.cursor-dot--text .cursor-arrow-svg {
+  opacity: 0;
+  scale: 0.5;
+}
+
+/* Stylized neon custom crosshair */
+.cursor-crosshair-svg {
+  transform-origin: 16px 16px;
+  filter: drop-shadow(0 0 4px var(--accent-2)) drop-shadow(0 0 8px var(--accent-1));
+  transition: 
+    transform 300ms var(--ease-out-soft), 
+    filter 300ms, 
+    opacity 200ms, 
+    scale 200ms var(--ease-out-soft);
+}
+
+.cursor-dot--active .cursor-crosshair-svg {
+  transform: rotate(90deg) scale(1.2);
+  filter: drop-shadow(0 0 6px var(--accent-3)) drop-shadow(0 0 12px var(--accent-warm));
+}
+
+.cursor-dot--click .cursor-crosshair-svg {
+  transform: scale(0.8);
+  filter: drop-shadow(0 0 12px var(--accent-3)) drop-shadow(0 0 24px var(--accent-3));
+}
+
+.cursor-dot--text .cursor-crosshair-svg {
+  opacity: 0;
+  scale: 0.5;
+}
+
+/* Stylized neon custom dot */
+.cursor-dot-svg {
+  transform-origin: 8px 8px;
+  filter: drop-shadow(0 0 4px var(--accent-2)) drop-shadow(0 0 8px var(--accent-1));
+  transition: 
+    transform 250ms var(--ease-out-soft), 
+    filter 300ms, 
+    opacity 200ms, 
+    scale 250ms var(--ease-out-soft);
+}
+
+.cursor-dot--active .cursor-dot-svg {
+  transform: scale(1.4);
+  filter: drop-shadow(0 0 6px var(--accent-3)) drop-shadow(0 0 12px var(--accent-warm));
+}
+
+.cursor-dot--click .cursor-dot-svg {
+  transform: scale(0.85);
+  filter: drop-shadow(0 0 12px var(--accent-3)) drop-shadow(0 0 24px var(--accent-3));
+}
+
+.cursor-dot--text .cursor-dot-svg {
+  opacity: 0;
+  scale: 0.5;
+}
+
+/* Thicker glowing text beam */
+.cursor-text-beam {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 1.5px;
+  background: var(--accent-2);
+  box-shadow: 
+    0 0 8px var(--accent-2),
+    0 0 16px var(--accent-2);
+  opacity: 0;
+  scale: 0.5;
+  transform-origin: center center;
+  transition: opacity 250ms, scale 250ms var(--ease-out-soft);
+}
+
+.cursor-dot--text .cursor-text-beam {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Dedicated click shockwave ripple element anchored at arrow tip hotspot */
+.cursor-click-ripple {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--accent-3) 40%, transparent);
+  background-color: color-mix(in srgb, var(--accent-3) 8%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cursor-dot--click .cursor-click-ripple {
+  animation: click-ripple 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes click-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(7.5);
+    opacity: 0;
+  }
+}
+
+/* Hide system cursor on hoverable devices where the custom cursor is active */
+@media (hover: hover) and (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button,
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [role="button"],
+  html.has-custom-cursor .cursor-pointer,
+  html.has-custom-cursor [data-cursor="grow"] {
+    cursor: none !important;
+  }
+}
+
+/* Prefers Reduced Motion Global Collapse Override */
+html.prefers-reduced-motion *,
+html.prefers-reduced-motion *::before,
+html.prefers-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ============================================================
+   Button press shine — diagonal sweep across button interior
+   ============================================================ */
+
+.btn-shine-target {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine-target.btn-shining::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.50) 50%,
+    transparent 75%
+  );
+  animation: button-shine 2200ms cubic-bezier(0.22, 1, 0.36, 1) 3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* The shine sweeps across in the first 82% of each cycle (~1800ms),
+   then holds off-screen-right for the remaining 18% (~400ms) before
+   the next iteration starts. Three iterations per press = clear
+   "shine, pause, shine, pause, shine" rhythm. */
+@keyframes button-shine {
+  0%   { transform: translateX(-150%); }
+  82%  { transform: translateX(150%); }
+  100% { transform: translateX(150%); }
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes border-spin {
+  to { --angle: 360deg; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent-1) 30%, transparent),
+      0 0 16px color-mix(in srgb, var(--accent-1) 15%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--accent-1) 60%, transparent),
+      0 0 32px color-mix(in srgb, var(--accent-1) 40%, transparent);
+  }
+}
+
+@keyframes mesh-flow {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33%  { transform: translate(3%, -5%) rotate(120deg) scale(1.1); }
+  66%  { transform: translate(-3%, 3%) rotate(240deg) scale(0.95); }
+  100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+}
+
+@keyframes dot-drift {
+  to { background-position: 32px 32px; }
+}
+
+@keyframes weave-flow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-20px); }
+}
+
+@keyframes noise-wash {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1) translate(2%, -2%);
+    opacity: 0.7;
+  }
+}
+
+/* Hero — slow drift loop for orbital cards. Each card uses a different
+   animation-duration + animation-delay so they never stay in sync. */
+@keyframes orbital-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25%      { transform: translate3d(12px, -10px, 0) rotate(1deg); }
+  50%      { transform: translate3d(-8px, -16px, 0) rotate(-1.5deg); }
+  75%      { transform: translate3d(-14px, 8px, 0) rotate(2deg); }
+}
+
+/* Hero — logo subtle breathe (opacity only — scale is handled by planet spin) */
+@keyframes logo-breathe {
+  0%, 100% { opacity: 0.90; }
+  50%      { opacity: 1; }
+}
+
+.showcase-copy-stack {
+  transform: translateY(clamp(1rem, 3vh, 2rem));
+}
+
+.yantra-electric-title {
+  position: relative;
+  display: inline-block;
+  font-family: "Clash Display", var(--font-display);
+  line-height: 0.92;
+  letter-spacing: 0;
+  color: transparent;
+  background:
+    linear-gradient(110deg, #ffffff 0%, #c9f8ff 20%, var(--accent-2) 38%, var(--accent-1) 62%, #fff4fb 82%, #ffffff 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter:
+    drop-shadow(0 0 8px rgba(0, 224, 203, 0.45))
+    drop-shadow(0 0 18px rgba(110, 86, 255, 0.28));
+  animation:
+    yantra-electric-flow 5s ease-in-out infinite,
+    yantra-electric-pulse 3.4s ease-in-out infinite;
+}
+
+.yantra-electric-title::before,
+.yantra-electric-title::after {
+  content: "YantraCore";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.yantra-electric-title::before {
+  background-image: linear-gradient(90deg, transparent, rgba(0, 224, 203, 0.9), transparent);
+  background-size: 45% 100%;
+  background-repeat: no-repeat;
+  animation: yantra-electric-scan 3.6s ease-in-out infinite;
+  opacity: 0.72;
+}
+
+.yantra-electric-title::after {
+  background-image: linear-gradient(90deg, rgba(255, 79, 176, 0.45), rgba(0, 224, 203, 0.55));
+  transform: translateX(1px);
+  opacity: 0;
+  animation: yantra-electric-flicker 4.8s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yantra-electric-title,
+  .yantra-electric-title::before,
+  .yantra-electric-title::after {
+    animation: none;
+  }
+}
+
+/* LogoMark — slow Y-axis rotation with tilted planet axis.
+   The axial tilt (rotateZ) gently wobbles like a real planetary body.
+   30 s per full revolution = serene, never distracting. */
+@keyframes logo-planet-spin {
+  0%   { transform: perspective(1000px) rotateZ(6deg)  rotateY(0deg); }
+  25%  { transform: perspective(1000px) rotateZ(3deg)  rotateY(90deg); }
+  50%  { transform: perspective(1000px) rotateZ(-4deg) rotateY(180deg); }
+  75%  { transform: perspective(1000px) rotateZ(2deg)  rotateY(270deg); }
+  100% { transform: perspective(1000px) rotateZ(6deg)  rotateY(360deg); }
+}
+
+@keyframes yantra-electric-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes yantra-electric-pulse {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 8px rgba(0, 224, 203, 0.42))
+      drop-shadow(0 0 18px rgba(110, 86, 255, 0.26));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 14px rgba(0, 224, 203, 0.62))
+      drop-shadow(0 0 26px rgba(110, 86, 255, 0.36));
+  }
+}
+
+@keyframes yantra-electric-scan {
+  0%, 18% { background-position: -65% 0; opacity: 0; }
+  38%, 54% { opacity: 0.75; }
+  78%, 100% { background-position: 165% 0; opacity: 0; }
+}
+
+@keyframes yantra-electric-flicker {
+  0%, 91%, 100% { opacity: 0; }
+  92% { opacity: 0.42; transform: translateX(1px); }
+  93% { opacity: 0; }
+  96% { opacity: 0.28; transform: translateX(-1px); }
+  97% { opacity: 0; }
+}
+
+/* LogoMark hover — gracefully eases to straight-on facing.
+   CSS picks up from wherever the spin currently is (no jarring snap). */
+@keyframes logo-planet-arrive {
+  to { transform: perspective(1000px) rotateZ(0deg) rotateY(0deg); }
+}
+
+
+/* Hero — rotating conic halo that orbits the logo */
+@keyframes logo-halo-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Hero — pulse rings that expand outward and fade */
+@keyframes logo-pulse-ring {
+  0%   { transform: scale(0.85); opacity: 0.7; }
+  70%  { opacity: 0.15; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Hero — holographic shimmer sweep across the logo */
+@keyframes logo-shimmer {
+  0%   { background-position: 200% 0; }
+  50%  { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Hero — chromatic aberration: red ghost drifts diagonally */
+@keyframes logo-chroma-r {
+  0%, 100% { transform: translate(0px, 0px); }
+  25%       { transform: translate(3px, -2px); }
+  50%       { transform: translate(-2px, 3px); }
+  75%       { transform: translate(2px, 2px); }
+}
+
+/* Hero — chromatic aberration: cyan ghost drifts opposite */
+@keyframes logo-chroma-c {
+  0%, 100% { transform: translate(0px, 0px); }
+  25%       { transform: translate(-3px, 2px); }
+  50%       { transform: translate(2px, -3px); }
+  75%       { transform: translate(-2px, -2px); }
+}
+
+/* LogoMark hover — RED ghost widens dramatically for full prism effect */
+@keyframes logo-chroma-r-wide {
+  0%, 100% { transform: translate(0px, 0px); }
+  25%       { transform: translate(7px, -5px); }
+  50%       { transform: translate(-6px, 7px); }
+  75%       { transform: translate(5px, 5px); }
+}
+
+/* LogoMark hover — CYAN ghost mirrors the wide drift */
+@keyframes logo-chroma-c-wide {
+  0%, 100% { transform: translate(0px, 0px); }
+  25%       { transform: translate(-7px, 5px); }
+  50%       { transform: translate(6px, -7px); }
+  75%       { transform: translate(-5px, -5px); }
+}
+
+/* LogoMark hover — GREEN ghost completes the RGB prism triad */
+@keyframes logo-chroma-g {
+  0%, 100% { transform: translate(0px, 0px); }
+  25%       { transform: translate(0px, -7px); }
+  50%       { transform: translate(7px, 4px); }
+  75%       { transform: translate(-7px, 3px); }
+}
+
+/* LogoMark hover — shockwave ring fires outward on hover enter */
+@keyframes logo-shockwave {
+  0%   { width: 0;    height: 0;    opacity: 1;   border-width: 3px; }
+  60%  { opacity: 0.6; border-width: 1.5px; }
+  100% { width: 520px; height: 520px; opacity: 0;  border-width: 0.5px; }
+}
+
+/* LogoMark hover — orbital spark particles pop in at their fixed positions */
+@keyframes logo-spark-orbit {
+  0%   { opacity: 0; scale: 0; }
+  50%  { opacity: 1; scale: 1.5; }
+  100% { opacity: 0.9; scale: 1; }
+}
+
+
+/* Hero — volumetric light cones gently shift to feel alive, not painted. */
+@keyframes light-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50%      { transform: translate(-3%, 3%) scale(1.08); opacity: 0.65; }
+}
+
+/* Hero — headline lines slide up from below */
+@keyframes hero-line-up {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Hero — general fade-up for sub-elements */
+@keyframes hero-fade-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Hero — scroll line pulses downward */
+@keyframes scroll-line-pulse {
+  0%, 100% { transform: scaleY(1);   opacity: 0.35; }
+  50%       { transform: scaleY(1.3); opacity: 0.7;  }
+}
+
+/* Showcase — star field twinkle */
+@keyframes star-twinkle {
+  0%, 100% { opacity: var(--tw-opacity, 0.2); transform: scale(1);   }
+  50%       { opacity: 1;                     transform: scale(1.6); }
+}
+
+/* Showcase — orbital ring clockwise */
+@keyframes ring-spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Showcase — orbital ring counter-clockwise */
+@keyframes ring-spin-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Forge — traveling light dot races down the timeline connector line */
+@keyframes forge-line-travel {
+  0%   { top: -30%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 130%; opacity: 0; }
+}
+
+/* Signal — radar/sonar ping rings expand outward */
+@keyframes radar-pulse {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* Universal "is typing" indicator — three bouncing dots. */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30%           { transform: translateY(-3px); opacity: 1; }
+}
+
+.typing-dot {
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes chat-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-chat-fade {
+  animation: chat-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* AI Activity card — equalizer bars that scale vertically.
+   Each bar gets its own animation-delay + animation-duration in JSX
+   so the wave reads as organic rather than synchronized. */
+@keyframes bar-scale {
+  0%, 100% { transform: scaleY(0.20); }
+  20%      { transform: scaleY(0.90); }
+  40%      { transform: scaleY(0.40); }
+  60%      { transform: scaleY(0.75); }
+  80%      { transform: scaleY(0.30); }
+}
+
+/* ============================================================
+   Marquee — infinite left/right scroll for MarqueeRow
+   ============================================================ */
+
+@keyframes marquee-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* ============================================================
+   Forge — gradient bar fill on section enter
+   ============================================================ */
+
+@keyframes forge-fill {
+  0%   { width: 0%; opacity: 0; }
+  20%  { opacity: 1; }
+  100% { width: 100%; opacity: 1; }
+}
+
+/* ============================================================
+   Navigation — scroll-reactive glass pill
+   ============================================================ */
+
+/**
+ * The header uses a CSS custom property --scroll-t (default to 1)
+ * to define the pill's glass-heavy background, blur, and border.
+ * Always set to 1 so the navigation bar is always visible.
+ */
+.nav-pill-scroll {
+  --scroll-t: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, calc(0.12 * var(--scroll-t))) 0%,
+    rgba(255, 255, 255, calc(0.06 * var(--scroll-t))) 100%
+  );
+  backdrop-filter: blur(calc(32px * var(--scroll-t))) saturate(150%);
+  -webkit-backdrop-filter: blur(calc(32px * var(--scroll-t))) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, calc(0.10 * var(--scroll-t)));
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, calc(0.10 * var(--scroll-t))),
+    0 32px 80px -20px rgba(0, 0, 0, calc(0.6 * var(--scroll-t)));
+  transition:
+    background 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    backdrop-filter 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   Navigation — Signal pulse dot
+   ============================================================ */
+
+@keyframes signal-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-2) 80%, transparent), 0 0 4px color-mix(in srgb, var(--accent-2) 50%, transparent);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 0%, transparent), 0 0 10px color-mix(in srgb, var(--accent-2) 80%, transparent);
+    opacity: 0.7;
+  }
+}
+
+.signal-dot {
+  animation: signal-pulse 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* ============================================================
+   Navigation — Mobile menu overlay
+   ============================================================ */
+
+@keyframes nav-overlay-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes nav-overlay-out {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes nav-item-in {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) skewY(2deg);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes nav-item-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) skewY(0deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) skewY(-1deg);
+    filter: blur(4px);
+  }
+}
+
+@keyframes nav-footer-in {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Hamburger bar morphing keyframes */
+@keyframes bar-top-open {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(7px) rotate(0deg); }
+  100% { transform: translateY(7px) rotate(45deg); }
+}
+@keyframes bar-top-close {
+  0%   { transform: translateY(7px) rotate(45deg); }
+  50%  { transform: translateY(7px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes bar-mid-open {
+  0%   { opacity: 1; transform: scaleX(1); }
+  40%  { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 0; transform: scaleX(0); }
+}
+@keyframes bar-mid-close {
+  0%   { opacity: 0; transform: scaleX(0); }
+  60%  { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
+@keyframes bar-bot-open {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-7px) rotate(0deg); }
+  100% { transform: translateY(-7px) rotate(-45deg); }
+}
+@keyframes bar-bot-close {
+  0%   { transform: translateY(-7px) rotate(-45deg); }
+  50%  { transform: translateY(-7px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Applied by JS via data attributes */
+[data-menu-open="true"] .ham-bar-top  { animation: bar-top-open  380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+[data-menu-open="true"] .ham-bar-mid  { animation: bar-mid-open  380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+[data-menu-open="true"] .ham-bar-bot  { animation: bar-bot-open  380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+[data-menu-open="false"] .ham-bar-top { animation: bar-top-close 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+[data-menu-open="false"] .ham-bar-mid { animation: bar-mid-close 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+[data-menu-open="false"] .ham-bar-bot { animation: bar-bot-close 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+/* Body scroll lock when mobile menu is open */
+.mobile-menu-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ============================================================
+   Auth layout — hide global header on login / signup pages
+   ============================================================ */
+
+/**
+ * When a route mounts with data-layout="auth" the global <Header />
+ * is still rendered by the root layout (can't be easily suppressed
+ * without a Context). We hide it with CSS so the login page gets a
+ * clean, full-screen canvas without a full layout refactor.
+ */
+[data-layout="auth"] ~ header,
+[data-layout="auth"] + header,
+body:has([data-layout="auth"]) > header {
+  display: none !important;
+}
+
+/* ============================================================
+   Reduced motion — collapse loops, keep fades short
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   TV style App Console & CRT Retro Filters
+   ============================================================ */
+
+.tv-frame-outer {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: linear-gradient(135deg, #101222 0%, #0a0b14 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 64px -12px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(110, 86, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  border-radius: inherit;
+  transition: all 0.5s ease;
+}
+
+.tv-frame-bezel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d0f1a;
+  border-radius: 0;
+  border: 4px solid #141829;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  position: relative;
+}
+
+.tv-screen-glass {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #06070d;
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-screen-content {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  transition: transform 0.5s ease;
+}
+
+/* CRTRetro active overlays */
+.crt-active .tv-screen-content {
+  animation: crt-distortion 20s infinite alternate;
+  filter: contrast(1.05) brightness(1.05) saturate(0.95);
+}
+
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.35) 50%
+  );
+  background-size: 100% 3px;
+  opacity: 0.85;
+}
+
+.crt-phosphor {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: radial-gradient(circle, rgba(110, 86, 255, 0.05) 0%, transparent 80%);
+  animation: crt-flicker 0.15s infinite;
+  opacity: 0.6;
+}
+
+.crt-curvature {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  background: radial-gradient(
+    circle at 50% 50%, 
+    transparent 55%, 
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  box-shadow: inset 0 0 80px rgba(0, 224, 203, 0.08);
+}
+
+/* TV Bezel Console bar */
+.tv-frame-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #101222 0%, #07080f 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-low);
+  z-index: 12;
+}
+
+.tv-badge {
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  color: var(--accent-1);
+}
+
+.tv-lights {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tv-light-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.tv-light-dot.green {
+  color: var(--accent-2);
+  background-color: var(--accent-2);
+}
+
+.tv-light-dot.blue {
+  color: var(--accent-1);
+  background-color: var(--accent-1);
+}
+
+.tv-light-dot.blinking {
+  animation: light-pulse 1.5s infinite alternate;
+}
+
+.crt-toggle-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all var(--dur-fast) ease;
+}
+
+.crt-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-1);
+  color: var(--text-hi);
+}
+
+/* Toggle Panel Styles */
+.toggle-panel-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  pointer-events: auto;
+}
+
+.toggle-panel-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-hi);
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out-soft);
+  
+  background: linear-gradient(135deg, rgba(10, 12, 22, 0.85) 0%, rgba(6, 7, 13, 0.9) 100%);
+  border: 1px solid rgba(110, 86, 255, 0.3);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.5), 
+    0 0 15px rgba(110, 86, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.toggle-panel-btn:hover {
+  transform: scale(1.03);
+  border-color: var(--accent-2);
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.6), 
+    0 0 25px rgba(0, 224, 203, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.toggle-dot.green {
+  color: var(--accent-2);
+  background-color: var(--accent-2);
+}
+
+.toggle-dot.orange {
+  color: var(--accent-warm);
+  background-color: var(--accent-warm);
+}
+
+.toggle-dot.blinking {
+  animation: light-pulse 1s infinite alternate;
+}
+
+.toggle-arrow {
+  font-size: 8px;
+  margin-left: 4px;
+}
+
+/* Animations */
+@keyframes crt-flicker {
+  0% { opacity: 0.98; }
+  50% { opacity: 1; }
+  100% { opacity: 0.99; }
+}
+
+@keyframes light-pulse {
+  0% { opacity: 0.3; filter: brightness(0.6); }
+  100% { opacity: 1; filter: brightness(1.2); }
+}
+
+@keyframes crt-distortion {
+  0% { transform: scale(1) translate(0, 0); }
+  55% { transform: scale(1.001) translate(0.2px, 0.2px); }
+  100% { transform: scale(0.999) translate(-0.2px, -0.2px); }
+}
+
+/* App-mode and Brochure-mode body locks */
+body.app-mode-active {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+body.app-mode-active header {
+  display: none !important;
+}
+
+body.brochure-mode-active {
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+
+
+/* On the homepage, hide the old floating pill header entirely —
+   the TV console tabs (now fixed/docked) serve as the sticky nav */
+body.brochure-mode-active header {
+  display: none !important;
+}
+
+/* Hide scrollbars for clean mockup layout */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom scrollbar for Jimbo chat card */
+.jimbo-chat-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.jimbo-chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.jimbo-chat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+.jimbo-chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.jimbo-chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+/* WhatsApp Chat custom scrollbar */
+.whatsapp-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.whatsapp-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.whatsapp-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+.whatsapp-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.whatsapp-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* ============================================================
+   TV Frame Console Navigation Extension
+   ============================================================ */
+
+.tv-frame-outer {
+  position: relative; /* Make sure positioning is relative for console extension */
+}
+
+.tv-console-tabs-container {
+  position: absolute;
+  top: 0;
+  left: 28px;
+  height: 48px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 60;
+  transition:
+    top 0.55s var(--ease-out-soft),
+    left 0.55s var(--ease-out-soft),
+    height 0.55s var(--ease-out-soft),
+    gap 0.55s var(--ease-out-soft);
+}
+
+.tv-console-tab {
+  height: 44px;
+  padding: 0 3px;
+  background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
+  border-top: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    height 0.55s var(--ease-out-soft),
+    border-radius 0.55s var(--ease-out-soft),
+    background 0.55s var(--ease-out-soft),
+    box-shadow 0.55s var(--ease-out-soft),
+    backdrop-filter 0.55s var(--ease-out-soft),
+    border-color 0.55s var(--ease-out-soft),
+    transform 0.3s var(--ease-out-soft),
+    color 0.3s var(--ease-out-soft);
+  color: var(--text-mid);
+  cursor: pointer;
+  position: relative;
+  opacity: 0.85;
+}
+
+.tv-console-tab.active {
+  height: 48px;
+  opacity: 1;
+  background: linear-gradient(180deg, #14172e 0%, #101222 100%);
+  border-top-color: rgba(0, 224, 203, 0.45);
+  border-left-color: rgba(0, 224, 203, 0.2);
+  border-right-color: rgba(0, 224, 203, 0.2);
+  border-bottom-color: rgba(0, 224, 203, 0.45);
+  color: var(--text-hi);
+  box-shadow: 
+    0 12px 30px rgba(0, 224, 203, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+  z-index: 10;
+}
+
+.tv-console-tab:hover {
+  opacity: 1;
+  color: var(--text-hi);
+  border-color: rgba(110, 86, 255, 0.35);
+  transform: translateY(2px);
+}
+
+.tv-console-tab.active:hover {
+  transform: none;
+}
+
+.tv-console-logo-panel {
+  display: none;
+}
+
+.tv-console-nav-panel {
+  position: absolute;
+  top: 0;
+  right: 90px;
+  height: 48px;
+  padding: 0 16px;
+  background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
+  border-top: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 60;
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    top 0.55s var(--ease-out-soft),
+    left 0.55s var(--ease-out-soft),
+    right 0.55s var(--ease-out-soft),
+    border-radius 0.55s var(--ease-out-soft),
+    background 0.55s var(--ease-out-soft),
+    box-shadow 0.55s var(--ease-out-soft),
+    backdrop-filter 0.55s var(--ease-out-soft),
+    border-color 0.55s var(--ease-out-soft);
+}
+
+.tv-console-user-panel {
+  position: absolute;
+  top: 0;
+  right: 28px;
+  height: 48px;
+  width: 52px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
+  border-top: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(0, 224, 203, 0.26);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 61;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.6),
+    0 6px 18px rgba(0, 224, 203, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    top 0.55s var(--ease-out-soft),
+    right 0.55s var(--ease-out-soft),
+    border-radius 0.55s var(--ease-out-soft),
+    background 0.55s var(--ease-out-soft),
+    box-shadow 0.55s var(--ease-out-soft),
+    backdrop-filter 0.55s var(--ease-out-soft),
+    border-color 0.55s var(--ease-out-soft);
+}
+
+.tv-console-account-btn {
+  color: var(--accent-2);
+}
+
+.tv-console-account-btn:hover {
+  border-color: var(--accent-2);
+  box-shadow:
+    0 0 16px rgba(0, 224, 203, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Docked state — peels off and attaches to viewport top */
+.tv-console-nav-panel.console-docked {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: auto;
+  /* Flat top (against the ceiling), curved bottom corners */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 0;
+  border-top: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(
+    180deg,
+    rgba(16, 18, 34, 0.95) 0%,
+    rgba(10, 11, 20, 0.98) 100%
+  );
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(110, 86, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.tv-console-user-panel.console-docked {
+  position: fixed;
+  top: 0;
+  right: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 0;
+  border-top: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(
+    180deg,
+    rgba(16, 18, 34, 0.95) 0%,
+    rgba(10, 11, 20, 0.98) 100%
+  );
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(0, 224, 203, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Seamless blend bar */
+.tv-console-nav-blend {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #101222;
+  z-index: 10;
+  transition: opacity 0.4s var(--ease-out-soft);
+}
+
+/* Hide the blend bar when docked — no longer needed */
+.console-docked .tv-console-nav-blend {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tv-console-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out-soft);
+}
+
+.tv-console-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-1);
+  color: var(--text-hi);
+  box-shadow: 
+    0 0 14px rgba(110, 86, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.tv-console-btn.active {
+  color: var(--accent-2);
+}
+
+.tv-console-btn .settings-icon {
+  transition: transform 0.5s var(--ease-out-soft);
+}
+
+.tv-console-btn:hover .settings-icon {
+  transform: rotate(45deg);
+}
+
+/* ============================================================
+   TV Frame — Sticky top bar (detaches from TV on scroll)
+   ============================================================ */
+
+/**
+ * The sticky bar sits permanently at top:0, fixed, off-screen by default
+ * (translateY(-100%)). When .tv-sticky-bar--visible is added (on scroll),
+ * it slides down into view with a spring-like ease.
+ *
+ * Shape: flat on top (hugs the viewport edge), rounded on the bottom.
+ * Background: deep TV-frame glass matching the console tab aesthetic.
+ */
+.tv-sticky-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  /* Flat top, rounded bottom — attached to viewport edge */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+
+  /* TV frame glass recipe */
+  background: linear-gradient(180deg, #101222 0%, #0d0f1a 90%, rgba(13, 15, 26, 0.95) 100%);
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: none;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    0 8px 32px -4px rgba(0, 0, 0, 0.7),
+    0 0 0 0 rgba(110, 86, 255, 0),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 0 40px -12px rgba(110, 86, 255, 0.25);
+
+  /* Hidden state — slid fully above the viewport */
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Visible state — slides down flush to top */
+.tv-sticky-bar--visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+  box-shadow:
+    0 12px 40px -4px rgba(0, 0, 0, 0.8),
+    0 0 60px -16px rgba(110, 86, 255, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Thin violet accent line along the bottom edge */
+.tv-sticky-bar--visible::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(110, 86, 255, 0.5) 30%,
+    rgba(0, 224, 203, 0.4) 70%,
+    transparent 100%
+  );
+  border-radius: 0 0 16px 16px;
+  pointer-events: none;
+}
+
+.tv-sticky-bar__logo {
+  display: flex;
+  align-items: center;
+}
+
+.tv-sticky-bar__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tv-sticky-bar__account {
+  flex-shrink: 0;
+  color: var(--accent-2);
+}
+
+/* When the TV console panels are docked, fade them out
+   so only the sticky bar is visible — no double-up */
+.console-docked {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tv-console-logo-panel:not(.console-docked),
+.tv-console-nav-panel:not(.console-docked),
+.tv-console-user-panel:not(.console-docked) {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* Tooltip container */
+.tv-console-btn .tooltip {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  background: rgba(6, 7, 13, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-hi);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s var(--ease-out-soft);
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.tv-console-btn:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 760px) {
+  .tv-console-tabs-container {
+    left: 12px;
+    gap: 6px;
+  }
+
+  .tv-console-tab {
+    padding: 0 3px;
+  }
+
+  .tv-console-nav-panel {
+    right: 66px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .tv-console-user-panel {
+    right: 12px;
+    width: 44px;
+    padding: 0 6px;
+  }
+
+  .tv-console-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .tv-sticky-bar {
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .tv-sticky-bar__logo {
+    min-width: 0;
+  }
+
+  .tv-sticky-bar__logo span {
+    display: none;
+  }
+
+  .tv-sticky-bar__nav {
+    gap: 5px;
+  }
+}
+
+/* ============================================================
+   CRT Glitch & Cathode Collapse Styles
+   ============================================================ */
+
+.crt-glitch-static {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  background-size: 100% 6px;
+  animation: static-flicker 0.12s infinite;
+  opacity: 0.85;
+}
+
+.crt-glitch-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  animation: glitch-line-move 0.22s linear infinite;
+}
+
+@keyframes static-flicker {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 12px; }
+}
+
+@keyframes glitch-line-move {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes crt-power-off {
+  0% {
+    transform: scaleY(1) scaleX(1);
+    filter: brightness(1) contrast(1);
+  }
+  60% {
+    transform: scaleY(0.015) scaleX(1.05);
+    filter: brightness(4) contrast(1.5);
+  }
+  100% {
+    transform: scaleY(0.001) scaleX(0.001);
+    filter: brightness(15) contrast(3);
+    background: white;
+  }
+}
+
+@keyframes crt-power-on {
+  0% {
+    transform: scale(0.92) translate3d(0, 0, 0);
+    filter: brightness(0);
+  }
+  50% {
+    transform: scale(1.04) translate3d(0, 0, 0);
+    filter: brightness(2.5);
+  }
+  75% {
+    transform: scale(0.98) translate3d(0, 0, 0);
+    filter: brightness(0.8);
+  }
+  100% {
+    transform: scale(1) translate3d(0, 0, 0);
+    filter: brightness(1);
+  }
+}
+
+.crt-collapse {
+  animation: crt-power-off 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.crt-power-on {
+  animation: crt-power-on 0.22s var(--ease-out-soft) forwards;
+}
+
+/* ============================================================
+   Neumorphic Light Theme (White Theme) Overrides
+   ============================================================ */
+
+html[data-theme="light"] {
+  /* Soft grey-blue neumorphic background */
+  --ink-0: #EEF2F6;
+  --ink-1: #EEF2F6;
+  --ink-edge: #D6DEE7;
+
+  /* Accent Colors (high readability & neon vibrance on white surfaces) */
+  --accent-1: #4F35FF; /* Royal Indigo */
+  --accent-2: #009E8F; /* Deep Forest Teal */
+  --accent-3: #DB2777; /* Deep Hot Pink */
+  --accent-warm: #D97706; /* Amber Honey */
+
+  /* Text Colors (extreme high contrast charcoal palette) */
+  --text-hi: #121420;
+  --text-mid: #3B3F56;
+  --text-low: #656984;
+  --text-faint: #9198AD;
+
+  /* Glass Border overwrites */
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.16);
+
+  /* Neumorphic shadow tokens */
+  --nm-raised-soft: 5px 5px 10px #cbd5e1, -5px -5px 10px #ffffff;
+  --nm-raised-medium: 8px 8px 16px #cbd5e1, -8px -8px 16px #ffffff;
+  --nm-raised-large: 12px 12px 24px #b8c4d9, -12px -12px 24px #ffffff;
+  --nm-sunken-soft: inset 3px 3px 6px #cbd5e1, inset -3px -3px 6px #ffffff;
+  --nm-sunken-medium: inset 5px 5px 10px #cbd5e1, inset -5px -5px 10px #ffffff;
+  --nm-sunken-deep: inset 8px 8px 16px #b8c4d9, inset -8px -8px 16px #ffffff;
+}
+
+html[data-theme="light"] body {
+  background: var(--ink-0);
+  color: var(--text-hi);
+}
+
+/* 1. Neumorphic Glass Surfaces */
+html[data-theme="light"] .glass-light {
+  background: #EEF2F6 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
+    var(--nm-raised-soft) !important;
+}
+
+html[data-theme="light"] .glass-medium {
+  background: #EEF2F6 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
+    var(--nm-raised-medium) !important;
+}
+
+html[data-theme="light"] .glass-heavy {
+  background: #EEF2F6 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
+    var(--nm-raised-large) !important;
+}
+
+html[data-theme="light"] .glass-primary {
+  background: linear-gradient(135deg, #F0F4F9 0%, #E2EAF4 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(79, 53, 255, 0.15) !important;
+  box-shadow: 
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
+    4px 4px 12px rgba(79, 53, 255, 0.06),
+    -4px -4px 12px #ffffff !important;
+}
+
+/* 2. Global Navigation overrides */
+html[data-theme="light"] .nav-pill-scroll {
+  background: #EEF2F6 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
+    4px 4px 12px #cbd5e1,
+    -4px -4px 12px #ffffff !important;
+}
+
+html[data-theme="light"] .tv-sticky-bar {
+  background: #EEF2F6 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    0 8px 24px rgba(163, 177, 198, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 3. TV Frame console design */
+html[data-theme="light"] .tv-frame-outer {
+  background: linear-gradient(135deg, #F5F7FA 0%, #E6ECF4 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 1) !important;
+  box-shadow: 
+    inset 1px 1px 0 rgba(255, 255, 255, 1),
+    10px 10px 30px #cbd5e1, 
+    -10px -10px 30px #ffffff,
+    0 0 40px rgba(79, 53, 255, 0.05) !important;
+}
+
+html[data-theme="light"] .tv-frame-bezel {
+  background: #EEF2F6 !important;
+  border: 4px solid #E6ECF4 !important;
+  border-radius: 0 !important;
+  box-shadow: 
+    inset 6px 6px 12px #cbd5e1, 
+    inset -6px -6px 12px #ffffff !important;
+}
+
+html[data-theme="light"] .tv-screen-glass {
+  background: #EEF2F6 !important;
+}
+
+html[data-theme="light"] .tv-frame-controls {
+  background: linear-gradient(180deg, #F5F7FA 0%, #E6ECF4 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 1) !important;
+}
+
+html[data-theme="light"] .tv-console-logo-panel,
+html[data-theme="light"] .tv-console-nav-panel,
+html[data-theme="light"] .tv-console-user-panel,
+html[data-theme="light"] .tv-console-tab.active {
+  background: linear-gradient(180deg, #F5F7FA 0%, #EEF2F6 100%) !important;
+  border-top: none !important;
+  border-left: 1px solid rgba(255, 255, 255, 1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 1) !important;
+  box-shadow: 
+    0 8px 16px rgba(163, 177, 198, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 1) !important;
+  color: var(--text-hi) !important;
+}
+
+html[data-theme="light"] .tv-console-tab:not(.active) {
+  background: linear-gradient(180deg, #E2E8F0 0%, #cbd5e1 100%) !important;
+  border-top: none !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 
+    0 4px 8px rgba(163, 177, 198, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.8) !important;
+  color: var(--text-mid) !important;
+}
+
+html[data-theme="light"] .tv-console-tab:hover {
+  background: linear-gradient(180deg, #ECF0F5 0%, #E2E8F0 100%) !important;
+  color: var(--text-hi) !important;
+}
+
+html[data-theme="light"] .tv-console-tab.active:hover {
+  background: linear-gradient(180deg, #F5F7FA 0%, #EEF2F6 100%) !important;
+}
+
+html[data-theme="light"] .tv-console-logo-panel.console-docked,
+html[data-theme="light"] .tv-console-nav-panel.console-docked,
+html[data-theme="light"] .tv-console-user-panel.console-docked {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: rgba(238, 242, 246, 0.95) !important;
+  box-shadow:
+    0 4px 20px rgba(163, 177, 198, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-theme="light"] .tv-console-btn {
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  background: #EEF2F6 !important;
+  color: var(--text-mid) !important;
+  box-shadow: 
+    3px 3px 6px #cbd5e1, 
+    -3px -3px 6px #ffffff !important;
+}
+
+html[data-theme="light"] .tv-console-btn:hover {
+  background: #F3F6FA !important;
+  border-color: var(--accent-1) !important;
+  color: var(--accent-1) !important;
+  box-shadow: 
+    1px 1px 3px #cbd5e1, 
+    -1px -1px 3px #ffffff,
+    0 0 10px rgba(79, 53, 255, 0.15) !important;
+}
+
+html[data-theme="light"] .tv-console-btn.active {
+  box-shadow: 
+    inset 2px 2px 5px #cbd5e1, 
+    inset -2px -2px 5px #ffffff !important;
+  background: #E2E8F0 !important;
+  color: var(--accent-1) !important;
+}
+
+/* 4. Background enhancements */
+html[data-theme="light"] .fixed.inset-0.z-0 {
+  background: #EEF2F6 !important;
+}
+
+/* Subdue colored mesh gradients */
+html[data-theme="light"] .fixed.inset-0.z-0 > div:first-child {
+  opacity: 0.15 !important;
+}
+
+/* Light overlay scan lines */
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(2) {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.012) 1px, transparent 1px), 
+    linear-gradient(90deg, rgba(0, 0, 0, 0.012) 1px, transparent 1px) !important;
+}
+
+/* Soft white cones */
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(3),
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(4),
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(5),
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(6) {
+  opacity: 0.10 !important;
+}
+
+/* Subdue vignette */
+html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(7) {
+  background: radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(238, 242, 246, 0.4) 100%) !important;
+}
+
+/* Convert stars to elegant soft twilight dots */
+html[data-theme="light"] .fixed.inset-0.z-0 > div:last-child > div {
+  background: var(--text-faint) !important;
+  opacity: 0.20 !important;
+}
+
+/* 5. Custom cursor adaptation */
+html[data-theme="light"] .cursor-arrow-svg,
+html[data-theme="light"] .cursor-crosshair-svg,
+html[data-theme="light"] .cursor-dot-svg {
+  filter: drop-shadow(0 0 3px var(--accent-1)) drop-shadow(0 0 5px rgba(79, 53, 255, 0.3)) !important;
+}
+
+/* 6. Settings shells and generic cards updates */
+html[data-theme="light"] .rounded-xl.border.border-white\/5 {
+  background: #EEF2F6 !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+html[data-theme="light"] .rounded-2xl.border.border-white\/10 {
+  background: #EEF2F6 !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] textarea,
+html[data-theme="light"] select {
+  background: #EEF2F6 !important;
+  color: var(--text-hi) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+html[data-theme="light"] input[type="text"]:focus,
+html[data-theme="light"] textarea:focus {
+  outline: none;
+  border-color: var(--accent-1) !important;
+  box-shadow: var(--nm-sunken-medium), 0 0 8px rgba(79, 53, 255, 0.1) !important;
+}
+
+/* 7. Divider replacements */
+html[data-theme="light"] .bg-white\/\[0\.10\],
+html[data-theme="light"] .border-white\/\[0\.06\],
+html[data-theme="light"] .border-white\/5,
+html[data-theme="light"] .border-white\/10,
+html[data-theme="light"] .border-b.border-white\/5,
+html[data-theme="light"] .border-t.border-white\/\[0\.04\],
+html[data-theme="light"] .border-b.border-white\/\[0\.04\],
+html[data-theme="light"] .border-r.border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-theme="light"] .text-text-low {
+  color: var(--text-low) !important;
+}
+
+html[data-theme="light"] .text-text-mid {
+  color: var(--text-mid) !important;
+}
+
+html[data-theme="light"] .text-text-hi {
+  color: var(--text-hi) !important;
+}
+
+html[data-theme="light"] .text-text-faint {
+  color: var(--text-faint) !important;
+}
+
+/* 8. Showcase adjustments & card refinements */
+html[data-theme="light"] #showcase .glass-light {
+  box-shadow: var(--nm-raised-soft) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* YantraCore technologies grid items */
+html[data-theme="light"] .group\/tech {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .group\/tech:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+html[data-theme="light"] .group\/tech > div:first-child {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Equalizer panels */
+html[data-theme="light"] .group\/equalizer {
+  background-color: #EEF2F6 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+html[data-theme="light"] .group\/equalizer > div:nth-child(2) {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Restroverse search bar */
+html[data-theme="light"] #showcase .my-1 > div:first-child {
+  background-color: #EEF2F6 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+/* Restroverse Swiper details box & badges */
+html[data-theme="light"] #showcase .swiper-slide .bg-black\/35 {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-hi) !important;
+}
+
+/* Shramdaan slider dots indicators */
+html[data-theme="light"] #showcase .bg-white\/30 {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+html[data-theme="light"] #showcase .bg-white\/30:hover {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
