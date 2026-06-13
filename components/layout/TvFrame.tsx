@@ -171,7 +171,7 @@ export function TvFrame({ children }: TvFrameProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen p-[5.6px] pt-[39.2px] pb-[8.4px] md:p-[11.2px] md:pt-[44.8px] md:pb-[11.2px] flex flex-col justify-center"
+      className="relative w-full h-screen p-[5.6px] pt-[53.6px] pb-[8.4px] md:p-[11.2px] md:pt-[59.2px] md:pb-[11.2px] flex flex-col justify-center"
       style={{
         boxShadow: "none",
       }}
