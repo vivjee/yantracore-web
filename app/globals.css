@@ -938,7 +938,7 @@ body:has([data-layout="auth"]) > header {
 .tv-frame-outer {
   width: 100%;
   height: 100%;
-  padding: 12px;
+  padding: 56px 12px 12px;
   background: linear-gradient(135deg, #101222 0%, #0a0b14 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
@@ -1251,7 +1251,7 @@ body.brochure-mode-active header {
 
 .tv-console-tabs-container {
   position: absolute;
-  top: 0;
+  top: 8px;
   left: 28px;
   height: 48px;
   display: flex;
@@ -1330,7 +1330,7 @@ body.brochure-mode-active header {
 
 .tv-console-nav-panel {
   position: absolute;
-  top: 0;
+  top: 8px;
   right: 90px;
   height: 48px;
   padding: 0 16px;
@@ -1363,7 +1363,7 @@ body.brochure-mode-active header {
 
 .tv-console-user-panel {
   position: absolute;
-  top: 0;
+  top: 8px;
   right: 28px;
   height: 48px;
   width: 52px;
