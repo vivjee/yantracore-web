@@ -173,6 +173,20 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
         <OrbitalCards />
       </div>
 
+      <motion.div
+        className="showcase-copy-stack pointer-events-none absolute inset-x-0 z-[10] hidden w-full md:flex"
+        style={{
+          top: inTv
+            ? "calc(50% + clamp(8rem, 14vh, 12rem))"
+            : "calc(50% + clamp(9rem, 16vh, 14rem))",
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
+      >
+        <BrandCopy isMobile={isMobile} />
+      </motion.div>
+
       {/* ── Foreground text (above everything) ── */}
       <div
         className={`relative z-[10] flex flex-col pointer-events-none ${
@@ -233,30 +247,12 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
 
         {/* Brand copy below the center logo */}
         <motion.div
-          className="showcase-copy-stack flex flex-col items-center gap-1.5 md:gap-2.5 text-center px-4"
+          className="showcase-copy-stack flex md:hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
         >
-          <h2
-            className="yantra-electric-title font-bold"
-            style={{ fontSize: isMobile ? "2rem" : "clamp(2.25rem, 5vw, 4.25rem)" }}
-          >
-            YantraCore
-          </h2>
-          <p
-            className="font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.24em] max-w-[320px] md:max-w-none leading-relaxed"
-            style={{ color: "var(--text-mid)" }}
-          >
-            Software for People, Businesses & Society
-          </p>
-          <p
-            className="text-xs md:text-sm max-w-[300px] md:max-w-xl leading-relaxed"
-            style={{ color: "var(--text-low)" }}
-          >
-            We turn bold ideas into useful apps -
-            <br />fast, elegant, intelligent, and built to serve the real world.
-          </p>
+          <BrandCopy isMobile={isMobile} />
         </motion.div>
       </div>
     </section>
@@ -267,6 +263,32 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
    LogoCentered — renders LogoMark within a positioned wrapper that
    makes its internal "left-1/2 top-[34%]" hit absolute centre.
    ───────────────────────────────────────────────────────────────── */
+function BrandCopy({ isMobile }: { isMobile: boolean }) {
+  return (
+    <div className="flex w-full flex-col items-center gap-1.5 px-4 text-center md:gap-2.5">
+      <h2
+        className="yantra-electric-title font-bold"
+        style={{ fontSize: isMobile ? "2rem" : "clamp(2.25rem, 5vw, 4.25rem)" }}
+      >
+        YantraCore
+      </h2>
+      <p
+        className="max-w-[320px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] md:max-w-none md:text-xs md:tracking-[0.24em]"
+        style={{ color: "var(--text-mid)" }}
+      >
+        Software for People, Businesses & Society
+      </p>
+      <p
+        className="max-w-[300px] text-xs leading-relaxed md:max-w-xl md:text-sm"
+        style={{ color: "var(--text-low)" }}
+      >
+        We turn bold ideas into useful apps -
+        <br />fast, elegant, intelligent, and built to serve the real world.
+      </p>
+    </div>
+  );
+}
+
 function LogoCentered() {
   return (
     /*
