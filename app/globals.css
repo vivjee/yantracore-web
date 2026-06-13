@@ -938,7 +938,7 @@ body:has([data-layout="auth"]) > header {
 .tv-frame-outer {
   width: 100%;
   height: 100%;
-  padding: 56px 12px 12px;
+  padding: 12px;
   background: linear-gradient(135deg, #101222 0%, #0a0b14 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
@@ -1251,11 +1251,11 @@ body.brochure-mode-active header {
 
 .tv-console-tabs-container {
   position: absolute;
-  top: 8px;
+  top: -48px;
   left: 28px;
   height: 48px;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 10px;
   z-index: 60;
   transition:
@@ -1269,20 +1269,18 @@ body.brochure-mode-active header {
   height: 44px;
   padding: 0 3px;
   background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
-  border-top: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 
-    0 12px 30px rgba(0, 0, 0, 0.6),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+    0 -12px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition:
     height 0.55s var(--ease-out-soft),
     border-radius 0.55s var(--ease-out-soft),
@@ -1305,11 +1303,10 @@ body.brochure-mode-active header {
   border-top-color: rgba(0, 224, 203, 0.45);
   border-left-color: rgba(0, 224, 203, 0.2);
   border-right-color: rgba(0, 224, 203, 0.2);
-  border-bottom-color: rgba(0, 224, 203, 0.45);
   color: var(--text-hi);
   box-shadow: 
-    0 12px 30px rgba(0, 224, 203, 0.25),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+    0 -12px 30px rgba(0, 224, 203, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
   z-index: 10;
 }
 
@@ -1317,7 +1314,7 @@ body.brochure-mode-active header {
   opacity: 1;
   color: var(--text-hi);
   border-color: rgba(110, 86, 255, 0.35);
-  transform: translateY(2px);
+  transform: translateY(-2px);
 }
 
 .tv-console-tab.active:hover {
@@ -1330,26 +1327,24 @@ body.brochure-mode-active header {
 
 .tv-console-nav-panel {
   position: absolute;
-  top: 8px;
+  top: -48px;
   right: 90px;
   height: 48px;
   padding: 0 16px;
   background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
-  border-top: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   z-index: 60;
   box-shadow: 
-    0 12px 30px rgba(0, 0, 0, 0.6),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+    0 -12px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition:
     top 0.55s var(--ease-out-soft),
     left 0.55s var(--ease-out-soft),
@@ -1363,28 +1358,26 @@ body.brochure-mode-active header {
 
 .tv-console-user-panel {
   position: absolute;
-  top: 8px;
+  top: -48px;
   right: 28px;
   height: 48px;
   width: 52px;
   padding: 0 10px;
   background: linear-gradient(180deg, #101222 0%, #0d0f1a 100%);
-  border-top: none;
+  border-top: 1px solid rgba(0, 224, 203, 0.26);
   border-left: 1px solid rgba(255, 255, 255, 0.12);
   border-right: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(0, 224, 203, 0.26);
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 61;
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.6),
-    0 6px 18px rgba(0, 224, 203, 0.12),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+    0 -12px 30px rgba(0, 0, 0, 0.6),
+    0 -6px 18px rgba(0, 224, 203, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition:
     top 0.55s var(--ease-out-soft),
     right 0.55s var(--ease-out-soft),
@@ -1921,25 +1914,23 @@ html[data-theme="light"] .tv-console-nav-panel,
 html[data-theme="light"] .tv-console-user-panel,
 html[data-theme="light"] .tv-console-tab.active {
   background: linear-gradient(180deg, #F5F7FA 0%, #EEF2F6 100%) !important;
-  border-top: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 1) !important;
   border-left: 1px solid rgba(255, 255, 255, 1) !important;
   border-right: 1px solid rgba(255, 255, 255, 1) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 1) !important;
   box-shadow: 
-    0 8px 16px rgba(163, 177, 198, 0.25),
-    inset 0 -1px 0 rgba(255, 255, 255, 1) !important;
+    0 -8px 16px rgba(163, 177, 198, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   color: var(--text-hi) !important;
 }
 
 html[data-theme="light"] .tv-console-tab:not(.active) {
   background: linear-gradient(180deg, #E2E8F0 0%, #cbd5e1 100%) !important;
-  border-top: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.8) !important;
   border-left: 1px solid rgba(255, 255, 255, 0.8) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.8) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
   box-shadow: 
-    0 4px 8px rgba(163, 177, 198, 0.2),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.8) !important;
+    0 -4px 8px rgba(163, 177, 198, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
   color: var(--text-mid) !important;
 }
 

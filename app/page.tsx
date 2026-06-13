@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { Showcase } from "@/components/sections/01-arrival/Showcase";
 import { TvFrame } from "@/components/layout/TvFrame";
 import { SectionDivider } from "@/components/layout/SectionDivider";
@@ -43,6 +44,7 @@ export default function Home() {
 
   return (
     <>
+      <SiteBackground />
       <TvFrame>
         <Showcase inTv={true} />
       </TvFrame>
