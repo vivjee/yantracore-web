@@ -924,7 +924,7 @@ function CardJimbo() {
     : (stepIndex < CONVERSATION_FLOW.length ? CONVERSATION_FLOW[stepIndex].sender : null);
 
   return (
-    <div className="flex flex-col justify-between h-full w-full">
+    <div className="flex flex-col h-full w-full gap-2">
       {/* Header */}
       <ProjectCardHeader
         logoImg="/images/logo/jimbo_logo.png"
@@ -938,7 +938,7 @@ function CardJimbo() {
 
       {/* WhatsApp-style phone UI */}
       <div
-        className="rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_28px_-10px_rgba(0,0,0,0.6)]"
+        className="rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_28px_-10px_rgba(0,0,0,0.6)] flex flex-col flex-1 min-h-0"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
@@ -960,8 +960,8 @@ function CardJimbo() {
         </div>
         <div
           ref={chatContainerRef}
-          className="p-2 overflow-y-auto scroll-smooth jimbo-chat-scrollbar flex flex-col"
-          style={{ background: "linear-gradient(180deg, #0b141a 0%, #131c23 100%)", height: "90px" }}
+          className="p-2 overflow-y-auto scroll-smooth jimbo-chat-scrollbar flex flex-col flex-1 min-h-[130px]"
+          style={{ background: "linear-gradient(180deg, #0b141a 0%, #131c23 100%)" }}
         >
           <div className="space-y-1.5 flex flex-col mt-auto">
             {messages.map((msg, idx) => (
@@ -1014,7 +1014,7 @@ function CardJimbo() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-1 w-full pointer-events-auto">
+      <div className="flex gap-2 w-full pointer-events-auto">
         <button
           onClick={handleReset}
           className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
@@ -1175,7 +1175,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
   };
 
   return (
-    <div className="flex flex-col justify-between h-full w-full">
+    <div className="flex flex-col h-full w-full gap-2">
       <ProjectCardHeader
         logoImg="/images/logo/restroverse_logo.png"
         unicodeChar="✨"
@@ -1186,7 +1186,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
         isLive={true}
       />
 
-      <div className="flex flex-col gap-2 flex-1 justify-center my-1">
+      <div className="flex flex-col gap-2 flex-1 min-h-0">
         <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 shadow-inner">
           <Sparkles className="w-3 h-3 text-accent-2 flex-shrink-0 animate-pulse" />
           <p className="text-[10px] text-text-hi font-mono truncate flex-1 flex items-center gap-0.5">
@@ -1214,7 +1214,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
         </div>
 
         {/* Swiper Coverflow Carousel */}
-        <div className="w-full relative overflow-hidden select-none">
+        <div className="w-full relative overflow-hidden select-none flex-1 min-h-[145px]">
           <Swiper
             onSwiper={setSwiperRef}
             effect="coverflow"
@@ -1234,8 +1234,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
               slideShadows: false,
             }}
             modules={[EffectCoverflow, Autoplay]}
-            className="w-full"
-            style={{ height: "115px" }}
+            className="w-full h-full"
           >
             {hotelSlides.map((hotel, index) => (
               <SwiperSlide key={index} className="w-full flex justify-center">
@@ -1260,12 +1259,12 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
 
                   {/* Details Section with Thumbnail */}
                   <div className="flex gap-2 items-center mt-1 z-10">
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-white/10 shadow-md flex-shrink-0 bg-black/20">
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/10 shadow-md flex-shrink-0 bg-black/20">
                       <Image
                         src={hotel.image}
                         alt={hotel.name}
                         fill
-                        sizes="48px"
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>
@@ -1299,7 +1298,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-1 w-full pointer-events-auto">
+      <div className="flex gap-2 w-full pointer-events-auto">
         <button
           onClick={handleSearchTrigger}
           className="flex-1 py-1.5 rounded-lg text-[9px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
@@ -1387,7 +1386,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
   };
 
   return (
-    <div className="flex flex-col justify-between h-full w-full relative">
+    <div className="flex flex-col h-full w-full relative gap-2">
       <style>{`
         @keyframes floatHeart {
           0% {
@@ -1426,7 +1425,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
         isLive={true}
       />
 
-      <div className="flex flex-col gap-2 flex-1 justify-center my-1 relative overflow-hidden min-h-[146px] pointer-events-auto">
+      <div className="flex flex-col gap-2 flex-1 min-h-0 relative overflow-hidden pointer-events-auto">
         <Swiper
           onSwiper={setSwiperRef}
           effect="creative"
@@ -1450,8 +1449,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
           }}
           onSlideChange={(swiper) => setActiveIdx(swiper.realIndex)}
           modules={[EffectCreative, Autoplay]}
-          className="w-full"
-          style={{ height: "146px" }}
+          className="w-full h-full"
         >
           {SHRAMDAN_PROJECTS.map((project, index) => (
             <SwiperSlide key={project.id} className="w-full h-full">
@@ -1462,7 +1460,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
                   swiperRef?.slideToLoop(index, 1000);
                 }}
               >
-                <div className="relative rounded-xl overflow-hidden border border-white/10 h-22 bg-black/30">
+                <div className="relative rounded-xl overflow-hidden border border-white/10 flex-1 min-h-[118px] bg-black/30">
                   <Image
                     src={project.image}
                     alt={`${project.name} before and after`}
@@ -1523,7 +1521,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-1 w-full pointer-events-auto">
+      <div className="flex gap-2 w-full pointer-events-auto">
         <button
           onClick={handleLike}
           className="flex-1 py-1.5 rounded-lg text-[9.5px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi flex items-center justify-center gap-1"
@@ -1666,7 +1664,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
         isLive={true}
       />
 
-      <div className="flex-1 my-2 relative overflow-visible pointer-events-auto">
+      <div className="flex-1 my-2 relative overflow-visible pointer-events-auto min-h-0">
         <Swiper
           onSwiper={setSwiperRef}
           effect="cube"
@@ -1682,8 +1680,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           speed={1500}
           onSlideChange={(swiper) => setActiveSlide(swiper.realIndex)}
           modules={[EffectCube, Autoplay]}
-          className="w-full"
-          style={{ height: "175px" }}
+          className="w-full h-full"
         >
           {/* Slide 1: Technologies Grid */}
           <SwiperSlide className="w-full h-full flex items-center justify-center p-0.5 bg-transparent">
@@ -1870,7 +1867,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-1 w-full pointer-events-auto">
+      <div className="flex gap-2 w-full pointer-events-auto">
         <button
           onClick={handleLiveStats}
           className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
