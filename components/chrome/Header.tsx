@@ -321,14 +321,14 @@ function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
 
   // Container dimensions (aspect-ratio matched to logo 1.39 + padding)
   const containerClass = isLarge
-    ? "relative flex items-center justify-center pointer-events-auto h-14 md:h-16 w-[75px] md:w-[86px]"
-    : "relative flex items-center justify-center pointer-events-auto h-10 w-[53px]";
+    ? "relative flex items-center justify-center pointer-events-auto h-14 w-14 md:h-16 md:w-16"
+    : "relative flex items-center justify-center pointer-events-auto h-10 w-10";
 
   // Logo image dimensions inside the glass circle
   const logoHeight = "h-full";
   const logoWidth = "w-full";
 
-  const logoPadding = isLarge ? "p-0.5" : "p-[1px]";
+  const logoPadding = isLarge ? "p-1.5" : "p-1";
 
   // Breathing size for bloom blobs
   const bloomSize1 = isLarge ? 55 : 35;
@@ -344,7 +344,8 @@ function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
     "drop-shadow(0 0 8px rgba(0,224,203,0.75)) " +
     "drop-shadow(0 0 28px rgba(255,79,176,0.45))";
 
-  const logoSrc = themeMode === "light" ? "/images/logo/logo.svg" : "/images/logo/logo-white.svg";
+  const logoSrc = "/images/logo/logo-white-logo-only.svg";
+  const logoToneFilter = themeMode === "light" ? "brightness(0) saturate(100%)" : "none";
   const ghostOpacity = themeMode === "light" ? "opacity-10" : "opacity-22";
   const ghostBlendMode = themeMode === "light" ? "multiply" : "screen";
 
@@ -515,6 +516,7 @@ function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
             src={logoSrc}
             alt="YantraCore"
             className="w-full h-full object-contain relative z-10"
+            style={{ filter: logoToneFilter }}
           />
         </div>
       </div>

@@ -167,6 +167,11 @@ export function TvFrame({ children }: TvFrameProps) {
       : undefined;
   const accountHref = isUserAuthed ? "/dashboard" : "/login";
   const isAccountActive = pathname === "/login" || (isUserAuthed && pathname.startsWith("/dashboard"));
+  const logoOnlySrc = "/images/logo/logo-white-logo-only.svg";
+  const logoToneFilter =
+    themeMode === "light"
+      ? "brightness(0) saturate(100%)"
+      : "drop-shadow(0 0 8px rgba(110,86,255,0.6)) drop-shadow(0 0 3px rgba(0,224,203,0.4))";
 
   return (
     <section
@@ -193,9 +198,10 @@ export function TvFrame({ children }: TvFrameProps) {
             {!pathname.startsWith("/dashboard") && <div className="tv-console-nav-blend" />}
             <div className="flex items-center select-none">
               <img
-                src="/images/logo/logo-white.svg"
+                src={logoOnlySrc}
                 alt="YantraCore Logo"
                 className="w-10 h-10 object-contain"
+                style={{ filter: logoToneFilter }}
               />
             </div>
           </Link>
@@ -384,13 +390,10 @@ export function TvFrame({ children }: TvFrameProps) {
               onMouseEnter={() => isPowered && audioSynth.playHover()}
             >
               <img
-                src="/images/logo/logo-white.svg"
+                src={logoOnlySrc}
                 alt="YantraCore Logo"
                 className="w-8 h-8 object-contain"
-                style={{
-                  filter:
-                    "drop-shadow(0 0 8px rgba(110,86,255,0.6)) drop-shadow(0 0 3px rgba(0,224,203,0.4))",
-                }}
+                style={{ filter: logoToneFilter }}
               />
             </Link>
 
