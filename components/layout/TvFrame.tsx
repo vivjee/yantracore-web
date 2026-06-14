@@ -3,10 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Maximize2, Minimize2, RadioTower } from "lucide-react";
+import { Globe2, Maximize2, Minimize2 } from "lucide-react";
 import {
   TvConsoleIcon,
-  StatsWaveIcon,
   UserIcon,
   SynthMusicIcon,
   ChipSettingsIcon,
@@ -168,7 +167,6 @@ export function TvFrame({ children }: TvFrameProps) {
       : undefined;
   const accountHref = isUserAuthed ? "/dashboard" : "/login";
   const isAccountActive = pathname === "/login" || (isUserAuthed && pathname.startsWith("/dashboard"));
-  const isChannelsActive = pathname.startsWith("/channels");
   const logoOnlySrc = "/images/logo/logo-white-logo-only.svg";
   const logoToneFilter =
     themeMode === "light"
@@ -262,11 +260,11 @@ export function TvFrame({ children }: TvFrameProps) {
             <span className="tooltip">Showcase</span>
           </Link>
 
-          {/* Project TV channels */}
+          {/* Entryport Earth */}
           <Link
-            href="/channels/jimbo"
-            className={`tv-console-btn ${isChannelsActive ? "active" : ""}`}
-            aria-label="Project Channels"
+            href="/entryport"
+            className={`tv-console-btn ${pathname === "/entryport" ? "active" : ""}`}
+            aria-label="Entryport Earth"
             onMouseEnter={() => isPowered && audioSynth.playHover()}
             onClick={(e) => {
               if (!isPowered) e.preventDefault();
@@ -274,39 +272,17 @@ export function TvFrame({ children }: TvFrameProps) {
             }}
             style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
           >
-            {isPowered && isChannelsActive && (
+            {isPowered && pathname === "/entryport" && (
               <motion.span
                 layoutId="tvActivePill"
                 className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <RadioTower className="w-4 h-4 relative z-10" />
-            <span className="tooltip">Channels</span>
+            <Globe2 className="w-4 h-4 relative z-10" />
+            <span className="tooltip">Entryport Earth</span>
           </Link>
 
-          {/* Dedicated Live Stats page */}
-          <Link
-            href="/stats"
-            className={`tv-console-btn ${pathname === "/stats" ? "active" : ""}`}
-            aria-label="System Stats"
-            onMouseEnter={() => isPowered && audioSynth.playHover()}
-            onClick={(e) => {
-              if (!isPowered) e.preventDefault();
-              else audioSynth.playClick();
-            }}
-            style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
-          >
-            {isPowered && pathname === "/stats" && (
-              <motion.span
-                layoutId="tvActivePill"
-                className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
-                transition={{ type: "spring", stiffness: 350, damping: 20 }}
-              />
-            )}
-            <StatsWaveIcon className="w-4 h-4 relative z-10" />
-            <span className="tooltip">Live Stats</span>
-          </Link>
 
           {/* Ambient Music */}
           <Link
@@ -487,53 +463,7 @@ export function TvFrame({ children }: TvFrameProps) {
 
           {/* Nav buttons side */}
           <div className="tv-sticky-bar__nav">
-            {/* Stats */}
-            <Link
-              href="/stats"
-              className={`tv-console-btn ${pathname === "/stats" ? "active" : ""}`}
-              aria-label="System Stats"
-              tabIndex={isConsoleDocked ? 0 : -1}
-              onMouseEnter={() => isPowered && audioSynth.playHover()}
-              onClick={(e) => {
-                if (!isPowered) e.preventDefault();
-                else audioSynth.playClick();
-              }}
-              style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-            >
-              {isPowered && pathname === "/stats" && (
-                <motion.span
-                  layoutId="tvActivePillSticky"
-                  className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
-                  transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                />
-              )}
-              <StatsWaveIcon className="w-4 h-4 relative z-10" />
-              <span className="tooltip">Live Stats</span>
-            </Link>
 
-            {/* Channels */}
-            <Link
-              href="/channels/jimbo"
-              className={`tv-console-btn ${isChannelsActive ? "active" : ""}`}
-              aria-label="Project Channels"
-              tabIndex={isConsoleDocked ? 0 : -1}
-              onMouseEnter={() => isPowered && audioSynth.playHover()}
-              onClick={(e) => {
-                if (!isPowered) e.preventDefault();
-                else audioSynth.playClick();
-              }}
-              style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
-            >
-              {isPowered && isChannelsActive && (
-                <motion.span
-                  layoutId="tvActivePillSticky"
-                  className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
-                  transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                />
-              )}
-              <RadioTower className="w-4 h-4 relative z-10" />
-              <span className="tooltip">Channels</span>
-            </Link>
 
             {/* Music */}
             <Link
