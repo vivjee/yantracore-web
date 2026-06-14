@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, User, Settings, ChevronDown, Music, Sun, Moon, Sliders, Maximize2, Minimize2 } from "lucide-react";
+import { Maximize2, Minimize2, RadioTower } from "lucide-react";
+import {
+  TvConsoleIcon,
+  StatsWaveIcon,
+  UserIcon,
+  SynthMusicIcon,
+  ChipSettingsIcon,
+  ControlSlidersIcon,
+  SunCoreIcon,
+  MoonCrescentIcon,
+} from "@/components/chrome/NavIcons";
 import { motion } from "framer-motion";
 import { audioSynth } from "@/lib/audio";
 import { useTheme } from "@/lib/theme/ThemeProvider";
@@ -19,11 +29,12 @@ export function TvFrame({ children }: TvFrameProps) {
   const [isCollapsing, setIsCollapsing] = useState(false);
   const [isPoweringOn, setIsPoweringOn] = useState(false);
   const [isPowered, setIsPowered] = useState(true);
-  const [isConsoleDocked, setIsConsoleDocked] = useState(false);
-  const [isUserAuthed, setIsUserAuthed] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isFullscreenSupported, setIsFullscreenSupported] = useState(false);
+  const isConsoleDocked = false;
+  const showTvNavigation = false;
+  const isUserAuthed = false;
+  const isAdmin = false;
+  const isFullscreen = false;
+  const isFullscreenSupported = false;
 
   const pathname = usePathname();
   const isFirstMount = useRef(true);
@@ -31,52 +42,10 @@ export function TvFrame({ children }: TvFrameProps) {
 
   // Set the body class to app-mode-active on mount
   useEffect(() => {
-    if (pathname !== "/") {
-      document.body.classList.add("app-mode-active");
-      document.body.classList.remove("brochure-mode-active");
-    }
+    document.body.classList.add("app-mode-active");
+    document.body.classList.remove("brochure-mode-active");
     return () => {
-      if (pathname !== "/") {
-        document.body.classList.remove("app-mode-active");
-      }
-    };
-  }, [pathname]);
-
-  // Sync admin state on mount and path changes
-  useEffect(() => {
-    const isAuthed = sessionStorage.getItem("ym_authed");
-    const role = sessionStorage.getItem("ym_role");
-    setIsUserAuthed(isAuthed === "1");
-    setIsAdmin(isAuthed === "1" && role === "admin");
-  }, [pathname]);
-
-  // Scroll listener — dock the console tabs when they reach top
-  const handleScroll = useCallback(() => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    // Dock when the TV section's top edge has scrolled above the viewport
-    // (i.e. rect.top < 0 means the section is scrolling out above)
-    setIsConsoleDocked(rect.top < 0);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // sync on mount
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  useEffect(() => {
-    setIsFullscreenSupported(Boolean(document.fullscreenEnabled));
-
-    const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
-
-    handleFullscreenChange();
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.body.classList.remove("app-mode-active");
     };
   }, []);
 
@@ -90,13 +59,18 @@ export function TvFrame({ children }: TvFrameProps) {
     
     // Play static channel change sound
     audioSynth.playStatic();
-    setIsGlitching(true);
+    const glitchStartTimer = setTimeout(() => {
+      setIsGlitching(true);
+    }, 0);
     
     const timer = setTimeout(() => {
       setIsGlitching(false);
     }, 220);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(glitchStartTimer);
+      clearTimeout(timer);
+    };
   }, [pathname, isPowered]);
 
   const handleCrtToggle = () => {
@@ -156,9 +130,7 @@ export function TvFrame({ children }: TvFrameProps) {
       } else {
         await document.documentElement.requestFullscreen();
       }
-    } catch {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    }
+    } catch {}
   };
 
   const fullscreenButtonStyle =
@@ -167,6 +139,7 @@ export function TvFrame({ children }: TvFrameProps) {
       : undefined;
   const accountHref = isUserAuthed ? "/dashboard" : "/login";
   const isAccountActive = pathname === "/login" || (isUserAuthed && pathname.startsWith("/dashboard"));
+  const isChannelsActive = pathname.startsWith("/channels");
   const logoOnlySrc = "/images/logo/logo-white-logo-only.svg";
   const logoToneFilter =
     themeMode === "light"
@@ -176,12 +149,14 @@ export function TvFrame({ children }: TvFrameProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen p-[5.6px] pt-[53.6px] pb-[8.4px] md:p-[11.2px] md:pt-[59.2px] md:pb-[11.2px] flex flex-col justify-center"
+      className="relative w-full h-screen p-[5.6px] pb-[8.4px] md:p-[11.2px] md:pb-[11.2px] flex flex-col justify-center"
       style={{
         boxShadow: "none",
       }}
     >
       <div className={`tv-frame-outer ${isCrtEnabled ? "crt-active" : ""}`}>
+        {showTvNavigation && (
+          <>
         {/* Top-Left Console Logo/Tabs Extension */}
         <div className={`tv-console-tabs-container${isConsoleDocked ? " console-docked" : ""}`}>
           <Link
@@ -223,7 +198,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 <span className={`absolute top-0 left-3 right-3 h-[2px] rounded-full transition-all duration-300 z-30 ${themeMode === "light" ? "bg-accent-1 shadow-[0_0_8px_var(--accent-1)]" : "bg-accent-2 shadow-[0_0_10px_var(--accent-2)]"}`} />
               )}
               <div className="flex items-center gap-2 select-none text-[10px] font-mono uppercase tracking-wider font-semibold relative z-20">
-                <Sliders className={`w-[18px] h-[18px] transition-all duration-300 ${pathname.startsWith("/dashboard") ? (themeMode === "light" ? "text-accent-1 scale-110 drop-shadow-[0_0_6px_rgba(110,86,255,0.4)]" : "text-accent-2 scale-110 drop-shadow-[0_0_8px_rgba(0,224,203,0.75)]") : "text-text-mid opacity-60"}`} />
+                <ControlSlidersIcon className={`w-[18px] h-[18px] transition-all duration-300 ${pathname.startsWith("/dashboard") ? (themeMode === "light" ? "text-accent-1 scale-110 drop-shadow-[0_0_6px_rgba(110,86,255,0.4)]" : "text-accent-2 scale-110 drop-shadow-[0_0_8px_rgba(0,224,203,0.75)]") : "text-text-mid opacity-60"}`} />
                 <span className={`w-1.5 h-1.5 rounded-full ${pathname.startsWith("/dashboard") ? (themeMode === "light" ? "bg-accent-1 animate-pulse" : "bg-accent-2 animate-pulse") : (themeMode === "light" ? "bg-black/20" : "bg-white/30")}`} />
                 <span className={pathname.startsWith("/dashboard") ? "text-text-hi font-bold" : "text-text-mid"}>Control Center</span>
               </div>
@@ -234,7 +209,53 @@ export function TvFrame({ children }: TvFrameProps) {
         {/* Top-Right Console Panel Extension */}
         <div className={`tv-console-nav-panel${isConsoleDocked ? " console-docked" : ""}`}>
           <div className="tv-console-nav-blend" />
-          
+
+          {/* Home / Showcase feed */}
+          <Link
+            href="/"
+            className={`tv-console-btn ${pathname === "/" ? "active" : ""}`}
+            aria-label="Showcase Feed"
+            onMouseEnter={() => isPowered && audioSynth.playHover()}
+            onClick={(e) => {
+              if (!isPowered) e.preventDefault();
+              else audioSynth.playClick();
+            }}
+            style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
+          >
+            {isPowered && pathname === "/" && (
+              <motion.span
+                layoutId="tvActivePill"
+                className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
+                transition={{ type: "spring", stiffness: 350, damping: 20 }}
+              />
+            )}
+            <TvConsoleIcon className="w-4 h-4 relative z-10" />
+            <span className="tooltip">Showcase</span>
+          </Link>
+
+          {/* Project TV channels */}
+          <Link
+            href="/channels/jimbo"
+            className={`tv-console-btn ${isChannelsActive ? "active" : ""}`}
+            aria-label="Project Channels"
+            onMouseEnter={() => isPowered && audioSynth.playHover()}
+            onClick={(e) => {
+              if (!isPowered) e.preventDefault();
+              else audioSynth.playClick();
+            }}
+            style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
+          >
+            {isPowered && isChannelsActive && (
+              <motion.span
+                layoutId="tvActivePill"
+                className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
+                transition={{ type: "spring", stiffness: 350, damping: 20 }}
+              />
+            )}
+            <RadioTower className="w-4 h-4 relative z-10" />
+            <span className="tooltip">Channels</span>
+          </Link>
+
           {/* Dedicated Live Stats page */}
           <Link
             href="/stats"
@@ -254,7 +275,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <Activity className="w-4 h-4 relative z-10" />
+            <StatsWaveIcon className="w-4 h-4 relative z-10" />
             <span className="tooltip">Live Stats</span>
           </Link>
 
@@ -277,7 +298,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <Music className="w-4 h-4 relative z-10" />
+            <SynthMusicIcon className="w-4 h-4 relative z-10" />
             <span className="tooltip">Music</span>
           </Link>
 
@@ -300,7 +321,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <Settings className="w-4 h-4 settings-icon relative z-10" />
+            <ChipSettingsIcon className="w-4 h-4 settings-icon relative z-10" />
             <span className="tooltip">Settings</span>
           </Link>
 
@@ -319,9 +340,9 @@ export function TvFrame({ children }: TvFrameProps) {
             style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
           >
             {themeMode === "dark" ? (
-              <Sun className="w-4 h-4 relative z-10" />
+              <SunCoreIcon className="w-4 h-4 relative z-10" />
             ) : (
-              <Moon className="w-4 h-4 relative z-10" />
+              <MoonCrescentIcon className="w-4 h-4 relative z-10" />
             )}
             <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"}</span>
           </button>
@@ -366,7 +387,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <User className="w-4 h-4 relative z-10" />
+            <UserIcon className="w-4 h-4 relative z-10" />
             <span className="tooltip">Account</span>
           </Link>
         </div>
@@ -417,7 +438,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 }}
                 onMouseEnter={() => isPowered && audioSynth.playHover()}
               >
-                <Sliders className={`w-[15px] h-[15px] transition-all duration-300 ${
+                <ControlSlidersIcon className={`w-[15px] h-[15px] transition-all duration-300 ${
                   pathname.startsWith("/dashboard")
                     ? (themeMode === "light"
                         ? "text-accent-1 drop-shadow-[0_0_4px_rgba(110,86,255,0.35)] scale-105"
@@ -456,8 +477,32 @@ export function TvFrame({ children }: TvFrameProps) {
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                 />
               )}
-              <Activity className="w-4 h-4 relative z-10" />
+              <StatsWaveIcon className="w-4 h-4 relative z-10" />
               <span className="tooltip">Live Stats</span>
+            </Link>
+
+            {/* Channels */}
+            <Link
+              href="/channels/jimbo"
+              className={`tv-console-btn ${isChannelsActive ? "active" : ""}`}
+              aria-label="Project Channels"
+              tabIndex={isConsoleDocked ? 0 : -1}
+              onMouseEnter={() => isPowered && audioSynth.playHover()}
+              onClick={(e) => {
+                if (!isPowered) e.preventDefault();
+                else audioSynth.playClick();
+              }}
+              style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+            >
+              {isPowered && isChannelsActive && (
+                <motion.span
+                  layoutId="tvActivePillSticky"
+                  className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none"
+                  transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                />
+              )}
+              <RadioTower className="w-4 h-4 relative z-10" />
+              <span className="tooltip">Channels</span>
             </Link>
 
             {/* Music */}
@@ -480,7 +525,7 @@ export function TvFrame({ children }: TvFrameProps) {
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                 />
               )}
-              <Music className="w-4 h-4 relative z-10" />
+              <SynthMusicIcon className="w-4 h-4 relative z-10" />
               <span className="tooltip">Music</span>
             </Link>
 
@@ -504,7 +549,7 @@ export function TvFrame({ children }: TvFrameProps) {
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                 />
               )}
-              <Settings className="w-4 h-4 settings-icon relative z-10" />
+              <ChipSettingsIcon className="w-4 h-4 settings-icon relative z-10" />
               <span className="tooltip">Settings</span>
             </Link>
 
@@ -524,9 +569,9 @@ export function TvFrame({ children }: TvFrameProps) {
               style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
             >
               {themeMode === "dark" ? (
-                <Sun className="w-4 h-4 relative z-10" />
+                <SunCoreIcon className="w-4 h-4 relative z-10" />
               ) : (
-                <Moon className="w-4 h-4 relative z-10" />
+                <MoonCrescentIcon className="w-4 h-4 relative z-10" />
               )}
               <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"}</span>
             </button>
@@ -570,10 +615,12 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <User className="w-4 h-4 relative z-10" />
+            <UserIcon className="w-4 h-4 relative z-10" />
             <span className="tooltip">Account</span>
           </Link>
         </div>
+          </>
+        )}
 
         <div className="tv-frame-bezel">
           <div className="tv-screen-glass">
@@ -615,22 +662,7 @@ export function TvFrame({ children }: TvFrameProps) {
               </div>
             </div>
 
-            {/* Scroll Down Button (Only on Homepage when Powered) */}
-            {pathname === "/" && isPowered && (
-              <button
-                onClick={() => {
-                  audioSynth.playClick();
-                  const target = document.getElementById("arrival");
-                  if (target) target.scrollIntoView({ behavior: "smooth" });
-                }}
-                onMouseEnter={() => audioSynth.playHover()}
-                className="tv-scroll-btn flex items-center gap-1.5 px-3 py-1 rounded bg-white/5 border border-white/10 hover:border-accent-2 hover:bg-white/10 text-[9px] font-mono tracking-wider uppercase text-text-hi transition-all duration-300 animate-pulse cursor-pointer z-20 pointer-events-auto"
-                title="Scroll Down to Brochure"
-              >
-                <ChevronDown className="w-3.5 h-3.5 text-accent-2 animate-bounce" />
-                <span>Scroll Down</span>
-              </button>
-            )}
+
 
             <div className="flex items-center gap-2">
               <button
