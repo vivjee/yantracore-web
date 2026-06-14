@@ -30,11 +30,12 @@ export function TvFrame({ children }: TvFrameProps) {
   const [isPoweringOn, setIsPoweringOn] = useState(false);
   const [isPowered, setIsPowered] = useState(true);
   const isConsoleDocked = false;
-  const showTvNavigation = false;
-  const isUserAuthed = false;
-  const isAdmin = false;
-  const isFullscreen = false;
-  const isFullscreenSupported = false;
+  const showTvNavigation = true;
+  const showTvStickyBar = false;
+  const [isUserAuthed, setIsUserAuthed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreenSupported, setIsFullscreenSupported] = useState(false);
 
   const pathname = usePathname();
   const isFirstMount = useRef(true);
@@ -46,6 +47,34 @@ export function TvFrame({ children }: TvFrameProps) {
     document.body.classList.remove("brochure-mode-active");
     return () => {
       document.body.classList.remove("app-mode-active");
+    };
+  }, []);
+  useEffect(() => {
+    const syncAuthTimer = setTimeout(() => {
+      const isAuthed = sessionStorage.getItem("ym_authed");
+      const role = sessionStorage.getItem("ym_role");
+      setIsUserAuthed(isAuthed === "1");
+      setIsAdmin(isAuthed === "1" && role === "admin");
+    }, 0);
+
+    return () => clearTimeout(syncAuthTimer);
+  }, [pathname]);
+
+  useEffect(() => {
+    const syncFullscreenTimer = setTimeout(() => {
+      setIsFullscreenSupported(Boolean(document.fullscreenEnabled));
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }, 0);
+
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      clearTimeout(syncFullscreenTimer);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
 
@@ -393,6 +422,7 @@ export function TvFrame({ children }: TvFrameProps) {
         </div>
 
         {/* ── Sticky top bar (detaches from TV → mounts to viewport top) ── */}
+        {showTvStickyBar && (
         <div
           className={`tv-sticky-bar ${isConsoleDocked ? "tv-sticky-bar--visible" : ""}`}
           aria-hidden={!isConsoleDocked}
@@ -619,6 +649,7 @@ export function TvFrame({ children }: TvFrameProps) {
             <span className="tooltip">Account</span>
           </Link>
         </div>
+        )}
           </>
         )}
 
