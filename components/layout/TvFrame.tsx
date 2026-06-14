@@ -17,7 +17,6 @@ import {
 import { motion } from "framer-motion";
 import { audioSynth } from "@/lib/audio";
 import { useTheme } from "@/lib/theme/ThemeProvider";
-import { AgentChatWidget } from "@/components/agent/AgentChatWidget";
 
 interface TvFrameProps {
   children: React.ReactNode;
@@ -683,7 +682,6 @@ export function TvFrame({ children }: TvFrameProps) {
             >
               {isPowered ? children : <div className="absolute inset-0 bg-[#020205]" />}
             </div>
-            <AgentChatWidget />
           </div>
 
           {/* Retro Bezel Console Bar */}
