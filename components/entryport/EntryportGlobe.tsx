@@ -402,45 +402,6 @@ export function EntryportGlobe() {
         </aside>
 
         <main className="order-1 xl:order-2 relative min-h-[420px] overflow-hidden rounded-[8px] border border-white/[0.08] bg-black/50">
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
-            <div className="absolute h-[min(62vw,62vh)] w-[min(62vw,62vh)] max-h-[560px] max-w-[560px] min-h-[260px] min-w-[260px] rounded-full border border-cyan-200/10 animate-[ring-spin-cw_48s_linear_infinite]" />
-            <div className="absolute h-[min(50vw,50vh)] w-[min(50vw,50vh)] max-h-[450px] max-w-[450px] min-h-[220px] min-w-[220px] rounded-full border border-dashed border-white/10 animate-[ring-spin-ccw_72s_linear_infinite]" />
-            <div
-              className="relative h-[min(38vw,46vh)] w-[min(38vw,46vh)] max-h-[390px] max-w-[390px] min-h-[210px] min-w-[210px] overflow-hidden rounded-full border border-cyan-200/20 bg-[#113d78] shadow-[0_0_70px_rgba(34,211,238,0.30),inset_-32px_-20px_46px_rgba(0,0,0,0.55),inset_20px_10px_34px_rgba(255,255,255,0.12)]"
-            >
-              <div
-                className="absolute inset-0 scale-110 opacity-95 animate-[ring-spin-cw_80s_linear_infinite]"
-                style={{
-                  backgroundImage: "url('/images/entryport/earth-atmos-2048.jpg')",
-                  backgroundSize: "205% 100%",
-                  backgroundPosition: focusNepal ? "57% center" : "center",
-                }}
-              />
-              <div
-                className="absolute inset-[-2%] opacity-45 mix-blend-screen animate-[ring-spin-cw_95s_linear_infinite]"
-                style={{
-                  backgroundImage: "url('/images/entryport/earth-clouds-1024.png')",
-                  backgroundSize: "190% 100%",
-                  backgroundPosition: "center",
-                }}
-              />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_32%_28%,rgba(255,255,255,0.28),transparent_22%),radial-gradient(circle_at_65%_62%,transparent_35%,rgba(0,0,0,0.46)_78%)]" />
-            </div>
-            {ACTIVITY_POINTS.slice(0, focusNepal ? 8 : 12).map((point, index) => (
-              <span
-                key={`${point.city}-fallback`}
-                className="absolute h-2 w-2 rounded-full shadow-[0_0_16px_currentColor]"
-                style={{
-                  color: KIND_TONE[point.kind],
-                  background: KIND_TONE[point.kind],
-                  left: `${48 + Math.cos(index * 0.92) * (focusNepal && point.country === "Nepal" ? 13 : 25)}%`,
-                  top: `${50 + Math.sin(index * 0.92) * (focusNepal && point.country === "Nepal" ? 12 : 24)}%`,
-                  animation: "radar-pulse 2.4s ease-out infinite",
-                  animationDelay: `${index * 0.16}s`,
-                }}
-              />
-            ))}
-          </div>
           <div className="absolute left-4 top-4 z-20 flex flex-wrap items-center gap-2">
             <button
               type="button"
