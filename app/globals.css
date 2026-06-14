@@ -1809,6 +1809,8 @@ html[data-theme="light"] {
   --nm-sunken-soft: inset 3px 3px 6px #cbd5e1, inset -3px -3px 6px #ffffff;
   --nm-sunken-medium: inset 5px 5px 10px #cbd5e1, inset -5px -5px 10px #ffffff;
   --nm-sunken-deep: inset 8px 8px 16px #b8c4d9, inset -8px -8px 16px #ffffff;
+  --nm-line-soft: rgba(97, 116, 139, 0.14);
+  --nm-line-faint: rgba(97, 116, 139, 0.08);
 }
 
 html[data-theme="light"] body {
@@ -1880,6 +1882,22 @@ html[data-theme="light"] .tv-sticky-bar {
     inset 0 -1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
+html[data-theme="light"] .tv-sticky-bar--visible {
+  box-shadow:
+    0 10px 26px rgba(163, 177, 198, 0.26),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-theme="light"] .tv-sticky-bar--visible::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(79, 53, 255, 0.16) 35%,
+    rgba(0, 158, 143, 0.14) 65%,
+    transparent 100%
+  ) !important;
+}
+
 /* 3. TV Frame console design */
 html[data-theme="light"] .tv-frame-outer {
   background: linear-gradient(135deg, #F5F7FA 0%, #E6ECF4 100%) !important;
@@ -1909,6 +1927,30 @@ html[data-theme="light"] .tv-frame-controls {
   border-top: 1px solid rgba(255, 255, 255, 1) !important;
 }
 
+html[data-theme="light"] .tv-badge,
+html[data-theme="light"] .crt-toggle-btn,
+html[data-theme="light"] .tv-scroll-btn {
+  background: #EEF2F6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-mid) !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+html[data-theme="light"] .crt-toggle-btn:hover,
+html[data-theme="light"] .tv-scroll-btn:hover {
+  background: #F6F8FB !important;
+  border-color: rgba(79, 53, 255, 0.24) !important;
+  color: var(--text-hi) !important;
+  box-shadow:
+    2px 2px 5px #cbd5e1,
+    -2px -2px 5px #ffffff !important;
+}
+
+html[data-theme="light"] .tv-light-dot {
+  background: rgba(97, 116, 139, 0.18) !important;
+  box-shadow: inset 1px 1px 2px rgba(97, 116, 139, 0.18) !important;
+}
+
 html[data-theme="light"] .tv-console-logo-panel,
 html[data-theme="light"] .tv-console-nav-panel,
 html[data-theme="light"] .tv-console-user-panel,
@@ -1921,6 +1963,10 @@ html[data-theme="light"] .tv-console-tab.active {
     0 -8px 16px rgba(163, 177, 198, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   color: var(--text-hi) !important;
+}
+
+html[data-theme="light"] .tv-console-nav-blend {
+  background: #EEF2F6 !important;
 }
 
 html[data-theme="light"] .tv-console-tab:not(.active) {
@@ -1978,6 +2024,15 @@ html[data-theme="light"] .tv-console-btn.active {
     inset -2px -2px 5px #ffffff !important;
   background: #E2E8F0 !important;
   color: var(--accent-1) !important;
+}
+
+html[data-theme="light"] .tv-console-btn .tooltip {
+  background: rgba(246, 248, 251, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  color: var(--text-hi) !important;
+  box-shadow:
+    4px 4px 10px rgba(163, 177, 198, 0.24),
+    -4px -4px 10px rgba(255, 255, 255, 0.82) !important;
 }
 
 /* 4. Background enhancements */
@@ -2053,7 +2108,10 @@ html[data-theme="light"] textarea:focus {
 }
 
 /* 7. Divider replacements */
-html[data-theme="light"] .bg-white\/\[0\.10\],
+html[data-theme="light"] .bg-white\/\[0\.10\] {
+  background-color: var(--nm-line-faint) !important;
+}
+
 html[data-theme="light"] .border-white\/\[0\.06\],
 html[data-theme="light"] .border-white\/5,
 html[data-theme="light"] .border-white\/10,
@@ -2061,8 +2119,28 @@ html[data-theme="light"] .border-b.border-white\/5,
 html[data-theme="light"] .border-t.border-white\/\[0\.04\],
 html[data-theme="light"] .border-b.border-white\/\[0\.04\],
 html[data-theme="light"] .border-r.border-white\/5 {
-  border-color: rgba(0, 0, 0, 0.06) !important;
-  background-color: rgba(0, 0, 0, 0.06) !important;
+  border-color: var(--nm-line-soft) !important;
+}
+
+html[data-theme="light"] .bg-white\/5,
+html[data-theme="light"] .bg-white\/\[0\.02\],
+html[data-theme="light"] .bg-white\/\[0\.03\],
+html[data-theme="light"] .bg-white\/\[0\.04\] {
+  background-color: rgba(255, 255, 255, 0.44) !important;
+}
+
+html[data-theme="light"] .bg-black\/30.border,
+html[data-theme="light"] .bg-black\/40.border,
+html[data-theme="light"] .bg-black\/50.border,
+html[data-theme="light"] .bg-black\/60.border,
+html[data-theme="light"] .bg-black\/75.border {
+  background-color: #EEF2F6 !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+html[data-theme="light"] .border-dashed.border-white {
+  border-color: rgba(97, 116, 139, 0.18) !important;
 }
 
 html[data-theme="light"] .text-text-low {
