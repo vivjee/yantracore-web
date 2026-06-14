@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { TvFrame } from "@/components/layout/TvFrame";
 import { Eyebrow } from "@/components/typography/Eyebrow";
@@ -19,613 +19,89 @@ import {
   Activity,
   AlertTriangle,
   RotateCcw,
+  Shuffle,
+  Maximize2,
+  Minimize2,
+  Upload,
+  Link as LinkIcon,
+  Wind,
+  CloudRain,
+  Cpu,
+  Sparkles,
 } from "lucide-react";
-
-interface Track {
-  id: number;
-  title: string;
-  duration: string;
-  isPlayable: boolean;
-  src?: string;
-  description: string;
-  tempo?: string;
-  key?: string;
-}
-
-const TRACKS: Track[] = [
-  { id: 1, title: "Quantum Drift", duration: "05:14", isPlayable: true, src: "/audio/ambient-1.mp3", description: "Lush resonant pads with shifting lowpass filters for deep focus.", tempo: "60 BPM", key: "C Minor" },
-  { id: 2, title: "Neon Horizon", duration: "04:32", isPlayable: true, src: "/audio/ambient-2.mp3", description: "Detuned analog waves drifting over a gentle sub-harmonic pulse.", tempo: "64 BPM", key: "D Major" },
-  { id: 3, title: "Subharmonic Resonance", duration: "06:08", isPlayable: true, src: "/audio/ambient-3.mp3", description: "Deep frequency vibrations designed to align brainwaves for coding.", tempo: "55 BPM", key: "Eb Minor" },
-  { id: 4, title: "Silicon Rain", duration: "04:55", isPlayable: true, src: "/audio/ambient-4.mp3", description: "Soft procedural rain noise overlaid with crystalline bell chords.", tempo: "70 BPM", key: "F Major" },
-  { id: 5, title: "Hyperdrive Terminal", duration: "05:40", isPlayable: true, src: "/audio/ambient-5.mp3", description: "Atmospheric interstellar drones and slow-decay feedback echo space pads.", tempo: "58 BPM", key: "Ab Minor" },
-  { id: 6, title: "Ethernet Dream", duration: "04:12", isPlayable: false, description: "A vintage lofi ambient track with simulated tape flutter.", tempo: "Offline", key: "N/A" },
-  { id: 7, title: "Baud Rate Lullaby", duration: "03:45", isPlayable: false, description: "Minimalist modular synthesizer loops reminiscent of early computing.", tempo: "Offline", key: "N/A" },
-  { id: 8, title: "Binary Snowfall", duration: "05:22", isPlayable: false, description: "Delicate chime arrangements resembling random falling code particles.", tempo: "Offline", key: "N/A" },
-  { id: 9, title: "Cybernetic Dusk", duration: "06:15", isPlayable: false, description: "Dark, cinematic drones for late-night compiler sessions.", tempo: "Offline", key: "N/A" },
-  { id: 10, title: "Magnetic Tape Pulse", duration: "04:48", isPlayable: false, description: "Warm saturation and slowly undulating magnetic tape harmonics.", tempo: "Offline", key: "N/A" },
-  { id: 11, title: "Analog Void", duration: "07:30", isPlayable: false, description: "Pure sine waves and white noise sweeps that clear room resonance.", tempo: "Offline", key: "N/A" },
-  { id: 12, title: "Cold Boot Sequence", duration: "03:10", isPlayable: false, description: "Slowly rising frequencies reflecting the startup of an AI engine.", tempo: "Offline", key: "N/A" },
-  { id: 13, title: "Mainframe Ambient", duration: "05:50", isPlayable: false, description: "Steady humming drone mimicking a well-cooled server room.", tempo: "Offline", key: "N/A" },
-  { id: 14, title: "Thermal Dissipation", duration: "04:25", isPlayable: false, description: "Cooling sweeps and static discharge clicks in a wide stereo field.", tempo: "Offline", key: "N/A" },
-  { id: 15, title: "Solar Wind Drift", duration: "06:40", isPlayable: false, description: "Spacious synthesizer sweeps evoking empty orbits and solar radiation.", tempo: "Offline", key: "N/A" },
-  { id: 16, title: "Suborbital Glide", duration: "05:05", isPlayable: false, description: "Gliding string pads that feel light, floating, and zero-gravity.", tempo: "Offline", key: "N/A" },
-  { id: 17, title: "Crystalline Grid", duration: "04:50", isPlayable: false, description: "Pure, high-frequency tones structured in geometric arpeggiation.", tempo: "Offline", key: "N/A" },
-  { id: 18, title: "Zero State", duration: "03:55", isPlayable: false, description: "Completely flat, grounding base pads for meditative rest periods.", tempo: "Offline", key: "N/A" },
-  { id: 19, title: "Ionized Atmosphere", duration: "05:35", isPlayable: false, description: "Crackling charges and sweeping bandpass noise for organic texture.", tempo: "Offline", key: "N/A" },
-  { id: 20, title: "Dark Matter Wave", duration: "06:20", isPlayable: false, description: "Extremely low frequency rumble with random sub-bass drops.", tempo: "Offline", key: "N/A" },
-];
+import { useAudioPlayer, Track } from "@/lib/audio/AudioPlayerContext";
+import { audioSynth } from "@/lib/audio";
 
 export default function MusicPage() {
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
+  const {
+    currentTrackIndex,
+    currentTrack,
+    isPlaying,
+    volume,
+    isMuted,
+    isSynthOnly,
+    isFallbackActive,
+    currentTime,
+    simulatedDuration,
+    logs,
+    repeatMode,
+    isShuffle,
+    tracks,
+    analyser,
+    togglePlay,
+    handleTrackSelect,
+    handleVolumeChange,
+    toggleMute,
+    handleNext,
+    handlePrev,
+    handleSynthToggle,
+    handleSeek,
+    toggleRepeatMode,
+    toggleShuffle,
+    // EQ
+    eqBass,
+    setEqBass,
+    eqMid,
+    setEqMid,
+    eqTreble,
+    setEqTreble,
+    // Echo
+    echoVol,
+    setEchoVol,
+    // Ambient
+    rainVol,
+    setRainVol,
+    windVol,
+    setWindVol,
+    humVol,
+    setHumVol,
+    // Custom Track Loaders
+    addCustomTrack,
+  } = useAudioPlayer();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSynthOnly, setIsSynthOnly] = useState(false);
-  const [isFallbackActive, setIsFallbackActive] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [simulatedDuration, setSimulatedDuration] = useState(314); // in seconds
-  const [logs, setLogs] = useState<string[]>([]);
-  const [repeatMode, setRepeatMode] = useState<"none" | "one" | "all">("all");
+  const [isVisualizerExpanded, setIsVisualizerExpanded] = useState(false);
+  const [isLocalGlitching, setIsLocalGlitching] = useState(false);
+  const [activeConsoleTab, setActiveConsoleTab] = useState<"eq" | "ambient">("ambient");
+  const [customUrl, setCustomUrl] = useState("");
+  const [visualizerStyle, setVisualizerStyle] = useState<"mixed" | "bars" | "scope" | "circular">("mixed");
+  const [visualizerColor, setVisualizerColor] = useState<"teal" | "purple" | "amber" | "emerald">("teal");
+
+  const toggleVisualizerExpanded = () => {
+    if (isVisualizerExpanded) {
+      audioSynth.playClick();
+    } else {
+      audioSynth.playStatic();
+    }
+    setIsLocalGlitching(true);
+    setIsVisualizerExpanded(!isVisualizerExpanded);
+    setTimeout(() => {
+      setIsLocalGlitching(false);
+    }, 220);
+  };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressInterval = useRef<NodeJS.Timeout | null>(null);
-
-  // Web Audio Nodes
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const audioSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
-
-  // Synthesizer Oscillators and Nodes
-  const synthGainRef = useRef<GainNode | null>(null);
-  const synthFilterRef = useRef<BiquadFilterNode | null>(null);
-  const droneOscsRef = useRef<OscillatorNode[]>([]);
-  const bellIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const addLog = useCallback((msg: string) => {
-    setLogs((prev) => [
-      `[${new Date().toLocaleTimeString([], { hour12: false })}] ${msg}`,
-      ...prev.slice(0, 15),
-    ]);
-  }, []);
-
-  const currentTrack = TRACKS[currentTrackIndex];
-
-  // Map track keys to synthesizers base frequencies
-  const getTrackFrequency = useCallback((trackId: number): number => {
-    switch (trackId) {
-      case 1: return 130.81; // C3 (Quantum Drift)
-      case 2: return 146.83; // D3 (Neon Horizon)
-      case 3: return 155.56; // Eb3 (Subharmonic Resonance)
-      case 4: return 174.61; // F3 (Silicon Rain)
-      case 5: return 207.65; // Ab3 (Hyperdrive Terminal)
-      default: return 130.81; // C3
-    }
-  }, []);
-
-  // Parse duration string MM:SS into seconds
-  const parseDuration = useCallback((durStr: string): number => {
-    const parts = durStr.split(":");
-    if (parts.length === 2) {
-      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-    }
-    return 300;
-  }, []);
-
-  // Initialize Web Audio API
-  const initAudioContext = useCallback(() => {
-    if (audioContextRef.current) return audioContextRef.current;
-
-    try {
-      const AudioCtx = window.AudioContext || (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) {
-        addLog("SYS: Web Audio API not supported in this browser.");
-        return null;
-      }
-
-      const ctx = new AudioCtx();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.connect(ctx.destination);
-
-      audioContextRef.current = ctx;
-      analyserRef.current = analyser;
-
-      addLog("SYS: Web Audio Context initialized.");
-
-      // Setup HTML5 Audio element source routing
-      if (audioRef.current && !audioSourceRef.current) {
-        const source = ctx.createMediaElementSource(audioRef.current);
-        source.connect(analyser);
-        audioSourceRef.current = source;
-        addLog("SYS: Audio tag linked to Analyser Node.");
-      }
-
-      return ctx;
-    } catch (e) {
-      addLog("ERR: Failed to initialize Audio Context.");
-      console.error(e);
-      return null;
-    }
-  }, [addLog]);
-
-  // Clean up procedural synthesizer nodes
-  const stopProceduralSynth = useCallback(() => {
-    // Fade out drone oscillator gain first
-    if (synthGainRef.current && audioContextRef.current) {
-      const now = audioContextRef.current.currentTime;
-      synthGainRef.current.gain.cancelScheduledValues(now);
-      synthGainRef.current.gain.setValueAtTime(synthGainRef.current.gain.value, now);
-      synthGainRef.current.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
-    }
-
-    // Clear sequencer
-    if (bellIntervalRef.current) {
-      clearInterval(bellIntervalRef.current);
-      bellIntervalRef.current = null;
-    }
-
-    // Stop oscillators after fadeout
-    const oscs = [...droneOscsRef.current];
-    droneOscsRef.current = [];
-    setTimeout(() => {
-      oscs.forEach((osc) => {
-        try {
-          osc.stop();
-          osc.disconnect();
-        } catch {}
-      });
-    }, 900);
-  }, []);
-
-  // Play procedural ambient synth tones
-  const startProceduralSynth = useCallback((trackIndex: number) => {
-    const ctx = initAudioContext();
-    const analyser = analyserRef.current;
-    if (!ctx || !analyser) return;
-
-    if (ctx.state === "suspended") {
-      ctx.resume().catch(() => {});
-    }
-
-    stopProceduralSynth();
-
-    const now = ctx.currentTime;
-    const baseFreq = getTrackFrequency(TRACKS[trackIndex].id);
-    addLog(`SYNTH: Starting synth tone generator (Base: ${baseFreq.toFixed(1)}Hz).`);
-
-    // 1. Create Synth Master Gain
-    const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(0, now);
-    masterGain.gain.linearRampToValueAtTime(volume * 0.25, now + 2.0); // Soft fade-in
-    masterGain.connect(analyser);
-    synthGainRef.current = masterGain;
-
-    // 2. Create Bandpass/Lowpass Filter
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(320, now);
-    filter.Q.setValueAtTime(2.0, now);
-    filter.connect(masterGain);
-    synthFilterRef.current = filter;
-
-    // 3. Create detuned oscillators for fat analog chorus sound
-    const osc1 = ctx.createOscillator();
-    osc1.type = "triangle";
-    osc1.frequency.setValueAtTime(baseFreq, now);
-    osc1.detune.setValueAtTime(-10, now); // Detune left
-
-    const osc2 = ctx.createOscillator();
-    osc2.type = "sine";
-    osc2.frequency.setValueAtTime(baseFreq * 1.5, now); // Perfect Fifth
-    osc2.detune.setValueAtTime(10, now); // Detune right
-
-    const osc3 = ctx.createOscillator();
-    osc3.type = "sawtooth";
-    osc3.frequency.setValueAtTime(baseFreq * 0.5, now); // Sub-octave base drone
-    osc3.detune.setValueAtTime(0, now);
-
-    // Create sub gain to mix saw wave quietly
-    const subGain = ctx.createGain();
-    subGain.gain.setValueAtTime(0.12, now);
-    osc3.connect(subGain);
-
-    osc1.connect(filter);
-    osc2.connect(filter);
-    subGain.connect(filter);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc3.start(now);
-
-    droneOscsRef.current = [osc1, osc2, osc3];
-
-    // 4. Create LFO to modulate filter cutoff (creates organic wave/breathing)
-    const lfo = ctx.createOscillator();
-    lfo.type = "sine";
-    lfo.frequency.setValueAtTime(0.06, now); // Very slow sweep (16s cycle)
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.setValueAtTime(120, now); // cut-off variation range
-
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start(now);
-    droneOscsRef.current.push(lfo);
-
-    // 5. Pentatonic bell tones generator (sequencer)
-    // Scale: root, minor 3rd (or major 3rd depending on key), 4th, 5th, minor 7th
-    const track = TRACKS[trackIndex];
-    const isMinor = track.key?.toLowerCase().includes("minor");
-    const intervalMap = isMinor ? [1, 1.2, 1.33, 1.5, 1.8] : [1, 1.125, 1.25, 1.5, 1.66]; // minor vs major steps
-
-    const delay = ctx.createDelay();
-    delay.delayTime.setValueAtTime(0.4, now);
-    const feedback = ctx.createGain();
-    feedback.gain.setValueAtTime(0.45, now); // Echo decay rate
-
-    delay.connect(feedback);
-    feedback.connect(delay);
-    delay.connect(masterGain);
-
-    const playBell = () => {
-      if (!synthGainRef.current) return;
-      const bellNow = ctx.currentTime;
-      const randomInterval = intervalMap[Math.floor(Math.random() * intervalMap.length)];
-      const bellFreq = baseFreq * 4.0 * randomInterval; // Shift up two octaves
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(bellFreq, bellNow);
-
-      gain.gain.setValueAtTime(0, bellNow);
-      gain.gain.linearRampToValueAtTime(0.06, bellNow + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, bellNow + 2.5); // long decay
-
-      osc.connect(gain);
-      gain.connect(masterGain); // Direct dry signal
-      gain.connect(delay); // Route to echo delay
-
-      osc.start(bellNow);
-      osc.stop(bellNow + 3.0);
-    };
-
-    // Trigger initial bell after 1 second, then run interval
-    setTimeout(() => {
-      if (isPlaying) playBell();
-    }, 1000);
-
-    bellIntervalRef.current = setInterval(() => {
-      playBell();
-    }, 4500 + Math.random() * 3000); // Randomized timing to prevent repetitive loops
-
-  }, [initAudioContext, stopProceduralSynth, getTrackFrequency, volume, addLog, isPlaying]);
-
-  // Triggers static buzz noise burst when selecting offline database entries
-  const playOfflineBuzz = useCallback(() => {
-    const ctx = initAudioContext();
-    const analyser = analyserRef.current;
-    if (!ctx || !analyser) return;
-
-    if (ctx.state === "suspended") {
-      ctx.resume().catch(() => {});
-    }
-
-    addLog("SYS: Attempting handshake with archived core...");
-    const now = ctx.currentTime;
-
-    // 1. Noise Generator (Handshake static)
-    const bufferSize = ctx.sampleRate * 0.4; // 400ms burst
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-
-    const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = buffer;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = "bandpass";
-    filter.frequency.setValueAtTime(1200, now);
-    filter.frequency.exponentialRampToValueAtTime(300, now + 0.35);
-    filter.Q.setValueAtTime(5.0, now);
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
-
-    noiseSource.connect(filter);
-    filter.connect(gain);
-    gain.connect(analyser);
-
-    // 2. Beep (Terminal fail chime)
-    const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(600, now);
-    osc.frequency.setValueAtTime(250, now + 0.12);
-
-    oscGain.gain.setValueAtTime(0.12, now);
-    oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
-
-    osc.connect(oscGain);
-    oscGain.connect(analyser);
-
-    noiseSource.start(now);
-    osc.start(now);
-    osc.stop(now + 0.4);
-
-    setTimeout(() => {
-      addLog("ERR: Connection rejected. Channel archived (Offline).");
-    }, 200);
-  }, [initAudioContext, addLog]);
-
-  // Core Play/Pause execution
-  const togglePlay = useCallback(async () => {
-    initAudioContext();
-
-    if (isPlaying) {
-      // Pause
-      setIsPlaying(false);
-      addLog("SYS: Playback paused.");
-
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      stopProceduralSynth();
-    } else {
-      // Play
-      if (!currentTrack.isPlayable) {
-        playOfflineBuzz();
-        return;
-      }
-
-      setIsPlaying(true);
-      setSimulatedDuration(parseDuration(currentTrack.duration));
-
-      if (isSynthOnly) {
-        setIsFallbackActive(true);
-        startProceduralSynth(currentTrackIndex);
-      } else {
-        if (audioRef.current) {
-          audioRef.current.volume = isMuted ? 0 : volume;
-          try {
-            addLog(`SYS: Stream loading on channel [${currentTrack.title}]...`);
-            setIsFallbackActive(false);
-            await audioRef.current.play();
-            addLog(`SYS: Streaming audio active.`);
-          } catch {
-            // Stream loading failed (e.g. file missing), fallback to Synth
-            addLog("WARN: Stream unavailable. Activating synthesis generator.");
-            setIsFallbackActive(true);
-            startProceduralSynth(currentTrackIndex);
-          }
-        }
-      }
-    }
-  }, [
-    isPlaying,
-    currentTrack,
-    currentTrackIndex,
-    isSynthOnly,
-    volume,
-    isMuted,
-    parseDuration,
-    initAudioContext,
-    startProceduralSynth,
-    stopProceduralSynth,
-    playOfflineBuzz,
-    addLog,
-  ]);
-
-  // Handle track changing
-  const handleTrackSelect = useCallback((index: number, options?: { autoplay?: boolean }) => {
-    const track = TRACKS[index];
-    const shouldPlay = isPlaying || options?.autoplay;
-
-    setCurrentTrackIndex(index);
-    setCurrentTime(0);
-    setSimulatedDuration(parseDuration(track.duration));
-
-    if (!track.isPlayable) {
-      // Pause current playback if moving to an unplayable track
-      if (isPlaying) {
-        setIsPlaying(false);
-        if (audioRef.current) audioRef.current.pause();
-        stopProceduralSynth();
-      }
-      playOfflineBuzz();
-      return;
-    }
-
-    addLog(`SYS: Selected channel [${track.title}]`);
-
-    if (shouldPlay) {
-      // Start or restart playback on the selected active track
-      setIsPlaying(true);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      stopProceduralSynth();
-
-      setTimeout(() => {
-        if (isSynthOnly) {
-          setIsFallbackActive(true);
-          startProceduralSynth(index);
-        } else {
-          setIsFallbackActive(false);
-          if (audioRef.current) {
-            audioRef.current.src = track.src || "";
-            audioRef.current.volume = isMuted ? 0 : volume;
-            audioRef.current.load();
-            audioRef.current.play().catch(() => {
-              addLog("WARN: Stream failed. Initializing synthesizer fallback.");
-              setIsFallbackActive(true);
-              startProceduralSynth(index);
-            });
-          }
-        }
-      }, 50);
-    } else {
-      // Just load the source if paused
-      setIsFallbackActive(false);
-      if (audioRef.current) {
-        audioRef.current.src = track.src || "";
-        audioRef.current.load();
-      }
-    }
-  }, [
-    isPlaying,
-    isSynthOnly,
-    isMuted,
-    volume,
-    parseDuration,
-    startProceduralSynth,
-    stopProceduralSynth,
-    playOfflineBuzz,
-    addLog,
-  ]);
-
-  // Adjust volume
-  const handleVolumeChange = useCallback((val: number) => {
-    setVolume(val);
-    const audioVol = isMuted ? 0 : val;
-    if (audioRef.current) {
-      audioRef.current.volume = audioVol;
-    }
-
-    // Apply to running synth drone master gain
-    if (synthGainRef.current && audioContextRef.current) {
-      synthGainRef.current.gain.setValueAtTime(audioVol * 0.25, audioContextRef.current.currentTime);
-    }
-  }, [isMuted]);
-
-  // Toggle Mute
-  const toggleMute = useCallback(() => {
-    const newMute = !isMuted;
-    setIsMuted(newMute);
-    const targetVol = newMute ? 0 : volume;
-
-    if (audioRef.current) {
-      audioRef.current.volume = targetVol;
-    }
-
-    if (synthGainRef.current && audioContextRef.current) {
-      synthGainRef.current.gain.setValueAtTime(targetVol * 0.25, audioContextRef.current.currentTime);
-    }
-
-    addLog(newMute ? "SYS: Volume muted." : "SYS: Volume unmuted.");
-  }, [isMuted, volume, addLog]);
-
-  // Previous and Next triggers
-  const handleNext = useCallback(() => {
-    let nextIndex = currentTrackIndex;
-    // Find next playable track or wrap
-    for (let i = 1; i <= TRACKS.length; i++) {
-      const idx = (currentTrackIndex + i) % TRACKS.length;
-      if (TRACKS[idx].isPlayable) {
-        nextIndex = idx;
-        break;
-      }
-    }
-    handleTrackSelect(nextIndex);
-  }, [currentTrackIndex, handleTrackSelect]);
-
-  const handlePrev = useCallback(() => {
-    let prevIndex = currentTrackIndex;
-    // Find previous playable track or wrap
-    for (let i = 1; i <= TRACKS.length; i++) {
-      const idx = (currentTrackIndex - i + TRACKS.length) % TRACKS.length;
-      if (TRACKS[idx].isPlayable) {
-        prevIndex = idx;
-        break;
-      }
-    }
-    handleTrackSelect(prevIndex);
-  }, [currentTrackIndex, handleTrackSelect]);
-
-  // Force synth-only mode switch
-  const handleSynthToggle = useCallback(() => {
-    const nextSynthMode = !isSynthOnly;
-    setIsSynthOnly(nextSynthMode);
-    addLog(`SYS: Force Synthesizer Mode [${nextSynthMode ? "ON" : "OFF (AUTO)"}].`);
-
-    if (isPlaying) {
-      if (nextSynthMode) {
-        if (audioRef.current) audioRef.current.pause();
-        setIsFallbackActive(true);
-        startProceduralSynth(currentTrackIndex);
-      } else {
-        stopProceduralSynth();
-        setIsFallbackActive(false);
-        if (audioRef.current) {
-          audioRef.current.src = currentTrack.src || "";
-          audioRef.current.load();
-          audioRef.current.play().catch(() => {
-            setIsFallbackActive(true);
-            startProceduralSynth(currentTrackIndex);
-          });
-        }
-      }
-    }
-  }, [isSynthOnly, isPlaying, currentTrackIndex, currentTrack, startProceduralSynth, stopProceduralSynth, addLog]);
-
-  // Sync seek state
-  const handleSeek = useCallback((percent: number) => {
-    const targetTime = percent * simulatedDuration;
-    setCurrentTime(targetTime);
-    if (audioRef.current && !isFallbackActive) {
-      audioRef.current.currentTime = targetTime;
-    }
-    addLog(`SYS: Seeked to ${Math.floor(targetTime / 60)}:${String(Math.floor(targetTime % 60)).padStart(2, "0")}`);
-  }, [simulatedDuration, isFallbackActive, addLog]);
-
-  // Run progress timer ticks
-  useEffect(() => {
-    if (isPlaying) {
-      if (isFallbackActive) {
-        // Synthesizer timer simulation
-        progressInterval.current = setInterval(() => {
-          setCurrentTime((prev) => {
-            if (prev >= simulatedDuration) {
-              if (repeatMode === "one") {
-                return 0;
-              } else {
-                handleNext();
-                return 0;
-              }
-            }
-            return prev + 1;
-          });
-        }, 1000);
-      } else {
-        // Stream progress sync
-        progressInterval.current = setInterval(() => {
-          if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-            if (audioRef.current.ended) {
-              if (repeatMode === "one") {
-                audioRef.current.currentTime = 0;
-                audioRef.current.play().catch(() => {});
-              } else {
-                handleNext();
-              }
-            }
-          }
-        }, 250);
-      }
-    }
-
-    return () => {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
-      }
-    };
-  }, [isPlaying, isFallbackActive, simulatedDuration, repeatMode, handleNext]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize Audio Visualizer Canvas Rendering
   useEffect(() => {
@@ -642,14 +118,36 @@ export default function MusicPage() {
 
       const width = canvas.width;
       const height = canvas.height;
-      const analyser = analyserRef.current;
 
-      // Draw trailing fade background
+      // Color maps based on visualizerColor theme
+      let cLow = "rgba(110, 86, 255, 0.15)";
+      let cMid = "rgba(110, 86, 255, 0.7)";
+      let cHi = "rgba(0, 224, 203, 1)";
+      let shadowColor = "rgba(0, 224, 203, 0.4)";
+
+      if (visualizerColor === "purple") {
+        cLow = "rgba(255, 79, 176, 0.15)";
+        cMid = "rgba(255, 79, 176, 0.7)";
+        cHi = "rgba(110, 86, 255, 1)";
+        shadowColor = "rgba(110, 86, 255, 0.4)";
+      } else if (visualizerColor === "amber") {
+        cLow = "rgba(239, 68, 68, 0.15)";
+        cMid = "rgba(239, 68, 68, 0.7)";
+        cHi = "rgba(245, 158, 11, 1)";
+        shadowColor = "rgba(245, 158, 11, 0.4)";
+      } else if (visualizerColor === "emerald") {
+        cLow = "rgba(59, 130, 246, 0.15)";
+        cMid = "rgba(59, 130, 246, 0.7)";
+        cHi = "rgba(16, 185, 129, 1)";
+        shadowColor = "rgba(16, 185, 129, 0.4)";
+      }
+
+      // Trail fade background
       ctx2d.fillStyle = "rgba(6, 7, 13, 0.22)";
       ctx2d.fillRect(0, 0, width, height);
 
       // Draw glowing background grid
-      ctx2d.strokeStyle = "rgba(255, 255, 255, 0.015)";
+      ctx2d.strokeStyle = "rgba(255, 255, 255, 0.012)";
       ctx2d.lineWidth = 1;
       const gridSize = 16;
       for (let x = 0; x < width; x += gridSize) {
@@ -668,71 +166,162 @@ export default function MusicPage() {
       if (analyser && isPlaying) {
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
-        analyser.getByteFrequencyData(dataArray);
 
-        // 1. Draw glowing vertical mirror frequencies
-        const barWidth = (width / 32) - 3;
-        let x = 0;
+        if (visualizerStyle === "scope") {
+          analyser.getByteTimeDomainData(dataArray);
 
-        for (let i = 0; i < 32; i++) {
-          const percent = dataArray[i] / 255;
-          const barHeight = percent * (height - 30);
-          
-          // Generate a smooth neon purple to teal gradient
-          const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
-          gradient.addColorStop(0, "rgba(110, 86, 255, 0.2)");
-          gradient.addColorStop(0.5, "rgba(110, 86, 255, 0.8)");
-          gradient.addColorStop(1, "rgba(0, 224, 203, 1)");
+          ctx2d.beginPath();
+          ctx2d.strokeStyle = cHi;
+          ctx2d.lineWidth = isVisualizerExpanded ? 3 : 1.5;
+          ctx2d.shadowBlur = 10;
+          ctx2d.shadowColor = shadowColor;
 
-          ctx2d.fillStyle = gradient;
-          ctx2d.shadowBlur = 8;
-          ctx2d.shadowColor = "rgba(0, 224, 203, 0.5)";
+          const sliceWidth = width / bufferLength;
+          let xWave = 0;
 
-          // Symmetrical outer render
-          ctx2d.fillRect(width / 2 + x, height - barHeight - 10, barWidth, barHeight);
-          ctx2d.fillRect(width / 2 - x - barWidth, height - barHeight - 10, barWidth, barHeight);
+          for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const yWave = (v * height / 2);
 
-          x += barWidth + 3;
-        }
+            if (i === 0) {
+              ctx2d.moveTo(xWave, yWave);
+            } else {
+              ctx2d.lineTo(xWave, yWave);
+            }
 
-        // 2. Draw central overlay oscilloscope waveform
-        const timeArray = new Uint8Array(bufferLength);
-        analyser.getByteTimeDomainData(timeArray);
-
-        ctx2d.beginPath();
-        ctx2d.strokeStyle = "rgba(0, 224, 203, 0.8)";
-        ctx2d.lineWidth = 2;
-        ctx2d.shadowBlur = 12;
-        ctx2d.shadowColor = "rgba(0, 224, 203, 0.6)";
-
-        const sliceWidth = width / bufferLength;
-        let tx = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-          const v = timeArray[i] / 128.0;
-          const ty = (v * height) / 2;
-
-          if (i === 0) {
-            ctx2d.moveTo(tx, ty);
-          } else {
-            ctx2d.lineTo(tx, ty);
+            xWave += sliceWidth;
           }
 
-          tx += sliceWidth;
+          ctx2d.lineTo(width, height / 2);
+          ctx2d.stroke();
+        } 
+        else if (visualizerStyle === "circular") {
+          analyser.getByteFrequencyData(dataArray);
+          const centerX = width / 2;
+          const centerY = height / 2;
+          const baseRadius = isVisualizerExpanded ? Math.min(width, height) * 0.35 : Math.min(width, height) * 0.22;
+
+          let bassSum = 0;
+          for (let i = 0; i < 8; i++) bassSum += dataArray[i];
+          const bassAvg = bassSum / 8;
+          const radius = baseRadius + (bassAvg / 255) * (isVisualizerExpanded ? 24 : 12);
+
+          // Central ring
+          ctx2d.beginPath();
+          ctx2d.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+          ctx2d.strokeStyle = cHi;
+          ctx2d.lineWidth = isVisualizerExpanded ? 4.5 : 2;
+          ctx2d.shadowBlur = 15;
+          ctx2d.shadowColor = shadowColor;
+          ctx2d.stroke();
+
+          // Spikes
+          const numBars = 60;
+          for (let i = 0; i < numBars; i++) {
+            const angle = (i / numBars) * 2 * Math.PI;
+            const dataIndex = Math.floor((i / numBars) * (bufferLength / 2));
+            const value = dataArray[dataIndex] / 255;
+            const barLength = value * (isVisualizerExpanded ? 60 : 30);
+
+            const startX = centerX + Math.cos(angle) * radius;
+            const startY = centerY + Math.sin(angle) * radius;
+            const endX = centerX + Math.cos(angle) * (radius + barLength);
+            const endY = centerY + Math.sin(angle) * (radius + barLength);
+
+            ctx2d.beginPath();
+            ctx2d.moveTo(startX, startY);
+            ctx2d.lineTo(endX, endY);
+            ctx2d.strokeStyle = cMid;
+            ctx2d.lineWidth = isVisualizerExpanded ? 3.5 : 1.75;
+            ctx2d.stroke();
+          }
         }
-        ctx2d.lineTo(width, height / 2);
-        ctx2d.stroke();
+        else if (visualizerStyle === "bars") {
+          analyser.getByteFrequencyData(dataArray);
+          const numBars = isVisualizerExpanded ? 64 : 48;
+          const barWidth = (width / numBars) - 2;
+          let x = 0;
 
+          for (let i = 0; i < numBars; i++) {
+            const percent = dataArray[i] / 255;
+            const barHeight = percent * (height - 35);
+            
+            const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
+            gradient.addColorStop(0, cLow);
+            gradient.addColorStop(0.5, cMid);
+            gradient.addColorStop(1, cHi);
+
+            ctx2d.fillStyle = gradient;
+            ctx2d.shadowBlur = 6;
+            ctx2d.shadowColor = shadowColor;
+
+            ctx2d.fillRect(x, height - barHeight - 8, barWidth, barHeight);
+            x += barWidth + 2;
+          }
+        }
+        else { // "mixed"
+          analyser.getByteFrequencyData(dataArray);
+
+          // Mirrored frequencies
+          const barWidth = (width / 32) - 3;
+          let x = 0;
+
+          for (let i = 0; i < 32; i++) {
+            const percent = dataArray[i] / 255;
+            const barHeight = percent * (height - 35);
+            
+            const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
+            gradient.addColorStop(0, cLow);
+            gradient.addColorStop(0.5, cMid);
+            gradient.addColorStop(1, cHi);
+
+            ctx2d.fillStyle = gradient;
+            ctx2d.shadowBlur = 8;
+            ctx2d.shadowColor = shadowColor;
+
+            ctx2d.fillRect(width / 2 + x, height - barHeight - 10, barWidth, barHeight);
+            ctx2d.fillRect(width / 2 - x - barWidth, height - barHeight - 10, barWidth, barHeight);
+
+            x += barWidth + 3;
+          }
+
+          // Central oscilloscope
+          const timeArray = new Uint8Array(bufferLength);
+          analyser.getByteTimeDomainData(timeArray);
+
+          ctx2d.beginPath();
+          ctx2d.lineWidth = 1.5;
+          ctx2d.strokeStyle = cHi;
+          ctx2d.shadowBlur = 10;
+          ctx2d.shadowColor = shadowColor;
+
+          const sliceWidth = width / bufferLength;
+          let xWave = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const v = timeArray[i] / 128.0;
+            const yWave = (v * height / 2);
+
+            if (i === 0) {
+              ctx2d.moveTo(xWave, yWave);
+            } else {
+              ctx2d.lineTo(xWave, yWave);
+            }
+
+            xWave += sliceWidth;
+          }
+
+          ctx2d.lineTo(width, height / 2);
+          ctx2d.stroke();
+        }
       } else {
-        // Draw flat idling noise line when paused
+        // Idle ambient line
         ctx2d.beginPath();
-        ctx2d.strokeStyle = "rgba(110, 86, 255, 0.4)";
-        ctx2d.lineWidth = 1.5;
-        ctx2d.shadowBlur = 4;
-        ctx2d.shadowColor = "rgba(110, 86, 255, 0.3)";
+        ctx2d.lineWidth = 1;
+        ctx2d.strokeStyle = cLow;
+        ctx2d.shadowBlur = 0;
         ctx2d.moveTo(0, height / 2);
-
-        // Add a micro-wobble to look live/idle
+        
         const time = Date.now() * 0.003;
         for (let ix = 0; ix < width; ix += 5) {
           const wobble = Math.sin(ix * 0.05 + time) * 1.5;
@@ -741,7 +330,6 @@ export default function MusicPage() {
         ctx2d.stroke();
       }
 
-      // Reset shadows
       ctx2d.shadowBlur = 0;
     };
 
@@ -750,53 +338,115 @@ export default function MusicPage() {
     return () => {
       cancelAnimationFrame(localFrameId);
     };
-  }, [isPlaying]);
+  }, [isPlaying, analyser, visualizerStyle, visualizerColor, isVisualizerExpanded]);
 
-  // Resize canvas bounds
+  // Resize canvas bounds dynamically using ResizeObserver
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const handleResize = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = 140;
+      canvas.width = Math.max(rect.width, 1);
+      canvas.height = Math.max(rect.height, 1);
     };
+
+    const observer = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    observer.observe(canvas);
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
-  // Sync starting audio tags
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.src = TRACKS[0].src || "";
-      audioRef.current.load();
-    }
-    queueMicrotask(() => addLog("SYS: Ambient Stream Decoders Ready."));
-    return () => {
-      stopProceduralSynth();
-    };
-  }, [stopProceduralSynth, addLog]);
+  // Handle local file upload
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  // Filter track library items
-  const filteredTracks = TRACKS.filter((t) =>
+    const objectURL = URL.createObjectURL(file);
+    const newTrack: Track = {
+      id: tracks.length + 1,
+      title: file.name.replace(/\.[^/.]+$/, ""),
+      duration: "00:00", // will load metadata
+      isPlayable: true,
+      src: objectURL,
+      description: "User uploaded local ambient core file.",
+      tempo: "Local",
+      key: "Custom"
+    };
+
+    addCustomTrack(newTrack);
+    setTimeout(() => {
+      handleTrackSelect(tracks.length, { autoplay: true });
+    }, 100);
+  };
+
+  // Handle URL stream loading
+  const handleUrlLoad = () => {
+    if (!customUrl) return;
+    const newTrack: Track = {
+      id: tracks.length + 1,
+      title: "Custom Stream " + (tracks.length - 19),
+      duration: "Stream",
+      isPlayable: true,
+      src: customUrl,
+      description: `External streaming network feed: ${customUrl}`,
+      tempo: "Network",
+      key: "Remote"
+    };
+
+    addCustomTrack(newTrack);
+    setCustomUrl("");
+    setTimeout(() => {
+      handleTrackSelect(tracks.length, { autoplay: true });
+    }, 100);
+  };
+
+  const filteredTracks = tracks.filter((t) =>
     t.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatTime = (secs: number) => {
+    if (isNaN(secs) || !isFinite(secs)) return "0:00";
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${m}:${String(s).padStart(2, "0")}`;
   };
 
+  // Setup visualizer preset controls
+  const visualizerStyles = [
+    { value: "mixed", label: "Spectrum Wave" },
+    { value: "bars", label: "EQ Columns" },
+    { value: "scope", label: "Oscilloscope" },
+    { value: "circular", label: "Radial Portal" },
+  ];
+
+  const themeColors = [
+    { value: "teal", label: "Neo Teal", class: "bg-accent-2" },
+    { value: "purple", label: "Cyber Purple", class: "bg-accent-1" },
+    { value: "amber", label: "Solar Amber", class: "bg-accent-3" },
+    { value: "emerald", label: "Matrix Emerald", class: "bg-emerald-500" },
+  ];
+
   return (
     <>
       <SiteBackground />
       <TvFrame>
-        {/* Hidden Audio Tag */}
-        <audio ref={audioRef} preload="auto" crossOrigin="anonymous" />
-
-        <div className="w-full h-full flex flex-col p-4 md:p-6 overflow-hidden">
+        <div className="w-full h-full flex flex-col p-4 md:p-6 overflow-hidden relative">
+          
+          {/* CRT Local Channel Static Glitch Overlay */}
+          {isLocalGlitching && (
+            <div className="absolute inset-0 bg-[#06070d] z-[99] pointer-events-none flex flex-col items-center justify-center">
+              <div className="crt-glitch-static" />
+              <div className="crt-glitch-line" />
+            </div>
+          )}
+          
           {/* Header row */}
           <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4 flex-shrink-0">
             <div className="flex items-center gap-3">
@@ -804,9 +454,9 @@ export default function MusicPage() {
                 <Radio className="w-4 h-4 animate-pulse" />
               </div>
               <div>
-                <Eyebrow className="mb-0">YANTRACORE // LABS</Eyebrow>
+                <Eyebrow className="mb-0">MUSIC FOR DEEP WORK</Eyebrow>
                 <h1 className="text-sm font-semibold tracking-wider font-mono text-text-hi uppercase">
-                  NEO Ambient Console
+                  Ambient Music Console
                 </h1>
               </div>
             </div>
@@ -818,302 +468,748 @@ export default function MusicPage() {
             </div>
           </div>
 
-          {/* Main workspace splits to left console, right sidebar */}
-          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden">
+          {/* Main workspace */}
+          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden relative">
             
             {/* Left Column: Player Console */}
-            <div className="flex-1 flex flex-col gap-4 min-h-0">
+            <div className="flex-1 flex flex-col gap-4 min-h-0 relative">
               
-              {/* Retro Audio Visualizer Screen */}
-              <div className="bg-black/60 border border-white/5 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden flex-shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]">
-                <div className="absolute top-2.5 left-3 z-10 flex items-center gap-1.5 select-none pointer-events-none">
-                  <Activity className="w-3.5 h-3.5 text-accent-2" />
-                  <span className="text-[9px] font-mono text-text-low uppercase tracking-wider">Waveform / Freq Spectrum</span>
+              {/* Visualizer Panel (Supports Fullscreen/Expanded Mode) */}
+              <div className={`
+                bg-black/60 border border-white/5 rounded-xl p-3 flex flex-col relative overflow-hidden flex-shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] transition-all duration-300
+                ${isVisualizerExpanded 
+                  ? "flex-1 border-accent-2/20 p-5 md:p-6 shadow-[0_0_40px_rgba(0,224,203,0.15)] bg-[#06070d]/98 gap-4" 
+                  : "w-full gap-2"
+                }
+              `}>
+                {/* Visualizer Panel Header */}
+                <div className="flex items-center justify-between z-10 w-full select-none">
+                  <div className="flex items-center gap-1.5 pointer-events-none">
+                    <Activity className="w-3.5 h-3.5 text-accent-2" />
+                    <span className="text-[9px] font-mono text-text-low uppercase tracking-wider font-semibold">
+                      {isVisualizerExpanded ? "TV Mode // Ambient Space" : "Visualization"}
+                    </span>
+                  </div>
+
+                  {/* Settings selectors & Expand control */}
+                  <div className="flex items-center gap-3">
+                    {/* Visualizer style selector */}
+                    <div className="flex items-center gap-1 bg-black/40 border border-white/5 rounded-md p-0.5">
+                      {visualizerStyles.map((s) => (
+                        <button
+                          key={s.value}
+                          onClick={() => setVisualizerStyle(s.value as any)}
+                          className={`px-1.5 py-0.5 text-[8px] font-mono rounded transition-colors ${
+                            visualizerStyle === s.value 
+                              ? "bg-white/10 text-text-hi" 
+                              : "text-text-low hover:text-text-mid"
+                          }`}
+                        >
+                          {s.label.split(" ")[0]}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Color selectors */}
+                    <div className="flex items-center gap-1">
+                      {themeColors.map((c) => (
+                        <button
+                          key={c.value}
+                          onClick={() => setVisualizerColor(c.value as any)}
+                          className={`w-2 h-2 rounded-full transition-transform hover:scale-125 ${c.class} ${
+                            visualizerColor === c.value ? "ring-2 ring-white scale-110" : "opacity-60"
+                          }`}
+                          title={c.label}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Expand/Shrink Button */}
+                    <button
+                      onClick={toggleVisualizerExpanded}
+                      className="p-1 rounded bg-white/5 border border-white/10 hover:bg-white/10 text-text-mid hover:text-text-hi transition-colors"
+                      title={isVisualizerExpanded ? "Exit TV Mode" : "Expand to TV Mode"}
+                    >
+                      {isVisualizerExpanded ? (
+                        <Minimize2 className="w-3 h-3" />
+                      ) : (
+                        <Maximize2 className="w-3 h-3" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 
-                {/* Visualizer Canvas */}
-                <canvas ref={canvasRef} className="w-full h-[140px] rounded-lg bg-black/40 border border-white/5" />
-              </div>
-
-              {/* Deck Console / Track Details */}
-              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-4 flex flex-col justify-between min-h-0 overflow-y-auto relative glass-panel">
-                <div className="absolute inset-0 bg-gradient-to-b from-accent-1/2 to-transparent opacity-10 pointer-events-none" />
-
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex gap-4 items-center">
-                    {/* Glowing rotating CD disc artwork */}
-                    <div className="relative w-20 h-20 flex-shrink-0 select-none">
-                      <div className={`w-full h-full rounded-full border border-white/10 bg-zinc-950 flex items-center justify-center shadow-2xl relative overflow-hidden ${isPlaying && currentTrack.isPlayable ? "animate-[spin_10s_linear_infinite]" : ""}`}>
-                        {/* Vinyl ridges pattern */}
-                        <div className="absolute inset-2 rounded-full border border-dashed border-white/5" />
-                        <div className="absolute inset-4 rounded-full border border-white/5" />
-                        <div className="absolute inset-6 rounded-full border border-dashed border-white/10" />
-                        {/* Center spindle */}
-                        <div className="w-6 h-6 rounded-full bg-black border border-white/20 flex items-center justify-center relative z-10 shadow-lg">
-                          <div className="w-2.5 h-2.5 rounded-full bg-accent-1 shadow-[0_0_8px_var(--accent-1)]" />
-                        </div>
-                        {/* Reflected neon ray */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
-                      </div>
-                      <div className={`absolute -inset-1.5 rounded-full border border-accent-2/10 pointer-events-none ${isPlaying && currentTrack.isPlayable ? "animate-pulse" : ""}`} />
-                    </div>
-
-                    <div>
-                      <span className="text-[8.5px] font-mono text-accent-1 uppercase tracking-widest font-semibold block mb-0.5">
-                        {currentTrack.isPlayable ? `Channel ${currentTrack.id}` : "Database Record"}
-                      </span>
-                      <h2 className="text-base font-bold font-mono text-text-hi leading-tight tracking-wide mb-1">
-                        {currentTrack.title}
-                      </h2>
-                      <p className="text-[10px] text-text-low line-clamp-2 leading-relaxed max-w-sm mb-1.5">
-                        {currentTrack.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {currentTrack.tempo && (
-                          <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
-                            Tempo: {currentTrack.tempo}
-                          </span>
-                        )}
-                        {currentTrack.key && (
-                          <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
-                            Key: {currentTrack.key}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mode Config Sliders icon */}
-                  <button 
-                    onClick={handleSynthToggle}
-                    className={`p-1.5 rounded-lg border transition-all ${isSynthOnly ? "bg-accent-1/10 border-accent-1 text-accent-1" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"}`}
-                    title="Toggle Synthesizer-Only Mode"
-                  >
-                    <Sliders className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Progress bar / Seeking */}
-                <div className="my-4">
-                  <div className="flex justify-between items-center text-[9px] font-mono text-text-low mb-1.5 select-none">
-                    <span>{formatTime(currentTime)}</span>
-                    <span className="text-text-faint">{"//"}</span>
-                    <span>{formatTime(simulatedDuration)}</span>
-                  </div>
-                  
-                  {/* Track slider */}
-                  <div 
-                    onClick={(e) => {
-                      if (!currentTrack.isPlayable) return;
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const percent = (e.clientX - rect.left) / rect.width;
-                      handleSeek(percent);
+                {/* Visualizer Canvas Container */}
+                <div className={`relative group overflow-hidden rounded-lg ${isVisualizerExpanded ? "flex-1 my-3 flex flex-col min-h-0" : "w-full"}`}>
+                  <canvas 
+                    ref={canvasRef} 
+                    className={`w-full rounded-lg bg-black/40 border border-white/5 transition-all duration-300 cursor-pointer ${
+                      isVisualizerExpanded ? "flex-1" : "h-[140px]"
+                    }`} 
+                    onClick={() => {
+                      if (!isVisualizerExpanded) {
+                        toggleVisualizerExpanded();
+                      }
                     }}
-                    className={`w-full h-1.5 rounded-full bg-white/5 border border-white/5 relative overflow-hidden group ${currentTrack.isPlayable ? "cursor-pointer" : "cursor-not-allowed"}`}
-                  >
+                  />
+                  {!isVisualizerExpanded && (
                     <div 
-                      className={`h-full absolute left-0 top-0 transition-all duration-100 rounded-full ${isFallbackActive ? "bg-accent-1" : "bg-accent-2"}`}
-                      style={{ width: `${(currentTime / (simulatedDuration || 1)) * 100}%` }}
-                    />
-                    <div 
-                      className="absolute w-2 h-full top-0 bg-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-full"
-                      style={{ left: `calc(${(currentTime / (simulatedDuration || 1)) * 100}% - 4px)` }}
-                    />
-                  </div>
+                      onClick={toggleVisualizerExpanded}
+                      className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer border border-accent-2/20 rounded-lg"
+                    >
+                      <div className="p-2.5 rounded-full bg-accent-2/20 border border-accent-2/40 text-accent-2 shadow-[0_0_15px_rgba(0,224,203,0.3)] scale-90 group-hover:scale-100 transition-all duration-300">
+                        <Maximize2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-mono text-accent-2 tracking-widest uppercase font-semibold">
+                        Enter TV Theater
+                      </span>
+                      <span className="text-[8px] font-mono text-text-low">
+                        Click to Expand Preview
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Bezel Controls */}
-                <div className="flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-2">
-                    {/* Prev */}
-                    <button
-                      onClick={handlePrev}
-                      className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                      title="Previous Track"
-                    >
-                      <SkipBack className="w-4 h-4" />
-                    </button>
-
-                    {/* Play/Pause */}
-                    <button
-                      onClick={togglePlay}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                        isPlaying && currentTrack.isPlayable
-                          ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
-                          : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
-                      }`}
-                      title={isPlaying ? "Pause" : "Play"}
-                    >
-                      {isPlaying && currentTrack.isPlayable ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-                    </button>
-
-                    {/* Next */}
-                    <button
-                      onClick={handleNext}
-                      className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                      title="Next Track"
-                    >
-                      <SkipForward className="w-4 h-4" />
-                    </button>
-
-                    {/* Repeat Toggle */}
-                    <button
-                      onClick={() => {
-                        setRepeatMode((prev) => (prev === "none" ? "all" : prev === "all" ? "one" : "none"));
-                        addLog(`SYS: Repeat Mode changed.`);
+                {/* Progress bar / Seeker - Collapsed state only */}
+                {!isVisualizerExpanded && (
+                  <div className="w-full flex flex-col gap-1 select-none">
+                    {/* Seeker Slider track */}
+                    <div 
+                      onClick={(e) => {
+                        if (!currentTrack.isPlayable) return;
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const percent = (e.clientX - rect.left) / rect.width;
+                        handleSeek(percent);
                       }}
-                      className={`ml-1 w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
-                        repeatMode !== "none" ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                      className={`w-full h-1.5 rounded-full bg-white/5 border border-white/10 relative overflow-hidden group ${
+                        currentTrack.isPlayable ? "cursor-pointer" : "cursor-not-allowed"
                       }`}
-                      title={`Repeat: ${repeatMode.toUpperCase()}`}
                     >
-                      <RotateCcw className={`w-3.5 h-3.5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
-                      {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[10px]">1</span>}
-                    </button>
+                      <div 
+                        className={`h-full absolute left-0 top-0 transition-all duration-100 rounded-full ${
+                          isFallbackActive ? "bg-accent-1" : "bg-accent-2"
+                        }`}
+                        style={{ width: `${(currentTime / (simulatedDuration || 1)) * 100}%` }}
+                      />
+                      <div 
+                        className="absolute w-2 h-full top-0 bg-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-full"
+                        style={{ left: `calc(${(currentTime / (simulatedDuration || 1)) * 100}% - 4px)` }}
+                      />
+                    </div>
+                    
+                    {/* Timestamps */}
+                    <div className="flex justify-between items-center text-[9px] font-mono text-text-low px-0.5">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(simulatedDuration)}</span>
+                    </div>
                   </div>
+                )}
 
-                  {/* Volume Slider Block */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={toggleMute}
-                      className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
-                      title={isMuted ? "Unmute" : "Mute"}
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
-                    </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      value={volume}
-                      onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                      className="w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
-                    />
+                {/* Expanded Full-TV Mode Cohesive Console Panel */}
+                {isVisualizerExpanded && (
+                  <div className="w-full bg-black/85 border border-white/10 rounded-xl p-4 flex flex-col gap-4 shadow-[0_4px_24px_rgba(0,0,0,0.6)] backdrop-blur-md z-50">
+                    
+                    {/* Seeker & Timestamps inside the Console Panel */}
+                    <div className="w-full flex flex-col gap-1.5 select-none">
+                      <div 
+                        onClick={(e) => {
+                          if (!currentTrack.isPlayable) return;
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const percent = (e.clientX - rect.left) / rect.width;
+                          handleSeek(percent);
+                        }}
+                        className={`w-full h-2 rounded-full bg-white/5 border border-white/10 relative overflow-hidden group ${
+                          currentTrack.isPlayable ? "cursor-pointer" : "cursor-not-allowed"
+                        }`}
+                      >
+                        <div 
+                          className={`h-full absolute left-0 top-0 transition-all duration-100 rounded-full ${
+                            isFallbackActive ? "bg-accent-1" : "bg-accent-2"
+                          }`}
+                          style={{ width: `${(currentTime / (simulatedDuration || 1)) * 100}%` }}
+                        />
+                        <div 
+                          className="absolute w-2.5 h-full top-0 bg-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-full"
+                          style={{ left: `calc(${(currentTime / (simulatedDuration || 1)) * 100}% - 5px)` }}
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center text-[9px] font-mono text-text-low px-0.5">
+                        <span className="bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-semibold text-text-hi">
+                          {formatTime(currentTime)}
+                        </span>
+                        
+                        {/* Broadcasting title banner */}
+                        <div className="flex items-center gap-2 max-w-[50%] md:max-w-[60%] truncate">
+                          <span className="w-2 h-2 rounded-full bg-accent-2 animate-ping" />
+                          <span className="text-[9px] font-mono tracking-widest text-accent-2 font-bold truncate">
+                            BROADCASTING // CH [{currentTrack.title.toUpperCase()}]
+                          </span>
+                        </div>
+
+                        <span className="bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-semibold text-text-hi">
+                          {formatTime(simulatedDuration)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Integrated Control Row */}
+                    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/5 pt-3">
+                      
+                      {/* Left Block: Audio Source Toggles */}
+                      <div className="flex items-center gap-2 select-none">
+                        {/* Repeat Mode Toggle */}
+                        <button
+                          onClick={toggleRepeatMode}
+                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                            repeatMode !== "none" ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                          }`}
+                          title={`Repeat: ${repeatMode.toUpperCase()}`}
+                        >
+                          <RotateCcw className={`w-3.5 h-3.5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
+                          {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[10px]">1</span>}
+                        </button>
+
+                        {/* Shuffle Toggle */}
+                        <button
+                          onClick={toggleShuffle}
+                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                            isShuffle ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                          }`}
+                          title={`Shuffle: ${isShuffle ? "ON" : "OFF"}`}
+                        >
+                          <Shuffle className="w-3.5 h-3.5" />
+                        </button>
+
+                        {/* Synthesizer Mode Toggle */}
+                        <button
+                          onClick={handleSynthToggle}
+                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                            isSynthOnly ? "bg-accent-1/10 border-accent-1 text-accent-1" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                          }`}
+                          title={`Synthesizer Mode: ${isSynthOnly ? "FORCE ON" : "AUTO"}`}
+                        >
+                          <Sliders className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Center Block: Playback controls */}
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={handlePrev}
+                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                          title="Previous Track"
+                        >
+                          <SkipBack className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={togglePlay}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                            isPlaying && currentTrack.isPlayable
+                              ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
+                              : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
+                          }`}
+                          title={isPlaying ? "Pause" : "Play"}
+                        >
+                          {isPlaying && currentTrack.isPlayable ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+                        </button>
+
+                        <button
+                          onClick={handleNext}
+                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                          title="Next Track"
+                        >
+                          <SkipForward className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Right Block: Volume control & Exit button */}
+                      <div className="flex items-center gap-2 select-none w-full md:w-auto justify-between md:justify-end">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={toggleMute}
+                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
+                            title={isMuted ? "Unmute" : "Mute"}
+                          >
+                            {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                          </button>
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={volume}
+                            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                            className="w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                          />
+                        </div>
+                        <button
+                          onClick={toggleVisualizerExpanded}
+                          className="ml-3 px-3 py-1.5 text-[9px] font-mono rounded border border-accent-3/20 bg-accent-3/10 text-accent-3 hover:bg-accent-3/20 transition-all uppercase font-semibold"
+                        >
+                          Exit Theater
+                        </button>
+                      </div>
+
+                    </div>
                   </div>
-                </div>
-
+                )}
               </div>
+
+              {/* Deck Console / Track Details / Tabbed Music Improvement Suite */}
+              {!isVisualizerExpanded && (
+                <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-4 flex flex-col justify-between min-h-0 overflow-y-auto relative glass-panel">
+                  <div className="absolute inset-0 bg-gradient-to-b from-accent-1/2 to-transparent opacity-10 pointer-events-none" />
+
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-4 items-center">
+                      {/* Disc artwork */}
+                      <div className="relative w-16 h-16 flex-shrink-0 select-none">
+                        <div className={`w-full h-full rounded-full border border-white/10 bg-zinc-950 flex items-center justify-center shadow-2xl relative overflow-hidden ${isPlaying && currentTrack.isPlayable ? "animate-[spin_10s_linear_infinite]" : ""}`}>
+                          <div className="absolute inset-2 rounded-full border border-dashed border-white/5" />
+                          <div className="absolute inset-4 rounded-full border border-white/5" />
+                          <div className="w-5 h-5 rounded-full bg-black border border-white/20 flex items-center justify-center relative z-10 shadow-lg">
+                            <div className="w-2 h-2 rounded-full bg-accent-1 shadow-[0_0_8px_var(--accent-1)]" />
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
+                        </div>
+                        <div className={`absolute -inset-1 rounded-full border border-accent-2/10 pointer-events-none ${isPlaying && currentTrack.isPlayable ? "animate-pulse" : ""}`} />
+                      </div>
+
+                      <div>
+                        <span className="text-[8.5px] font-mono text-accent-1 uppercase tracking-widest font-semibold block mb-0.5">
+                          {currentTrack.isPlayable ? "Now Playing" : "Archive database"}
+                        </span>
+                        <h2 className="text-sm font-bold font-mono text-text-hi leading-tight tracking-wide mb-1">
+                          {currentTrack.title}
+                        </h2>
+                        <p className="text-[9.5px] text-text-low line-clamp-2 leading-relaxed max-w-sm">
+                          {currentTrack.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tabbed Suite: Equalizer, Ambient Soundscapes, Custom Uploaders */}
+                  <div className="my-4 border border-white/5 rounded-xl bg-black/40 overflow-hidden flex flex-col flex-1 min-h-[120px]">
+                    {/* Tab Headers */}
+                    <div className="flex border-b border-white/5 bg-black/20 text-[9px] font-mono">
+                      <button
+                        onClick={() => setActiveConsoleTab("eq")}
+                        className={`flex-1 py-2 flex items-center justify-center gap-1.5 border-r border-white/5 transition-all ${
+                          activeConsoleTab === "eq" ? "bg-white/5 text-accent-2 font-bold" : "text-text-low hover:text-text-mid"
+                        }`}
+                      >
+                        <Sliders className="w-3 h-3" />
+                        Equalizer
+                      </button>
+                      <button
+                        onClick={() => setActiveConsoleTab("ambient")}
+                        className={`flex-1 py-2 flex items-center justify-center gap-1.5 transition-all ${
+                          activeConsoleTab === "ambient" ? "bg-white/5 text-accent-2 font-bold" : "text-text-low hover:text-text-mid"
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 animate-pulse" />
+                        Nature
+                      </button>
+                    </div>
+
+                    {/* Tab Contents */}
+                    <div className="p-3 flex-1 flex flex-col justify-center min-h-[90px]">
+                      {activeConsoleTab === "eq" && (
+                        <div className="flex items-center justify-around gap-4">
+                          {/* Bass */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low uppercase">Bass</span>
+                            <input
+                              type="range"
+                              min="-12"
+                              max="12"
+                              step="1"
+                              value={eqBass}
+                              onChange={(e) => setEqBass(parseInt(e.target.value))}
+                              className="w-full accent-accent-1 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className={`text-[8.5px] font-mono ${eqBass > 0 ? "text-accent-1" : eqBass < 0 ? "text-text-low" : "text-text-faint"}`}>
+                              {eqBass > 0 ? `+${eqBass}` : eqBass} dB
+                            </span>
+                          </div>
+
+                          {/* Mid */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low uppercase">Mid</span>
+                            <input
+                              type="range"
+                              min="-12"
+                              max="12"
+                              step="1"
+                              value={eqMid}
+                              onChange={(e) => setEqMid(parseInt(e.target.value))}
+                              className="w-full accent-accent-2 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className={`text-[8.5px] font-mono ${eqMid > 0 ? "text-accent-2" : eqMid < 0 ? "text-text-low" : "text-text-faint"}`}>
+                              {eqMid > 0 ? `+${eqMid}` : eqMid} dB
+                            </span>
+                          </div>
+
+                          {/* Treble */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low uppercase">Treble</span>
+                            <input
+                              type="range"
+                              min="-12"
+                              max="12"
+                              step="1"
+                              value={eqTreble}
+                              onChange={(e) => setEqTreble(parseInt(e.target.value))}
+                              className="w-full accent-accent-3 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className={`text-[8.5px] font-mono ${eqTreble > 0 ? "text-accent-3" : eqTreble < 0 ? "text-text-low" : "text-text-faint"}`}>
+                              {eqTreble > 0 ? `+${eqTreble}` : eqTreble} dB
+                            </span>
+                          </div>
+
+                          {/* Echo */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low uppercase">Echo</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="0.8"
+                              step="0.01"
+                              value={echoVol}
+                              onChange={(e) => setEchoVol(parseFloat(e.target.value))}
+                              className="w-full accent-purple-400 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className={`text-[8.5px] font-mono ${echoVol > 0 ? "text-purple-400" : "text-text-faint"}`}>
+                              {Math.round((echoVol / 0.8) * 100)}%
+                            </span>
+                          </div>
+
+                          {/* Reset EQ */}
+                          <button
+                            onClick={() => {
+                              setEqBass(0);
+                              setEqMid(0);
+                              setEqTreble(0);
+                              setEchoVol(0);
+                            }}
+                            className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[8px] font-mono text-text-low hover:text-text-hi transition-colors"
+                          >
+                            Flat
+                          </button>
+                        </div>
+                      )}
+
+                      {activeConsoleTab === "ambient" && (
+                        <div className="flex items-center justify-around gap-4">
+                          {/* Rain */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low flex items-center gap-1">
+                              <CloudRain className="w-2.5 h-2.5 text-blue-400" />
+                              Rain
+                            </span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="0.4"
+                              step="0.01"
+                              value={rainVol}
+                              onChange={(e) => setRainVol(parseFloat(e.target.value))}
+                              className="w-full accent-blue-400 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className="text-[8px] font-mono text-text-low">
+                              {Math.round((rainVol / 0.4) * 100)}%
+                            </span>
+                          </div>
+
+                          {/* Wind */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low flex items-center gap-1">
+                              <Wind className="w-2.5 h-2.5 text-teal-400" />
+                              Wind
+                            </span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="0.4"
+                              step="0.01"
+                              value={windVol}
+                              onChange={(e) => setWindVol(parseFloat(e.target.value))}
+                              className="w-full accent-teal-400 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className="text-[8px] font-mono text-text-low">
+                              {Math.round((windVol / 0.4) * 100)}%
+                            </span>
+                          </div>
+
+                          {/* Hum */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <span className="text-[8px] font-mono text-text-low flex items-center gap-1">
+                              <Cpu className="w-2.5 h-2.5 text-accent-3" />
+                              Hum
+                            </span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="0.4"
+                              step="0.01"
+                              value={humVol}
+                              onChange={(e) => setHumVol(parseFloat(e.target.value))}
+                              className="w-full accent-accent-3 cursor-pointer bg-white/10 h-1 rounded outline-none"
+                            />
+                            <span className="text-[8px] font-mono text-text-low">
+                              {Math.round((humVol / 0.4) * 100)}%
+                            </span>
+                          </div>
+
+                          {/* Presets */}
+                          <div className="flex flex-col gap-1 select-none">
+                            <button
+                              onClick={() => {
+                                setRainVol(0.15);
+                                setWindVol(0.1);
+                                setHumVol(0);
+                              }}
+                              className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[7.5px] font-mono text-text-low hover:text-text-hi"
+                            >
+                              Nature
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRainVol(0);
+                                setWindVol(0);
+                                setHumVol(0);
+                              }}
+                              className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[7.5px] font-mono text-text-low hover:text-text-hi"
+                            >
+                              Off
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bezel Controls */}
+                  <div className="flex items-center justify-between mt-auto w-full gap-4 flex-shrink-0">
+                    {/* Left Column: Toggles (Repeat, Shuffle, Synth Mode) */}
+                    <div className="flex items-center gap-1.5 md:gap-2 flex-1 justify-start select-none">
+                      {/* Repeat Toggle */}
+                      <button
+                        onClick={toggleRepeatMode}
+                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          repeatMode !== "none" ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                        }`}
+                        title={`Repeat: ${repeatMode.toUpperCase()}`}
+                      >
+                        <RotateCcw className={`w-3.5 h-3.5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
+                        {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[10px]">1</span>}
+                      </button>
+
+                      {/* Shuffle Toggle */}
+                      <button
+                        onClick={toggleShuffle}
+                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          isShuffle ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                        }`}
+                        title={`Shuffle: ${isShuffle ? "ON" : "OFF"}`}
+                      >
+                        <Shuffle className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Synthesizer Mode Toggle */}
+                      <button
+                        onClick={handleSynthToggle}
+                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          isSynthOnly ? "bg-accent-1/10 border-accent-1 text-accent-1" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
+                        }`}
+                        title={`Synthesizer Mode: ${isSynthOnly ? "FORCE ON" : "AUTO"}`}
+                      >
+                        <Sliders className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Center Column: Playback Controls (Prev, Play/Pause, Next) */}
+                    <div className="flex items-center gap-2 md:gap-3 justify-center flex-shrink-0">
+                      {/* Prev */}
+                      <button
+                        onClick={handlePrev}
+                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                        title="Previous Track"
+                      >
+                        <SkipBack className="w-4 h-4" />
+                      </button>
+
+                      {/* Play/Pause */}
+                      <button
+                        onClick={togglePlay}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                          isPlaying && currentTrack.isPlayable
+                             ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
+                             : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
+                        }`}
+                        title={isPlaying ? "Pause" : "Play"}
+                      >
+                        {isPlaying && currentTrack.isPlayable ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+                      </button>
+
+                      {/* Next */}
+                      <button
+                        onClick={handleNext}
+                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                        title="Next Track"
+                      >
+                        <SkipForward className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Right Column: Volume Block */}
+                    <div className="flex items-center gap-1.5 md:gap-2 flex-1 justify-end select-none">
+                      <button
+                        onClick={toggleMute}
+                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
+                        title={isMuted ? "Unmute" : "Mute"}
+                      >
+                        {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                      </button>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={volume}
+                        onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                        className="w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              )}
 
             </div>
 
             {/* Right Column: Track Search and Playlist Library */}
-            <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-0">
-              
-              {/* Search Box */}
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-2.5 text-text-low pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Search channels..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-black/40 border border-white/5 focus:border-accent-2/50 rounded-lg py-2 pl-9 pr-8 text-xs font-mono text-text-hi placeholder-text-faint outline-none transition-all focus:shadow-[0_0_12px_rgba(0,224,203,0.1)]"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-2.5 text-text-faint hover:text-text-mid text-xs font-mono"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Scrollable Track list */}
-              <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-3 flex flex-col min-h-0 glass-panel">
-                <div className="flex justify-between items-center mb-2 px-1 select-none flex-shrink-0">
-                  <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Channel Library</span>
-                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
-                    COUNT: {filteredTracks.length}
-                  </span>
-                </div>
-
-                {/* List container */}
-                <div className="flex-1 overflow-y-auto space-y-1.5 pr-1.5 custom-scrollbar">
-                  {filteredTracks.map((track) => {
-                    const isSelected = track.id === currentTrack.id;
-                    const isTrackPlaying = isPlaying && isSelected;
-                    
-                    return (
+            {!isVisualizerExpanded && (
+              <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-0 select-none">
+                
+                {/* Search Box */}
+                <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-2.5 text-text-low pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Search Music..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-black/40 border border-white/5 focus:border-accent-2/50 rounded-lg py-2 pl-9 pr-8 text-xs font-mono text-text-hi placeholder-text-faint outline-none transition-all focus:shadow-[0_0_12px_rgba(0,224,203,0.1)]"
+                    />
+                    {searchQuery && (
                       <button
-                        key={track.id}
-                        onClick={() => {
-                          const idx = TRACKS.findIndex((t) => t.id === track.id);
-                          handleTrackSelect(idx, { autoplay: true });
-                        }}
-                        aria-current={isTrackPlaying ? "true" : undefined}
-                        className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden ${
-                          isTrackPlaying
-                            ? "bg-accent-2/10 border-accent-2/60 shadow-[0_0_18px_rgba(0,224,203,0.12),inset_0_1px_8px_rgba(0,224,203,0.08)]"
-                            : isSelected
-                            ? "bg-white/5 border-accent-1/50 shadow-[inset_0_1px_4px_rgba(255,255,255,0.02)]"
-                            : "bg-transparent border-white/5 hover:bg-white/5 hover:border-white/10"
-                        }`}
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-3 top-2.5 text-text-faint hover:text-text-mid text-xs font-mono"
                       >
-                        {/* Indicator highlight pill */}
-                        {isSelected && (
-                          <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${isTrackPlaying ? "bg-accent-2 shadow-[0_0_12px_var(--accent-2)]" : track.isPlayable ? "bg-accent-2" : "bg-accent-3"}`} />
-                        )}
-
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          {/* Channel number or animated indicator */}
-                          <div className="w-6 h-6 rounded bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 text-[10px] font-mono text-text-low select-none">
-                            {isTrackPlaying ? (
-                              <Music className="w-3.5 h-3.5 text-accent-2 animate-bounce" />
-                            ) : (
-                              String(track.id).padStart(2, "0")
-                            )}
-                          </div>
-
-                          <div className="min-w-0">
-                            <span className={`text-xs font-semibold font-mono block truncate leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
-                              {track.title}
-                            </span>
-                            <span className={`text-[8.5px] font-mono tracking-wider font-semibold uppercase px-1 rounded inline-block mt-0.5 select-none ${
-                              isTrackPlaying
-                                ? "bg-accent-2/20 border border-accent-2/40 text-accent-2"
-                                : track.isPlayable 
-                                ? "bg-accent-2/10 border border-accent-2/20 text-accent-2" 
-                                : "bg-accent-3/10 border border-accent-3/20 text-accent-3"
-                            }`}>
-                              {isTrackPlaying ? "PLAYING" : track.isPlayable ? "LIVE" : "ARCHIVE"}
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="text-[9px] font-mono text-text-low group-hover:text-text-mid transition-colors flex-shrink-0 select-none">
-                          {track.duration}
-                        </span>
+                        ×
                       </button>
-                    );
-                  })}
+                    )}
+                  </div>
+                </div>
 
-                  {filteredTracks.length === 0 && (
-                    <div className="text-center py-8">
-                      <AlertTriangle className="w-6 h-6 text-text-faint mx-auto mb-2" />
-                      <p className="text-[10px] font-mono text-text-low">No channels found matching query.</p>
-                    </div>
+                {/* Scrollable Track list */}
+                <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-3 flex flex-col min-h-0 glass-panel">
+                  <div className="flex justify-between items-center mb-2 px-1 flex-shrink-0">
+                    <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Channel Library</span>
+                    <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
+                      COUNT: {filteredTracks.length}
+                    </span>
+                  </div>
+
+                  {/* List container */}
+                  <div className="flex-1 overflow-y-auto space-y-1.5 pr-1.5 custom-scrollbar">
+                    {filteredTracks.map((track) => {
+                      const isSelected = track.id === currentTrack.id;
+                      const isTrackPlaying = isPlaying && isSelected;
+                      
+                      return (
+                        <button
+                          key={track.id}
+                          onClick={() => {
+                            const idx = tracks.findIndex((t) => t.id === track.id);
+                            handleTrackSelect(idx, { autoplay: true });
+                          }}
+                          aria-current={isTrackPlaying ? "true" : undefined}
+                          className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden ${
+                            isTrackPlaying
+                              ? "bg-accent-2/10 border-accent-2/60 shadow-[0_0_18px_rgba(0,224,203,0.12),inset_0_1px_8px_rgba(0,224,203,0.08)]"
+                              : isSelected
+                              ? "bg-white/5 border-accent-1/50 shadow-[inset_0_1px_4px_rgba(255,255,255,0.02)]"
+                              : "bg-transparent border-white/5 hover:bg-white/5 hover:border-white/10"
+                          }`}
+                        >
+                          {/* Indicator highlight pill */}
+                          {isSelected && (
+                            <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${isTrackPlaying ? "bg-accent-2 shadow-[0_0_12px_var(--accent-2)]" : track.isPlayable ? "bg-accent-2" : "bg-accent-3"}`} />
+                          )}
+
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {/* Channel number or animated indicator */}
+                            <div className="w-6 h-6 rounded bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 text-[10px] font-mono text-text-low">
+                              {isTrackPlaying ? (
+                                <Music className="w-3.5 h-3.5 text-accent-2 animate-bounce" />
+                              ) : (
+                                String(track.id).padStart(2, "0")
+                              )}
+                            </div>
+
+                            <div className="min-w-0">
+                              <span className={`text-xs font-semibold font-mono block truncate leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
+                                {track.title}
+                              </span>
+                              <span className={`text-[8.5px] font-mono tracking-wider font-semibold uppercase px-1 rounded inline-block mt-0.5 ${
+                                isTrackPlaying
+                                  ? "bg-accent-2/20 border border-accent-2/40 text-accent-2"
+                                  : track.isPlayable 
+                                  ? "bg-accent-2/10 border border-accent-2/20 text-accent-2" 
+                                  : "bg-accent-3/10 border border-accent-3/20 text-accent-3"
+                              }`}>
+                                {isTrackPlaying ? "PLAYING" : track.isPlayable ? "LIVE" : "ARCHIVE"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className="text-[9px] font-mono text-text-low group-hover:text-text-mid transition-colors flex-shrink-0">
+                            {track.duration}
+                          </span>
+                        </button>
+                      );
+                    })}
+
+                    {filteredTracks.length === 0 && (
+                      <div className="text-center py-8">
+                        <AlertTriangle className="w-6 h-6 text-text-faint mx-auto mb-2" />
+                        <p className="text-[10px] font-mono text-text-low">No channels found matching query.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Console log footer (retro style log) */}
+                <div className="h-[100px] bg-black/75 border border-white/5 rounded-xl p-2.5 font-mono text-[8.5px] text-accent-2 overflow-y-auto flex flex-col-reverse gap-0.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.7)] flex-shrink-0">
+                  {logs.length > 0 ? (
+                    logs.map((log, i) => <div key={i} className="truncate select-none leading-relaxed">{log}</div>)
+                  ) : (
+                    <div className="text-text-faint select-none animate-pulse">TERMINAL LOG ACTIVE (IDLE)</div>
                   )}
+                  <div className="text-text-low border-b border-white/5 pb-1 mb-1 select-none flex items-center gap-1">
+                    <Terminal className="w-3 h-3 text-text-low" />
+                    <span>DECODER LOG SUMMARY</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Console log footer (retro style log) */}
-              <div className="h-[100px] bg-black/75 border border-white/5 rounded-xl p-2.5 font-mono text-[8.5px] text-accent-2 overflow-y-auto flex flex-col-reverse gap-0.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.7)] flex-shrink-0">
-                {logs.length > 0 ? (
-                  logs.map((log, i) => <div key={i} className="truncate select-none leading-relaxed">{log}</div>)
-                ) : (
-                  <div className="text-text-faint select-none animate-pulse">TERMINAL LOG ACTIVE (IDLE)</div>
-                )}
-                <div className="text-text-low border-b border-white/5 pb-1 mb-1 select-none flex items-center gap-1">
-                  <Terminal className="w-3 h-3 text-text-low" />
-                  <span>DECODER LOG SUMMARY</span>
-                </div>
               </div>
-
-            </div>
+            )}
 
           </div>
         </div>
