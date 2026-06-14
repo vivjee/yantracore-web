@@ -1,0 +1,456 @@
+/* Global YantraMate assistant */
+.agent-widget {
+  position: absolute;
+  right: clamp(14px, 2.4vw, 30px);
+  bottom: clamp(14px, 2.4vw, 30px);
+  z-index: 120;
+  pointer-events: none;
+}
+
+.agent-launcher,
+.agent-panel {
+  pointer-events: auto;
+}
+
+.agent-launcher {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(76px, 8vw, 108px);
+  height: clamp(76px, 8vw, 108px);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 42%, transparent);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.18), transparent 32%),
+    linear-gradient(145deg, rgba(12, 16, 30, 0.92), rgba(5, 7, 16, 0.72));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.42),
+    0 0 22px color-mix(in srgb, var(--accent-2) 26%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  overflow: visible;
+}
+
+.agent-launcher::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--accent-1) 34%, transparent);
+  opacity: 0.72;
+  animation: agent-pulse-ring 2.8s var(--ease-out-soft) infinite;
+}
+
+.agent-launcher--open::before {
+  border-color: color-mix(in srgb, var(--accent-3) 44%, transparent);
+}
+
+.agent-launcher__tag {
+  position: absolute;
+  right: 4px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  color: #041016;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent-2) 55%, transparent);
+}
+
+.agent-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  isolation: isolate;
+}
+
+.agent-orb__halo {
+  position: absolute;
+  width: 78%;
+  height: 78%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--accent-2) 32%, transparent) 0 34%, transparent 66%),
+    conic-gradient(from 0deg, var(--accent-2), var(--accent-1), var(--accent-3), var(--accent-2));
+  filter: blur(8px);
+  opacity: 0.62;
+  animation: agent-halo-spin 5.8s linear infinite;
+  z-index: -1;
+}
+
+.agent-orb__bot {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 10px color-mix(in srgb, var(--accent-2) 38%, transparent));
+  animation: agent-stand 3.2s var(--ease-in-out) infinite;
+  user-select: none;
+}
+
+.agent-orb__signal {
+  position: absolute;
+  top: 15%;
+  right: 12%;
+  display: inline-flex;
+  gap: 3px;
+}
+
+.agent-orb__signal span {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-2);
+  animation: agent-signal 1.15s ease-in-out infinite;
+}
+
+.agent-orb__signal span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.agent-orb__signal span:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.agent-orb--thinking .agent-orb__bot {
+  animation: agent-think 0.78s ease-in-out infinite;
+}
+
+.agent-orb--thinking .agent-orb__halo {
+  animation-duration: 1.8s;
+  opacity: 0.9;
+}
+
+.agent-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(clamp(76px, 8vw, 108px) + 18px);
+  width: min(390px, calc(100vw - 36px));
+  max-height: min(580px, calc(100vh - 150px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background:
+    linear-gradient(155deg, rgba(10, 14, 28, 0.94), rgba(5, 8, 18, 0.86)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 45%);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.54),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 0 34px color-mix(in srgb, var(--accent-1) 24%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.agent-panel__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+
+.agent-panel__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-panel__identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.agent-panel__identity .agent-orb {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+}
+
+.agent-panel__identity p {
+  margin: 0;
+  color: var(--text-hi);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.agent-panel__identity span {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-low);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.agent-panel__close,
+.agent-panel__composer button {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-hi);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-soft),
+    background var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.agent-panel__close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+}
+
+.agent-panel__close:hover,
+.agent-panel__composer button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent-2) 46%, transparent);
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+  transform: translateY(-1px);
+}
+
+.agent-panel__messages {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 240px;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.agent-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 86%;
+}
+
+.agent-message p {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.agent-message--assistant {
+  align-self: flex-start;
+  color: var(--text-mid);
+}
+
+.agent-message--assistant svg {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  color: var(--accent-2);
+}
+
+.agent-message--assistant p {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.agent-message--user {
+  align-self: flex-end;
+}
+
+.agent-message--user p {
+  color: white;
+  background: linear-gradient(135deg, var(--accent-1), color-mix(in srgb, var(--accent-3) 72%, var(--accent-1)));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-1) 22%, transparent);
+}
+
+.agent-message--thinking p {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 58px;
+  min-height: 38px;
+}
+
+.agent-message--thinking p span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  box-shadow: 0 0 10px var(--accent-2);
+  animation: agent-typing-dot 0.9s ease-in-out infinite;
+}
+
+.agent-message--thinking p span:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.agent-message--thinking p span:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.agent-panel__composer {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.agent-panel__composer input {
+  min-width: 0;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text-hi);
+  padding: 0 13px;
+  font-size: 13px;
+  outline: none;
+  box-shadow: inset 0 1px 14px rgba(0, 0, 0, 0.24);
+}
+
+.agent-panel__composer input:focus {
+  border-color: color-mix(in srgb, var(--accent-2) 48%, transparent);
+  box-shadow:
+    inset 0 1px 14px rgba(0, 0, 0, 0.24),
+    0 0 0 2px color-mix(in srgb, var(--accent-2) 12%, transparent);
+}
+
+.agent-panel__composer button {
+  width: 42px;
+  height: 42px;
+}
+
+.agent-panel__composer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+html[data-theme="light"] .agent-launcher {
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.88), transparent 34%),
+    linear-gradient(145deg, #f7f9fc, #e6ecf4);
+  box-shadow:
+    8px 8px 20px rgba(163, 177, 198, 0.36),
+    -8px -8px 20px rgba(255, 255, 255, 0.86),
+    0 0 24px color-mix(in srgb, var(--accent-2) 18%, transparent);
+}
+
+html[data-theme="light"] .agent-panel {
+  background:
+    linear-gradient(155deg, rgba(245, 247, 250, 0.96), rgba(230, 236, 244, 0.9)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 45%);
+  border-color: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    10px 10px 28px rgba(163, 177, 198, 0.32),
+    -10px -10px 28px rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="light"] .agent-panel__composer input,
+html[data-theme="light"] .agent-message--assistant p {
+  background: rgba(255, 255, 255, 0.62) !important;
+  color: var(--text-hi) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+@keyframes agent-stand {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1.2deg);
+  }
+}
+
+@keyframes agent-think {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg) scale(1.035);
+  }
+}
+
+@keyframes agent-halo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes agent-signal {
+  0%, 100% {
+    opacity: 0.35;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+  }
+}
+
+@keyframes agent-pulse-ring {
+  0% {
+    opacity: 0.64;
+    transform: scale(0.92);
+  }
+  70%, 100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes agent-typing-dot {
+  0%, 100% {
+    opacity: 0.34;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+
+@media (max-width: 720px) {
+  .agent-widget {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .agent-panel {
+    width: calc(100vw - 24px);
+    max-height: min(520px, calc(100vh - 132px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-launcher::before,
+  .agent-orb__bot,
+  .agent-orb__halo,
+  .agent-orb__signal span,
+  .agent-message--thinking p span {
+    animation: none !important;
+  }
+}

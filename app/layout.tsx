@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import "@/components/agent/AgentChatWidget.css";
 import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
 import { Header } from "@/components/chrome/Header";
