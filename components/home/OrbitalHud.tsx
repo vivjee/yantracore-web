@@ -11,10 +11,8 @@ import { useEffect, useState } from "react";
  *
  *   • Viewfinder corner brackets — frame the screen like a scope.
  *   • A bottom telemetry strip   — a live status pulse with a `YantraCore / Home`
- *                                  brand readout, and an `Orbital Hub / CH·00`
- *                                  tag carrying the visitor's local timezone +
- *                                  running clock (the channel code slots Home into
- *                                  the existing CH-01…CH-04 metaphor).
+ *                                  brand readout on the left, and the visitor's
+ *                                  local timezone + a running clock on the right.
  *   • Vertical edge spines        — micro-type restating the value prop in the
  *                                  wide side gutters (xl screens only).
  *
@@ -51,10 +49,6 @@ export function OrbitalHud() {
           <span className="orbital-hud__dim">Home</span>
         </span>
         <span className="orbital-hud__readout orbital-hud__readout--right">
-          Orbital Hub
-          <span className="orbital-hud__sep">/</span>
-          <span className="orbital-hud__dim">CH·00</span>
-          <span className="orbital-hud__sep">/</span>
           <span className="orbital-hud__dim">{clock?.zone ?? "—"}</span>
           <span className="orbital-hud__clock">{clock?.time ?? "––:––:––"}</span>
         </span>
