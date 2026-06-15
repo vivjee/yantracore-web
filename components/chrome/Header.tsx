@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { useTheme } from "@/lib/theme/ThemeProvider";
 import { audioSynth } from "@/lib/audio";
 import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
+import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 
 /* ─── Nav link definitions ───────────────────────────────────────────── */
 
@@ -43,11 +44,11 @@ function HamburgerIcon({ open }: { open: boolean }) {
     <div
       data-menu-open={open ? "true" : "false"}
       aria-hidden
-      className="flex flex-col justify-center items-center gap-[6px] w-5 h-5"
+      className="flex flex-col justify-center items-center gap-[7px] w-6 h-6"
     >
-      <span className="ham-bar-top block h-[1.5px] w-5 rounded-full bg-current origin-center" />
-      <span className="ham-bar-mid block h-[1.5px] w-5 rounded-full bg-current origin-center" />
-      <span className="ham-bar-bot block h-[1.5px] w-5 rounded-full bg-current origin-center" />
+      <span className="ham-bar-top block h-[2px] w-6 rounded-full bg-current origin-center" />
+      <span className="ham-bar-mid block h-[2px] w-6 rounded-full bg-current origin-center" />
+      <span className="ham-bar-bot block h-[2px] w-6 rounded-full bg-current origin-center" />
     </div>
   );
 }
@@ -602,13 +603,33 @@ export function Header() {
         <Container width="default">
           <div className="flex items-center justify-between gap-4">
 
-            {/* ── Logo ── */}
+            {/* ── Logo + wordmark ── */}
             <Link
               href="/"
               aria-label="YantraCore — home"
-              className="pointer-events-auto relative inline-block group"
+              className="pointer-events-auto relative inline-flex items-center gap-3 group"
             >
               <HeaderLogo size="large" />
+              <span
+                style={{
+                  fontSize: "1.1rem",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  letterSpacing: "0.06em",
+                  lineHeight: 1,
+                  background: "linear-gradient(110deg, #00e0cb 0%, #6e56ff 40%, #ff4fb0 70%, #00e0cb 100%)",
+                  backgroundSize: "220% 100%",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  color: "transparent",
+                  animation: "yantra-electric-flow 16s ease-in-out infinite",
+                  display: "inline-block",
+                  filter: "drop-shadow(0 0 6px rgba(110,86,255,0.4))",
+                }}
+              >
+                YantraCore
+              </span>
             </Link>
 
             {/* ── Pill ── */}
@@ -715,7 +736,7 @@ export function Header() {
                 />
                 {/* User icon */}
                 <svg
-                  width="12" height="12" viewBox="0 0 16 16"
+                  width="18" height="18" viewBox="0 0 16 16"
                   fill="none" stroke="currentColor"
                   strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                   aria-hidden
@@ -742,14 +763,14 @@ export function Header() {
                 aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} theme`}
               >
                 <div
-                  className="relative w-4 h-4 transition-transform duration-500"
+                  className="relative w-5 h-5 transition-transform duration-500"
                   style={{
                     transform: themeMode === "light" ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 >
                   {themeMode === "dark" ? (
                     <svg
-                      width="16" height="16" viewBox="0 0 24 24"
+                      width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor"
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                     >
@@ -757,7 +778,7 @@ export function Header() {
                     </svg>
                   ) : (
                     <svg
-                      width="16" height="16" viewBox="0 0 24 24"
+                      width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor"
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                     >

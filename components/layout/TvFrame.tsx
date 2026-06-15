@@ -199,27 +199,27 @@ export function TvFrame({ children }: TvFrameProps) {
               <div className="tv-chrome-btn-group">
                 <Link href="/" className={`tv-console-btn ${pathname === "/" ? "active" : ""}`} aria-label="Showcase Feed" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/" && (<motion.span layoutId="tvActivePill" className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <TvConsoleIcon className="w-4 h-4 relative z-10" />
+                  <TvConsoleIcon className="w-5 h-5 relative z-10" />
                   <span className="tooltip">Showcase</span>
                 </Link>
                 <Link href="/entryport" className={`tv-console-btn ${pathname === "/entryport" ? "active" : ""}`} aria-label="Entryport Earth" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/entryport" && (<motion.span layoutId="tvActivePill" className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <Globe2 className="w-4 h-4 relative z-10" />
+                  <Globe2 className="w-5 h-5 relative z-10" />
                   <span className="tooltip">Entryport Earth</span>
                 </Link>
                 <Link href="/music" className={`tv-console-btn ${pathname === "/music" ? "active" : ""}`} aria-label="Ambient Music" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/music" && (<motion.span layoutId="tvActivePill" className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <SynthMusicIcon className="w-4 h-4 relative z-10" />
+                  <SynthMusicIcon className="w-5 h-5 relative z-10" />
                   <span className="tooltip">Music</span>
                 </Link>
                 <Link href="/settings" className={`tv-console-btn ${pathname === "/settings" ? "active" : ""}`} aria-label="System Settings" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/settings" && (<motion.span layoutId="tvActivePill" className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <ChipSettingsIcon className="w-4 h-4 settings-icon relative z-10" />
+                  <ChipSettingsIcon className="w-6 h-6 settings-icon relative z-10" />
                   <span className="tooltip">Settings</span>
                 </Link>
                 <Link href="/technologies" className={`tv-console-btn ${pathname === "/technologies" ? "active" : ""}`} aria-label="Technologies" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/technologies" && (<motion.span layoutId="tvActivePill" className="absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 shadow-[0_0_12px_rgba(110,86,255,0.3)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <StellarOrbitIcon className="w-4 h-4 relative z-10" />
+                  <StellarOrbitIcon className="w-5 h-5 relative z-10" />
                   <span className="tooltip">Technologies</span>
                 </Link>
               </div>
@@ -227,11 +227,11 @@ export function TvFrame({ children }: TvFrameProps) {
               {/* Group 2 — System controls */}
               <div className="tv-chrome-btn-group">
                 <button className="tv-console-btn relative z-10" onClick={() => { if (isPowered) { audioSynth.playClick(); setThemeMode(themeMode === "dark" ? "light" : "dark"); } }} onMouseEnter={() => isPowered && audioSynth.playHover()} aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} theme`} disabled={!isPowered} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
-                  {themeMode === "dark" ? <SunCoreIcon className="w-4 h-4 relative z-10" /> : <MoonCrescentIcon className="w-4 h-4 relative z-10" />}
+                  {themeMode === "dark" ? <SunCoreIcon className="w-5 h-5 relative z-10" /> : <MoonCrescentIcon className="w-5 h-5 relative z-10" />}
                   <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"}</span>
                 </button>
                 <button className="tv-console-btn relative z-10" onClick={toggleFullscreen} onMouseEnter={() => isPowered && isFullscreenSupported && audioSynth.playHover()} aria-label={isFullscreen ? "Exit full screen" : "Enter full screen"} aria-pressed={isFullscreen} disabled={!isPowered || !isFullscreenSupported} style={fullscreenButtonStyle}>
-                  {isFullscreen ? <Minimize2 className="w-4 h-4 relative z-10" /> : <Maximize2 className="w-4 h-4 relative z-10" />}
+                  {isFullscreen ? <Minimize2 className="w-5 h-5 relative z-10" /> : <Maximize2 className="w-5 h-5 relative z-10" />}
                   <span className="tooltip">{isFullscreen ? "Exit Full Screen" : "Full Screen"}</span>
                 </button>
               </div>
@@ -240,7 +240,7 @@ export function TvFrame({ children }: TvFrameProps) {
               <div className="tv-chrome-btn-group">
                 <Link href={accountHref} className={`tv-console-btn tv-console-account-btn ${isAccountActive ? "active" : ""}`} aria-label="Account" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}>
                   {isPowered && isAccountActive && (<motion.span layoutId="tvAccountActivePill" className="absolute inset-0 rounded-[7px] bg-accent-2/20 border border-accent-2/45 shadow-[0_0_14px_rgba(0,224,203,0.35)] pointer-events-none" transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <UserIcon className="w-4 h-4 relative z-10" />
+                  <UserIcon className="w-5 h-5 relative z-10" />
                   <span className="tooltip">Account</span>
                 </Link>
               </div>
@@ -337,7 +337,7 @@ export function TvFrame({ children }: TvFrameProps) {
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                 />
               )}
-              <SynthMusicIcon className="w-4 h-4 relative z-10" />
+              <SynthMusicIcon className="w-5 h-5 relative z-10" />
               <span className="tooltip">Music</span>
             </Link>
 
@@ -361,7 +361,7 @@ export function TvFrame({ children }: TvFrameProps) {
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                 />
               )}
-              <ChipSettingsIcon className="w-4 h-4 settings-icon relative z-10" />
+              <ChipSettingsIcon className="w-6 h-6 settings-icon relative z-10" />
               <span className="tooltip">Settings</span>
             </Link>
 
@@ -381,9 +381,9 @@ export function TvFrame({ children }: TvFrameProps) {
               style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}
             >
               {themeMode === "dark" ? (
-                <SunCoreIcon className="w-4 h-4 relative z-10" />
+                <SunCoreIcon className="w-5 h-5 relative z-10" />
               ) : (
-                <MoonCrescentIcon className="w-4 h-4 relative z-10" />
+                <MoonCrescentIcon className="w-5 h-5 relative z-10" />
               )}
               <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"}</span>
             </button>
@@ -400,9 +400,9 @@ export function TvFrame({ children }: TvFrameProps) {
               style={fullscreenButtonStyle}
             >
               {isFullscreen ? (
-                <Minimize2 className="w-4 h-4 relative z-10" />
+                <Minimize2 className="w-5 h-5 relative z-10" />
               ) : (
-                <Maximize2 className="w-4 h-4 relative z-10" />
+                <Maximize2 className="w-5 h-5 relative z-10" />
               )}
               <span className="tooltip">{isFullscreen ? "Exit Full Screen" : "Full Screen"}</span>
             </button>
@@ -427,7 +427,7 @@ export function TvFrame({ children }: TvFrameProps) {
                 transition={{ type: "spring", stiffness: 350, damping: 20 }}
               />
             )}
-            <UserIcon className="w-4 h-4 relative z-10" />
+            <UserIcon className="w-5 h-5 relative z-10" />
             <span className="tooltip">Account</span>
           </Link>
         </div>
