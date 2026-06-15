@@ -1166,11 +1166,18 @@ export default function MusicPage() {
                       <button
                         key={track.id}
                         onClick={() => {
+                          // Clicking the current track toggles play/pause (so
+                          // clicking the live track pauses it); any other track
+                          // gets selected and auto-played.
+                          if (isSelected) {
+                            togglePlay();
+                            return;
+                          }
                           const idx = tracks.findIndex((t) => t.id === track.id);
                           handleTrackSelect(idx, { autoplay: true });
                         }}
                         aria-current={isTrackPlaying ? "true" : undefined}
-                        className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden ${
+                        className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden cursor-pointer ${
                           isTrackPlaying
                             ? "bg-accent-2/10 border-accent-2/60 shadow-[0_0_18px_rgba(0,224,203,0.12),inset_0_1px_8px_rgba(0,224,203,0.08)]"
                             : isSelected
@@ -1187,7 +1194,9 @@ export default function MusicPage() {
                           {/* Channel number or animated indicator */}
                           <div className="w-6 h-6 rounded bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 text-[10px] font-mono text-text-low">
                             {isTrackPlaying ? (
-                              <Music className="w-5 h-5 text-accent-2 animate-bounce" />
+                              <span className="inline-flex animate-[track-icon-spin-in_0.6s_ease-out]">
+                                <Music className="w-3.5 h-3.5 text-accent-2 animate-[track-icon-zoom_1.4s_ease-in-out_infinite]" />
+                              </span>
                             ) : (
                               String(track.id).padStart(2, "0")
                             )}

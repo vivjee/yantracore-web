@@ -898,6 +898,21 @@ html.prefers-reduced-motion *::after {
   80%      { transform: scaleY(0.30); }
 }
 
+/* Music list — playing-track indicator.
+   `track-icon-zoom` loops the icon in/out; `track-icon-spin-in` fires once
+   (on mount) for a single rotation when a track first starts playing. They
+   live on separate nested elements so the rotate and scale transforms don't
+   clobber each other. */
+@keyframes track-icon-zoom {
+  0%, 100% { transform: scale(0.82); }
+  50%      { transform: scale(1.12); }
+}
+
+@keyframes track-icon-spin-in {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ============================================================
    Marquee — infinite left/right scroll for MarqueeRow
    ============================================================ */
