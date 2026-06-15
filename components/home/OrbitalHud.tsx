@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 
 /**
  * OrbitalHud — the ambient "mission-control" instrumentation that frames the
@@ -13,16 +14,26 @@ import { useEffect, useState } from "react";
  *   • A bottom telemetry strip   — a live status pulse with a `YantraCore / Home`
  *                                  brand readout on the left, and the visitor's
  *                                  local timezone + a running clock on the right.
- *   • Vertical edge spines        — micro-type restating the value prop in the
- *                                  wide side gutters (xl screens only).
+ *   • Vertical edge spines        — micro-type in the wide side gutters (xl only):
+ *                                  the left spine names who we build for as a
+ *                                  live telemetry channel — Individuals ·
+ *                                  Companies · Communities, scanning one lit at a
+ *                                  time; the right restates the capability stack.
  *
  * Entirely decorative: the root is aria-hidden and pointer-events-none, so it
  * never steals focus or clicks from the satellites layered above it. Hidden on
  * mobile (the compact layout owns that space) and on very short viewports, where
  * the height lock would otherwise clip it into the centre copy.
  */
+/** Who we build for — the left spine cycles a lit highlight across these, one at
+ *  a time, like a scanning telemetry channel. The whole triad is always present
+ *  (legible, not just an animation); the scan only moves the emphasis. */
+const AUDIENCES = ["Individuals", "Companies", "Communities"] as const;
+const AUDIENCE_DWELL = 3000; // ms each audience stays lit
+
 export function OrbitalHud() {
   const clock = useClock();
+  const lit = useAudienceScan();
 
   return (
     <div className="orbital-hud" aria-hidden>
@@ -32,9 +43,19 @@ export function OrbitalHud() {
       <span className="orbital-hud__corner orbital-hud__corner--bl" />
       <span className="orbital-hud__corner orbital-hud__corner--br" />
 
-      {/* Side spines — the value prop, set in the gutters (xl only) */}
-      <span className="orbital-hud__spine orbital-hud__spine--left">
-        Building for companies &amp; communities
+      {/* Side spines — the value prop, set in the gutters (xl only). Left names
+          who we build for as a live scan; right restates the capability stack. */}
+      <span
+        className={`orbital-hud__spine orbital-hud__spine--left${lit < 0 ? " is-static" : ""}`}
+      >
+        {AUDIENCES.map((who, i) => (
+          <Fragment key={who}>
+            {i > 0 && <span className="orbital-hud__spine-sep">·</span>}
+            <span className={`orbital-hud__audience${i === lit ? " is-active" : ""}`}>
+              {who}
+            </span>
+          </Fragment>
+        ))}
       </span>
       <span className="orbital-hud__spine orbital-hud__spine--right">
         Software · AI · Infrastructure
@@ -55,6 +76,38 @@ export function OrbitalHud() {
       </div>
     </div>
   );
+}
+
+/**
+ * Drives the left spine's scanning highlight: returns the index of the currently
+ * lit audience, advancing every AUDIENCE_DWELL ms. Returns -1 when the user
+ * prefers reduced motion (and until mount, so SSR/first paint agree) — the spine
+ * then renders the full triad evenly lit and still, no scan.
+ */
+function useAudienceScan() {
+  const reduced = useReducedMotion();
+  const [lit, setLit] = useState(-1);
+
+  useEffect(() => {
+    if (reduced) {
+      // Settle to the static (evenly-lit) state on the next frame — never
+      // synchronously in the effect body — in case the scan was already running.
+      const raf = requestAnimationFrame(() => setLit(-1));
+      return () => cancelAnimationFrame(raf);
+    }
+    // Light the first audience on the next frame, then scan on a fixed cadence.
+    const raf = requestAnimationFrame(() => setLit(0));
+    const id = setInterval(
+      () => setLit((i) => (i + 1) % AUDIENCES.length),
+      AUDIENCE_DWELL,
+    );
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
+  }, [reduced]);
+
+  return lit;
 }
 
 /**

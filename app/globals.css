@@ -3533,6 +3533,29 @@ html[data-theme="light"] .orbital-node__emblem {
   right: 24px;
   transform: translateY(-50%);
 }
+/* Left spine = the "who we build for" scan. The whole triad is always present;
+   a lit highlight glides across it, one audience at a time. Dim siblings keep
+   the gutter a whisper; the active word breaks above it with a soft accent bloom. */
+.orbital-hud__spine-sep {
+  opacity: 0.4;
+}
+.orbital-hud__audience {
+  opacity: 0.5;
+  color: var(--text-low);
+  transition: opacity 0.7s var(--ease-out-soft), color 0.7s var(--ease-out-soft),
+    text-shadow 0.7s var(--ease-out-soft);
+}
+.orbital-hud__audience.is-active {
+  opacity: 1;
+  color: var(--text-mid);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent-1) 55%, transparent);
+}
+/* Reduced motion / pre-mount (lit = -1): the full triad, evenly lit and still. */
+.orbital-hud__spine--left.is-static .orbital-hud__audience {
+  opacity: 0.8;
+  transition: none;
+  text-shadow: none;
+}
 @media (min-width: 1280px) {
   .orbital-hud__spine {
     display: inline-block;
