@@ -345,7 +345,9 @@ export function EntryportGlobe() {
   const activeRegions = useMemo(() => new Set(events.map((event) => event.country)).size + 5, [events]);
 
   return (
-    <div className="relative h-full w-full overflow-hidden text-text-hi">
+    // Height-locked 3-col on xl; below xl it stacks and scrolls (the TV screen
+    // itself doesn't scroll), so the panels under the globe stay reachable.
+    <div className="relative h-full w-full overflow-x-hidden overflow-y-auto no-scrollbar xl:overflow-hidden text-text-hi">
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -354,7 +356,7 @@ export function EntryportGlobe() {
         }}
       />
 
-      <div className="relative z-10 grid h-full grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-4 p-4 md:p-5">
+      <div className="relative z-10 grid min-h-full grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-4 p-4 md:p-5">
         <aside className="order-2 xl:order-1 flex min-h-0 flex-col gap-3">
           <Rise delay={0.14} x={-16}>
             <section className="glass-medium rounded-[8px] border border-white/[0.07] p-4">
@@ -408,7 +410,7 @@ export function EntryportGlobe() {
           </Rise>
         </aside>
 
-        <main className="order-1 xl:order-2 relative min-h-[420px] overflow-hidden rounded-[8px] border border-white/[0.08] bg-black/50">
+        <main className="order-1 xl:order-2 relative min-h-[340px] xl:min-h-[420px] overflow-hidden rounded-[8px] border border-white/[0.08] bg-black/50">
           <div className="absolute left-4 top-4 z-20 flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -428,10 +430,10 @@ export function EntryportGlobe() {
             </button>
           </div>
 
-          <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between gap-3 rounded-md border border-white/[0.08] bg-black/45 px-3 py-2 text-[9px] uppercase tracking-[0.14em] text-text-low backdrop-blur font-mono">
+          <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-md border border-white/[0.08] bg-black/45 px-3 py-2 text-center text-[9px] uppercase tracking-[0.14em] text-text-low backdrop-blur font-mono sm:justify-between">
             <span>Drag to rotate</span>
-            <span>Scroll or pinch to zoom</span>
-            <span>Arcs originate from Nepal</span>
+            <span>Pinch / scroll to zoom</span>
+            <span className="hidden xs:inline">Arcs originate from Nepal</span>
           </div>
 
           <Rise delay={0.05} y={0} duration={0.9} className="absolute inset-0">

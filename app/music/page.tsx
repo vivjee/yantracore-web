@@ -1030,7 +1030,7 @@ export default function MusicPage() {
                 </div>
 
                 {/* Bezel Controls */}
-                <div className="flex items-center justify-between w-full gap-4 flex-shrink-0">
+                <div className="flex items-center justify-between w-full gap-2 sm:gap-4 flex-shrink-0">
                   {/* Left: Toggles (Repeat, Shuffle, Synth Mode) */}
                   <div className="flex items-center gap-1.5 md:gap-2 flex-1 justify-start select-none">
                     <button
@@ -1112,7 +1112,9 @@ export default function MusicPage() {
                       step="0.01"
                       value={volume}
                       onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                      className="w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                      aria-label="Volume"
+                      // Hidden on phones (device volume rules there); mute stays.
+                      className="hidden sm:block w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
                     />
                   </div>
                 </div>

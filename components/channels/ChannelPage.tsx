@@ -152,7 +152,7 @@ export function ChannelPage({ slug }: ChannelPageProps) {
         </div>
       </StaggerItem>
 
-      <div className="grid flex-1 grid-cols-1 gap-5 lg:grid-cols-12">
+      <div className="grid flex-1 grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12">
         <div className="flex flex-col gap-5 lg:col-span-4">
           <StaggerItem className="glass-medium rounded-[18px] border border-white/[0.06] p-4">
             <div className="mb-3 flex items-center justify-between">
@@ -291,7 +291,7 @@ export function ChannelPage({ slug }: ChannelPageProps) {
           </StaggerItem>
         </div>
 
-        <div className="flex flex-col gap-5 lg:col-span-4">
+        <div className="flex flex-col gap-5 md:col-span-2 lg:col-span-4">
           <StaggerItem className="glass-medium rounded-[18px] border border-white/[0.06] p-4">
             <div className="mb-3 flex items-center justify-between">
               <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-text-low">
