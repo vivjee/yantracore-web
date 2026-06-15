@@ -156,7 +156,10 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
       style={{ minHeight: inTv ? "100%" : "100svh" }}
     >
       {/* ── MOBILE ONLY LAYOUT ── */}
-      <div className="block md:hidden relative w-full h-full min-h-[100svh]">
+      {/* Bottom-anchored flex column (like HomeOrbital): the logo/rings sit
+          behind as an absolute layer, copy + grid hug the base. No min-h/spacer
+          so it can't overflow the height-locked, bottom-nav-shortened screen. */}
+      <div className="flex flex-col justify-end md:hidden relative w-full h-full pb-4">
         {/* Center Galaxy/Logo System for Mobile — omitted when the orbital layout
             renders the persistent Sun behind this scene. */}
         {!externalSun && (
@@ -201,10 +204,9 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
         </motion.div>
         )}
 
-        {/* Foreground copy and mobile projects grid */}
-          <div className="h-[30svh]" />
-          
-          <div className="flex-1 flex flex-col justify-center pointer-events-auto">
+        {/* Foreground copy and mobile projects grid — bottom-anchored by the
+            parent's justify-end; the absolute logo/rings layer sits behind. */}
+          <div className="flex flex-col justify-center pointer-events-auto">
             {/* Brand copy — Home identity only; omitted on the orbital Projects view */}
             {!externalSun && (
             <motion.div
@@ -1666,6 +1668,10 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
   const [isInteractive, setIsInteractive] = useState(false);
   const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
 
+  // Neumorphic surface recipes — raised tactile chips + a carved sunken groove
+  const nmChip = "3px 3px 7px #050608, -3px -3px 7px #131829";
+  const nmGroove = "inset 2px 2px 5px #010203, inset -1px -1px 3px #171c30";
+
   // Auto-simulation flow synced centrally
   useEffect(() => {
     if (isInteractive) return;
@@ -1762,15 +1768,19 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
           {SHRAMDAN_PROJECTS.map((project, index) => (
             <SwiperSlide key={project.id} className="w-full h-full">
               <div
-                className="flex flex-col gap-2 w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm"
+                className="flex flex-col gap-2 w-full h-full rounded-2xl border border-white/[0.04] p-2 backdrop-blur-sm"
+                style={{ background: "var(--ink-1)", boxShadow: "var(--nm-sunken-soft)" }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsInteractive(true);
                   swiperRef?.slideToLoop(index, 1000);
                 }}
               >
-                {/* 30% reduced image height: min-h-[118px] -> fixed h-[82px] */}
-                <div className="relative rounded-xl overflow-hidden border border-white/10 h-[82px] flex-shrink-0 bg-black/30 w-full">
+                {/* Project visual — raised neumorphic photo frame */}
+                <div
+                  className="relative rounded-xl overflow-hidden h-[104px] flex-shrink-0 w-full"
+                  style={{ background: "var(--ink-0)", boxShadow: "var(--nm-raised-soft)", border: "1px solid var(--nm-line-soft)" }}
+                >
                   <Image
                     src={project.image}
                     alt={`${project.name} before and after`}
@@ -1778,101 +1788,110 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
                     sizes="(max-width: 768px) 240px, 300px"
                     className="object-cover"
                   />
-                  {/* Category Tag overlay on top-left of image */}
-                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[7px] font-mono text-accent-warm leading-none">
+                  {/* Legibility gradient for the overlaid chrome */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-black/25 pointer-events-none" />
+
+                  {/* Category tag — top-left */}
+                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/55 border border-white/10 backdrop-blur-md text-[7px] font-mono uppercase tracking-wider text-accent-warm leading-none">
                     {project.tag}
                   </div>
 
-                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
-                    <MapPin className="w-2 h-2 text-text-hi" />
-                    <span className="text-[7.5px] text-text-hi leading-none">{project.location}</span>
-                  </div>
-                  
-                  {/* Pagination dots overlay */}
-                  <div className="absolute bottom-1.5 right-1.5 flex gap-1 z-30 pointer-events-auto">
+                  {/* Pagination — top-right (active pill grows) */}
+                  <div className="absolute top-1.5 right-1.5 flex items-center gap-1 z-30 pointer-events-auto">
                     {SHRAMDAN_PROJECTS.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={(e) => handleDotClick(idx, e)}
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          activeIdx === idx 
-                            ? "bg-accent-warm scale-125 shadow-[0_0_6px_var(--accent-warm)]" 
-                            : "bg-white/30 hover:bg-white/50"
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeIdx === idx
+                            ? "w-4 bg-accent-warm shadow-[0_0_6px_var(--accent-warm)]"
+                            : "w-1.5 bg-white/35 hover:bg-white/60"
                         }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />
                     ))}
                   </div>
+
+                  {/* Location — bottom-left */}
+                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
+                    <MapPin className="w-2 h-2 text-accent-warm" />
+                    <span className="text-[7.5px] text-text-hi leading-none font-medium">{project.location}</span>
+                  </div>
+
+                  {/* Social proof — bottom-right avatar stack */}
+                  <div className="absolute bottom-1.5 right-1.5 flex -space-x-1.5 items-center">
+                    {project.avatars.slice(0, 3).map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="w-4 h-4 rounded-full border border-black/60 flex items-center justify-center text-[6.5px] font-bold text-white"
+                        style={{
+                          backgroundColor: color,
+                          backgroundImage: "radial-gradient(circle at top, rgba(255,255,255,0.25) 0%, transparent 75%)",
+                        }}
+                      >
+                        {["A", "S", "R", "N"][idx]}
+                      </div>
+                    ))}
+                    <div className="w-4 h-4 rounded-full bg-black/55 border border-white/20 backdrop-blur-md flex items-center justify-center text-[6px] text-text-hi font-bold">
+                      +{Math.max(project.volunteers - 3, 0)}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Details Section utilizing the extra space */}
-                <div className="flex-1 flex flex-col justify-between py-0.5 min-h-0">
-                  {/* Row 1: Title, Address and Likes */}
-                  <div className="flex justify-between items-start gap-1">
+                {/* Details */}
+                <div className="flex-1 flex flex-col justify-between min-h-0">
+                  {/* Title + Like */}
+                  <div className="flex items-start justify-between gap-1.5">
                     <div className="min-w-0">
-                      <p className="text-[11.5px] font-bold text-text-hi leading-tight truncate">{project.name}</p>
+                      <p className="text-[12px] font-bold text-text-hi leading-tight truncate">{project.name}</p>
                       <p className="text-[8px] text-text-low font-mono leading-none mt-0.5 truncate">{project.address}</p>
                     </div>
-                    <button 
-                      className="flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform pointer-events-auto flex-shrink-0 px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/5" 
+                    <button
                       onClick={handleLike}
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-shrink-0 active:scale-95 transition-transform pointer-events-auto"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
                     >
                       <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" />
-                      <span className="text-[9.5px] text-text-hi font-medium leading-none">{likes[index]}</span>
+                      <span className="text-[9px] text-text-hi font-semibold leading-none">{likes[index]}</span>
                     </button>
                   </div>
 
-                  {/* Row 2: Impact Stats & Progress Bar */}
-                  <div className="space-y-1">
+                  {/* Impact + carved progress groove */}
+                  <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-[8.5px] font-mono leading-none">
-                      <span className="text-text-low flex items-center gap-1">
+                      <span className="text-text-mid flex items-center gap-1">
                         <TrendingUp className="w-2.5 h-2.5 text-accent-warm" />
                         {project.impact}
                       </span>
-                      <span className="text-accent-warm font-semibold">{project.progress}%</span>
+                      <span className="text-accent-warm font-bold">{project.progress}%</span>
                     </div>
-                    <div className="w-full h-1 bg-white/[0.06] rounded-full overflow-hidden border border-white/5 relative">
-                      <div 
-                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-amber-500 to-orange-400"
-                        style={{ 
-                          width: `${project.progress}%`,
-                          boxShadow: "0 0 6px rgba(255,180,84,0.4)" 
-                        }}
+                    <div
+                      className="w-full h-2 rounded-full overflow-hidden relative"
+                      style={{ background: "var(--ink-0)", boxShadow: nmGroove }}
+                    >
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-300"
+                        style={{ width: `${project.progress}%`, boxShadow: "0 0 8px rgba(255,180,84,0.55)" }}
                       />
                     </div>
                   </div>
 
-                  {/* Row 3: Volunteers (Participants), Time, and Avatar Stack */}
-                  <div className="flex items-center justify-between border-t border-white/[0.05] pt-1.5 mt-0.5">
-                    <div className="flex flex-col gap-0.5 text-[8px] min-w-0">
-                      <div className="flex items-center gap-1">
-                        <Users className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
-                        <span className="text-text-hi font-semibold leading-none">{project.volunteers}</span>
-                        <span className="text-text-low text-[7.5px] leading-none">participants</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
-                        <span className="text-text-hi font-medium leading-none truncate max-w-[80px]">{project.time}</span>
-                      </div>
+                  {/* Footer — raised neumorphic stat chips */}
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-1 min-w-0"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
+                    >
+                      <Users className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                      <span className="text-[9px] text-text-hi font-bold leading-none">{project.volunteers}</span>
+                      <span className="text-[7px] text-text-low leading-none">joined</span>
                     </div>
-
-                    {/* Avatar Stack */}
-                    <div className="flex -space-x-1.5 overflow-hidden items-center flex-shrink-0">
-                      {project.avatars.map((color, idx) => (
-                        <div 
-                          key={idx}
-                          className="w-3.5 h-3.5 rounded-full border border-black/50 flex items-center justify-center text-[6.5px] font-bold text-white shadow-sm flex-shrink-0"
-                          style={{ 
-                            backgroundColor: color,
-                            backgroundImage: `radial-gradient(circle at top, rgba(255,255,255,0.2) 0%, transparent 80%)`
-                          }}
-                        >
-                          {["A", "S", "R", "N"][idx]}
-                        </div>
-                      ))}
-                      <div className="w-3.5 h-3.5 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-center text-[5.5px] text-text-low font-bold flex-shrink-0 z-10">
-                        +8
-                      </div>
+                    <div
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-[1.4] min-w-0"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
+                    >
+                      <Clock className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                      <span className="text-[7.5px] text-text-hi font-medium leading-none truncate">{project.time}</span>
                     </div>
                   </div>
                 </div>
