@@ -44,7 +44,7 @@ import {
   CheckCircle,
   Server,
 } from "lucide-react";
-import { Eyebrow } from "@/components/typography/Eyebrow";
+import { Rise } from "@/components/motion/Rise";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { LogoMark } from "../01-arrival/LogoMark";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
@@ -219,6 +219,14 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
             </motion.div>
             )}
 
+            {/* Projects intro — replaces the brand copy on the orbital /projects
+                view, sitting just above the product grid. */}
+            {externalSun && (
+              <div className="mb-5 flex justify-center px-2">
+                <ProjectsIntro mobile />
+              </div>
+            )}
+
             {/* Mobile Projects Grid */}
             <div className="w-full max-w-[320px] mx-auto px-2 mb-6 z-20">
               <div className="grid grid-cols-2 gap-2.5">
@@ -267,11 +275,11 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
         </div>
 
       <div 
-        className="showcase-solar hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-12 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
+        className="showcase-solar hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-8 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
         style={{ perspective: 1200 }}
       >
         {/* Column 1: Left Column (Yantracore 1st, Restroverse 3rd) */}
-        <div className="flex flex-col gap-12 lg:gap-16 items-end justify-center w-full h-full pointer-events-auto">
+        <div className="flex flex-col gap-8 lg:gap-11 items-end justify-center w-full h-full pointer-events-auto">
           {/* Card 1: Yantracore (index 0) */}
           <FloatingCard
             key={0}
@@ -363,10 +371,21 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
             <BrandCopy isMobile={false} />
           </motion.div>
           </>)}
+
+          {/* Projects intro — shown on the orbital /projects view in place of the
+              brand copy. Anchored low in the centre column (a top-% so it survives
+              the height-locked TV's bottom clip and the showcase-solar centre-origin
+              scaling) so it reads below the persistent Sun, nested in the gap between
+              the two lower product cards. */}
+          {externalSun && (
+            <div className="pointer-events-auto absolute inset-x-0 top-[61%] flex justify-center px-4">
+              <ProjectsIntro />
+            </div>
+          )}
         </div>
 
         {/* Column 3: Right Column (Jimbo 2nd, Shramdan 4th) */}
-        <div className="flex flex-col gap-12 lg:gap-16 items-start justify-center w-full h-full pointer-events-auto">
+        <div className="flex flex-col gap-8 lg:gap-11 items-start justify-center w-full h-full pointer-events-auto">
           {/* Card 2: Jimbo (index 1) */}
           <FloatingCard
             key={1}
@@ -433,6 +452,62 @@ function BrandCopy({ isMobile }: { isMobile: boolean }) {
         <br />
         Technology with purpose. Built for impact.
       </p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ProjectsIntro — the orienting copy for the /projects orbital view.
+   Where Home shows the brand wordmark, the Projects page omits its own
+   centre logo (the persistent Sun fills that role) and instead explains
+   what the orbiting cards are: YantraCore's growing ecosystem of work.
+   Staggers in on the site's shared Rise curve; `mobile` tightens the
+   scale for the phone layout above the product grid.
+   ───────────────────────────────────────────────────────────────── */
+function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <div
+      className={`flex w-full flex-col items-center text-center ${
+        mobile ? "max-w-[340px] gap-2" : "max-w-[520px] gap-3"
+      }`}
+    >
+      <Rise delay={0.08} y={mobile ? 10 : 18}>
+        {/* The page's main heading — the orbital /projects view had none until
+            now. Styled as a quiet mono eyebrow so it labels without competing
+            with the Sun. */}
+        <h1
+          className={`font-mono uppercase text-text-mid ${
+            mobile ? "text-[10px] tracking-[0.24em]" : "text-[11px] tracking-[0.28em]"
+          }`}
+        >
+          Our Projects
+        </h1>
+      </Rise>
+
+      <Rise delay={0.16} y={mobile ? 10 : 18}>
+        <p
+          className={`text-balance leading-relaxed ${
+            mobile ? "text-[12px]" : "text-[15px] md:text-base"
+          }`}
+          style={{ color: "var(--text-mid)" }}
+        >
+          A growing ecosystem of apps, AI agents, platforms, and social-impact
+          tools — built by YantraCore to serve people, businesses, and
+          communities.
+        </p>
+      </Rise>
+
+      <Rise delay={0.24} y={mobile ? 10 : 18}>
+        <p
+          className={`inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.18em] ${
+            mobile ? "text-[9px]" : "text-[11px]"
+          }`}
+          style={{ color: "var(--accent-2)" }}
+        >
+          <Sparkles className={mobile ? "h-3 w-3" : "h-3.5 w-3.5"} aria-hidden />
+          Explore what we&rsquo;re building
+        </p>
+      </Rise>
     </div>
   );
 }
