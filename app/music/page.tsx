@@ -795,7 +795,7 @@ export default function MusicPage() {
                 )}
               </div>
 
-              {/* Deck Console — track details + EQ/Nature suite + transport (compact) */}
+              {/* Deck Console — track details + EQ/Remix suite + transport (compact) */}
               <div className="flex-shrink-0 bg-black/30 border border-white/5 rounded-xl p-3.5 flex flex-col gap-3 relative glass-panel">
                 <div className="absolute inset-0 bg-gradient-to-b from-accent-1/2 to-transparent opacity-10 pointer-events-none" />
 
@@ -828,7 +828,7 @@ export default function MusicPage() {
                   </div>
                 </div>
 
-                {/* Tabbed Suite: Equalizer + Nature Soundscapes */}
+                {/* Tabbed Suite: Equalizer + Remix (ambient texture) layers */}
                 <div className="border border-white/5 rounded-xl bg-black/40 overflow-hidden flex flex-col flex-shrink-0">
                   {/* Tab Headers */}
                   <div className="flex border-b border-white/5 bg-black/20 text-[9px] font-mono">
@@ -848,7 +848,7 @@ export default function MusicPage() {
                       }`}
                     >
                       <Sparkles className="w-4 h-4 animate-pulse" />
-                      Nature
+                      Remix
                     </button>
                   </div>
 
