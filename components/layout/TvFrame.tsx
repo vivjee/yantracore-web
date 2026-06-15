@@ -25,9 +25,16 @@ import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle
 
 interface TvFrameProps {
   children: React.ReactNode;
+  /**
+   * Suppress the CRT channel-change glitch on route changes. Used by the
+   * orbital route group, where one TvFrame instance persists across pages and
+   * the transition between them must be seamless. Power on/off and the CRT
+   * toggle keep their own animations — only the navigation glitch is gated.
+   */
+  seamless?: boolean;
 }
 
-export function TvFrame({ children }: TvFrameProps) {
+export function TvFrame({ children, seamless = false }: TvFrameProps) {
   const { themeMode, setThemeMode } = useTheme();
   const [isCrtEnabled, setIsCrtEnabled] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
@@ -71,13 +78,15 @@ export function TvFrame({ children }: TvFrameProps) {
       return;
     }
     if (!isPowered) return;
-    
+    // Orbital routes share one persistent frame — keep their transitions seamless.
+    if (seamless) return;
+
     // Play static channel change sound
     audioSynth.playStatic();
     const glitchStartTimer = setTimeout(() => {
       setIsGlitching(true);
     }, 0);
-    
+
     const timer = setTimeout(() => {
       setIsGlitching(false);
     }, 220);
@@ -86,7 +95,7 @@ export function TvFrame({ children }: TvFrameProps) {
       clearTimeout(glitchStartTimer);
       clearTimeout(timer);
     };
-  }, [pathname, isPowered]);
+  }, [pathname, isPowered, seamless]);
 
   const handleCrtToggle = () => {
     if (!isPowered) return;
@@ -207,35 +216,30 @@ export function TvFrame({ children }: TvFrameProps) {
                   {isPowered && pathname === "/" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Home className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Home</span>
-                  <KeyHint id="nav-home" className="tv-console-key" />
                   <span className="tooltip">Home <KeyHint id="nav-home" /></span>
                 </Link>
                 <Link href="/entryport" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/entryport" ? "active" : ""}`} aria-label="Live Activity" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/entryport" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Globe2 className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Live Activity</span>
-                  <KeyHint id="nav-entryport" className="tv-console-key" />
                   <span className="tooltip">Live Activity <KeyHint id="nav-entryport" /></span>
                 </Link>
                 <Link href="/technologies" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/technologies" ? "active" : ""}`} aria-label="Technologies" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/technologies" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <StellarOrbitIcon className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Technologies</span>
-                  <KeyHint id="nav-technologies" className="tv-console-key" />
                   <span className="tooltip">Technologies <KeyHint id="nav-technologies" /></span>
                 </Link>
                 <Link href="/music" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/music" ? "active" : ""}`} aria-label="Music Lab" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/music" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Headphones className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Music Lab</span>
-                  <KeyHint id="nav-music" className="tv-console-key" />
                   <span className="tooltip">Music Lab <KeyHint id="nav-music" /></span>
                 </Link>
                 <Link href="/contact" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/contact" ? "active" : ""}`} aria-label="Contact" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/contact" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Mail className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Contact</span>
-                  <KeyHint id="nav-contact" className="tv-console-key" />
                   <span className="tooltip">Contact <KeyHint id="nav-contact" /></span>
                 </Link>
               </div>

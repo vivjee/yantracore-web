@@ -19,8 +19,10 @@
 | Theme system (5 palettes, light/dark, fonts, cursor, reduced-motion) | ✅ Built |
 | Audio (UI synth + music player) | ✅ Built |
 | Glass primitives + motion primitives | ✅ Built (`/lab/playground` reviews them) |
-| Homepage (`Showcase` hero scene) | ✅ Live (not the 9-chapter scroll) |
+| Homepage — orbital navigation hub (`HomeOrbital`) | ✅ Live (calm one-screen hub; replaced the `Showcase` scene) |
+| Orbital route group — persistent `Sun` + seamless transitions | ✅ Phase 0+1 foundation shipped (Projects/Technologies/Activity fold in Phases 2–3) |
 | Brochure pages (contact, music, entryport, technologies, channels) | ✅ Live |
+| Projects page (`/projects`) — relocated `Showcase` | ✅ Live (client showcase + testimonials pending Phase 2) |
 | Console / dashboard (Ask AI, Email, Drive, Projects) | ✅ Live, wired to YantraMate |
 | YantraMate proxy routes (`app/api/*`) | ✅ Built |
 | Auth (login/signup) | ⚠️ Demo-grade (sessionStorage, no server session) |
@@ -48,8 +50,19 @@ Grouped by theme. Unordered within a group; promote items as priorities firm up.
 - [ ] Flip `lib/api/posts.ts` from the static array to a real source (decide: keep typed TS, or a CMS/WordPress).
 - [ ] Build the missing inner pages if still wanted: `/work/{restroverse,jimbo,shramdan}`, `/work`, `/capabilities`, `/atelier`, `/lab`, `/lab/[slug]`, `/signal`.
 
+### Orbital makeover (in progress)
+
+Reorganizing the site around one idea: **YantraCore is the sun; every page is a constellation orbiting it.** Orbital pages (`/`, `/projects`, `/technologies`, `/activity`) share one persistent, memoized `Sun` via the `app/(orbital)/` route-group layout (mounts once, never re-mounts) so navigation between them is seamless — while staying distinct, server-rendered, crawlable routes. Channel pages keep the CRT glitch. See [03-sitemap.md](./03-sitemap.md#the-orbital-makeover-in-progress--phase-01-shipped-2026-06-15).
+
+- [x] **Phase 0+1 — foundation + new Home.** `(orbital)` route group; persistent `Sun` + `OrbitalRings`; `SatelliteTransition`; `TvFrame` `seamless` prop (gates the channel glitch); removed the root `template.tsx` remount boundary; `SiteBackground` hoist-ready. New calm `HomeOrbital` hub. `Showcase` relocated to `/projects`. *Verified: `tsc` clean, full `next build` passes, `/` + `/projects` static-prerendered with crawlable anchors.*
+- [ ] **Phase 2 — Projects.** Fold `/projects` into the orbital group (strip its own logo, use the persistent `Sun`); add client showcase + testimonials + consultation CTA.
+- [ ] **Phase 3 — Technologies + Activity into the group** (`/entryport` → `/activity` with a redirect); perfect the exit→enter cross-morph (frozen-router `AnimatePresence`).
+- [ ] **Phase 4 — About** (`/about`, WebGL scroll walkthrough).
+- [ ] **Phase 5 — Book a Consultation** (`/book`, project intake + budget estimator).
+- [ ] **Phase 6 — Contact refresh + nav/IA reconcile + docs sweep.** (Staffing deferred.)
+
 ### Polish & decisions
-- [ ] Decide the homepage: keep the `Showcase` scene, or assemble the 9 section components into the long-form scroll. Reconcile [03-sitemap.md](./03-sitemap.md) + [04-hero-concept.md](./04-hero-concept.md) with the decision.
+- [x] ~~Decide the homepage~~ — **decided (2026-06-15):** the homepage is the calm **orbital navigation hub**; the `Showcase` product scene moved to `/projects`. [04-hero-concept.md](./04-hero-concept.md)'s scroll-assembled hero remains a possible future treatment for `/about`.
 - [ ] Re-enable Lenis smooth scroll, or remove the dependency + passthrough provider.
 - [ ] Decide on i18n: wire `next-intl` (`[locale]` routes + middleware) or drop it until needed.
 - [ ] Wire `FloatingAssistant` to YantraMate (currently a simulated demo).

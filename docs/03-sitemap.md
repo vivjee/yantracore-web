@@ -6,11 +6,12 @@
 
 | Route | Surface | What it is |
 |---|---|---|
-| `/` | Brochure | Homepage — `Showcase` solar-system scene inside `TvFrame` |
+| `/` | Brochure | Homepage — calm **orbital navigation hub** (`HomeOrbital`). Lives in the `app/(orbital)/` route group; the animated logo (`Sun`) is a *persistent* centre. Satellites: 3 initiative portals (Jimbo/Restroverse/Shramdan) + 3 wayfinding nodes (Projects/Technologies/About·soon) + identity copy & two CTAs |
+| `/projects` | Brochure | The live product "solar system" (`Showcase`) — **relocated here from the old homepage**. Client showcase + testimonials land in Phase 2 |
 | `/contact` | Brochure | Contact form (client-validated) |
 | `/music` | Brochure | Ambient music player (Web-Audio engine) |
-| `/entryport` | Brochure | Interactive 3D globe of global activity |
-| `/technologies` | Brochure | `StarSystem` tech-stack visualization |
+| `/entryport` | Brochure | Interactive 3D globe of global activity (becomes `/activity` and folds into the orbital group in Phase 3) |
+| `/technologies` | Brochure | `StarSystem` tech-stack visualization (folds into the orbital group in Phase 3) |
 | `/channels/[slug]` | Brochure/App | Per-channel live dashboard (`jimbo`/`restroverse`/`shramdan`/`yantracore`) |
 | `/lab/components` | Internal | UI component library — categorized, navigable source of truth (buttons, badges, tags, cards, icons, tech-stack, motion, brand) |
 | `/lab/playground` | Internal | Glass-primitives showcase / design review surface (older scratch surface) |
@@ -21,7 +22,18 @@
 
 **Top nav today** lives in the `TvFrame` chrome bar (Home / Entryport / Technologies / Music / Contact) plus the `Header` pill on brochure pages — **not** the Studio/Capabilities/Atelier/Lab/Signal structure described in the vision below.
 
-**Not built yet** (described in the vision but no route exists): `/work/*` product teasers, `/work` index, `/capabilities`, `/atelier`, `/lab` blog index, `/lab/[slug]`, `/signal`.
+**Not built yet** (described in the vision but no route exists): `/work/*` product teasers, `/work` index, `/capabilities`, `/atelier`, `/lab` blog index, `/lab/[slug]`, `/signal`. From the **orbital makeover** plan: `/about` (WebGL scroll walkthrough), `/book` (consultation intake + budget estimator). *Staffing is deferred.*
+
+### The orbital makeover (in progress — Phase 0+1 shipped 2026-06-15)
+
+The site is being reorganized around one idea: **YantraCore is the sun; every page is a constellation orbiting the same sun.** Routes split into two classes:
+
+- **Orbital pages** (`/`, `/projects`, `/technologies`, `/activity`) — *same channel, different view*. They share one **persistent, memoized `Sun`** (the animated logo) via the `app/(orbital)/` route-group layout, which mounts once and never re-mounts across soft navigations. Transitions are **seamless** (no CRT glitch; only the satellites swap). They are still **distinct, server-rendered routes** with their own metadata — SEO is preserved.
+- **Channel pages** (`/about`, `/contact`, `/book`, `/music`, console) — *change the channel*. They keep the CRT channel-change glitch.
+
+**Phase status:** **0+1 ✅** orbital foundation (persistent `Sun`, `TvFrame seamless` prop, removed root `template.tsx`) + new calm Home, and `Showcase` relocated to `/projects` · **2** Projects (fold into group, add client showcase + testimonials) · **3** Technologies/Activity into the group + perfect the cross-morph · **4** About (WebGL scroll) · **5** Book a Consultation · **6** Contact refresh + nav/IA + docs reconcile.
+
+The mechanism: in Next.js App Router a shared layout is preserved across navigations between its children, so the `(orbital)` layout's `Sun` + `TvFrame` persist while only `{children}` (the satellites) swap through `SatelliteTransition`. The root `template.tsx` (a remount boundary) was removed because it would have re-mounted the group on every navigation.
 
 ---
 

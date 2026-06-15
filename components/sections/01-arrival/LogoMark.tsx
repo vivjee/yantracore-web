@@ -37,7 +37,7 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
  *         <Logo layers>  — chroma, primary, shimmer, specular
  *     <Sparks>           — hover-only orbital dots (z 20)
  */
-export function LogoMark({ centerY = "34%", onClick }: { centerY?: string; onClick?: () => void }) {
+export function LogoMark({ centerY = "34%", onClick, parallax = true }: { centerY?: string; onClick?: () => void; parallax?: boolean }) {
   const { themeMode, logoHeartbeatEnabled } = useTheme();
   const ghostBlendMode = themeMode === "light" ? "multiply" : "screen";
   const wrapRef   = useRef<HTMLDivElement>(null);
@@ -49,6 +49,9 @@ export function LogoMark({ centerY = "34%", onClick }: { centerY?: string; onCli
 
   // ── Mouse-parallax tilt — composes ON TOP of CSS planet spin ──
   useEffect(() => {
+    // Ambient/persistent usages (e.g. the orbital Sun) opt out so this rAF loop
+    // + mousemove listener don't run forever on a never-unmounting node.
+    if (!parallax) return;
     const wrap   = wrapRef.current;
     const tilt   = tiltRef.current;
     if (!wrap || !tilt) return;
@@ -96,7 +99,7 @@ export function LogoMark({ centerY = "34%", onClick }: { centerY?: string; onCli
       window.removeEventListener("mousemove", onMouseMove);
       cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [parallax]);
 
   function handleMouseEnter() {
     setHovered(true);

@@ -77,21 +77,26 @@ Declared in earlier planning for v2 but **not yet wired**: `NODE_API_URL`, `NODE
 ```
 app/                 # Next.js App Router: pages, layouts, and /api proxy routes
   api/               # Server-side proxies to YantraMate (ask, drive, email, projects)
-  page.tsx           # Homepage (Showcase inside TvFrame)
+  (orbital)/         # Orbital route group — shared layout = persistent Sun + TvFrame (seamless)
+    layout.tsx       #   mounts the Sun + frame ONCE; satellites swap beneath it
+    page.tsx         #   / — calm orbital navigation hub (HomeOrbital)
+  projects/          # Live product "solar system" (Showcase), relocated from the old homepage
   dashboard/         # The console (DashboardShell)
   login/ signup/     # Auth surfaces (currently localStorage/demo)
   music/ entryport/  # Brochure feature pages
   channels/[slug]/   # Per-channel dashboards
   technologies/      # StarSystem tech visualization
-  globals.css        # ~2,570 lines: ALL design tokens, glass classes, keyframes, CRT/TV styles
+  globals.css        # ~2,840 lines: ALL design tokens, glass classes, keyframes, CRT/TV + orbital styles
 components/
   glass/             # Design-system primitives (GlassCard, GlassButton, ...)
   motion/            # Reveal, MarqueeRow, CountUp, StarSystem, ...
   backgrounds/       # SiteBackground + MeshGradient/DotField/LineWeave/NoiseAura
   chrome/            # Header, Footer, Cursor, SmoothScrollProvider, NavIcons
-  layout/            # Container, SectionDivider, TvFrame
+  layout/            # Container, SectionDivider, TvFrame (has a `seamless` prop for orbital routes)
   typography/        # Eyebrow, YantraElectricTitle
-  sections/          # 01-arrival … 09-signal homepage chapters (VISION-era; mostly not on live home)
+  orbital/           # Sun (persistent logo), OrbitalRings, SatelliteTransition — the orbital shell
+  home/              # HomeOrbital hub + OrbitNode (calm satellite) — the new homepage
+  sections/          # 01-arrival … 09-signal homepage chapters (VISION-era; Showcase now lives at /projects)
   dashboard/         # DashboardShell, SettingsShell
   auth/ channels/ entryport/ assistant/ brand/   # feature components
 lib/
