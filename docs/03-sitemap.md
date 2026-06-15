@@ -12,7 +12,8 @@
 | `/entryport` | Brochure | Interactive 3D globe of global activity |
 | `/technologies` | Brochure | `StarSystem` tech-stack visualization |
 | `/channels/[slug]` | Brochure/App | Per-channel live dashboard (`jimbo`/`restroverse`/`shramdan`/`yantracore`) |
-| `/lab/playground` | Internal | Glass-primitives showcase / design review surface |
+| `/lab/components` | Internal | UI component library — categorized, navigable source of truth (buttons, badges, tags, cards, icons, tech-stack, motion, brand) |
+| `/lab/playground` | Internal | Glass-primitives showcase / design review surface (older scratch surface) |
 | `/login`, `/signup` | Auth | Demo auth surfaces (no real backend session) |
 | `/dashboard` | Console | The app — Ask AI / Email / Drive / Projects (`DashboardShell`) |
 | `/dashboard/settings` | Console | Dashboard settings tab |
