@@ -466,10 +466,10 @@ export function ReachGlobe() {
           <div className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 backdrop-blur-md">
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-low">
               <Globe2 className="h-3.5 w-3.5 text-accent-2" />
-              Reach · Global Activity
+              Reach · Live Activity
             </div>
-            <h1 className="mt-1 font-display text-lg font-semibold leading-none tracking-tight text-text-hi sm:text-xl">
-              Nepal to the World
+            <h1 className="mt-1 max-w-[16rem] font-display text-lg font-semibold leading-tight tracking-tight text-text-hi sm:text-xl">
+              Where our work is happening, live
             </h1>
             <div className="mt-2 flex items-center gap-3 font-mono text-[10px] text-text-mid">
               <span className="flex items-center gap-1.5">
