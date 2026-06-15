@@ -243,17 +243,17 @@ export function ChannelPage({ slug }: ChannelPageProps) {
               </span>
             </div>
             <div className="relative mb-3">
-              <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-text-faint" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={channel.searchPlaceholder}
-                className="h-9 w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-9 font-mono text-[10px] text-text-hi placeholder:text-text-faint focus:border-accent-2 focus:outline-none"
+                className="h-11 sm:h-9 w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-9 font-mono text-[10px] text-text-hi placeholder:text-text-faint focus:border-accent-2 focus:outline-none"
               />
               {query && (
                 <button
                   onClick={() => setQuery("")}
-                  className="absolute right-2 top-2 rounded p-1 text-text-low transition hover:text-text-hi"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-text-low transition hover:text-text-hi"
                   aria-label="Clear search"
                 >
                   <X className="h-3.5 w-3.5" />

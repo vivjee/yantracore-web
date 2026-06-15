@@ -132,7 +132,7 @@ function ProjectModal({
       role="dialog"
       aria-modal="true"
       aria-label={project.name}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
       style={{ animation: "cap-panel-in 0.45s cubic-bezier(0.22,1,0.36,1) both" }}
     >
       {/* Backdrop */}
@@ -145,13 +145,13 @@ function ProjectModal({
 
       {/* Panel */}
       <div
-        className="relative z-10 w-full max-w-lg"
+        className="relative z-10 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto overflow-x-hidden rounded-[28px]"
         style={{ animation: "cap-panel-in 0.5s cubic-bezier(0.22,1,0.36,1) 0.05s both" }}
       >
         <div
+          className="p-6 sm:p-9"
           style={{
             borderRadius: 28,
-            padding: 36,
             background: "linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%)",
             backdropFilter: "blur(30px)",
             WebkitBackdropFilter: "blur(30px)",

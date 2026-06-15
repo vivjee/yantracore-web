@@ -231,6 +231,10 @@ body {
     height: max(100%, 44px);
     transform: translate(-50%, -50%);
   }
+
+  /* Force-reveal a hover-gated control on touch (no hover to trigger it).
+     Unlayered, so it wins over Tailwind's `opacity-0` on coarse pointers. */
+  .touch-reveal { opacity: 1 !important; }
 }
 
 /* ============================================================
@@ -2007,6 +2011,39 @@ html[data-theme="light"] .kbd-hint--solid {
   }
 }
 
+/* Tablet / small-laptop (768–1279): the five labeled page-nav buttons plus the
+   utility groups exceed the bar width once labels render, pushing Account /
+   Fullscreen off the clipped (overflow:hidden) right edge. Keep the page-nav
+   icon-only through this band; the word labels return at xl where the row fits. */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .tv-chrome-btn-group .tv-console-btn--labeled {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  .tv-console-label {
+    display: none;
+  }
+  .tv-console-btn--labeled .tooltip {
+    display: block;
+  }
+}
+
+/* Touch: expand the chrome icon buttons (30px on phones, 40px elsewhere) to a
+   ≥44px hit area without changing their visual size. `.tv-console-btn` is
+   already position:relative and uses no ::after of its own. */
+@media (pointer: coarse) {
+  .tv-console-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+
 /* ============================================================
    CRT Glitch & Cathode Collapse Styles
    ============================================================ */
@@ -2208,6 +2245,17 @@ select:focus {
   outline: none !important;
   border-color: var(--accent-2) !important;
   box-shadow: var(--nm-sunken-medium), 0 0 12px rgba(0, 224, 203, 0.35) !important;
+}
+
+/* iOS Safari zooms the viewport when a focused field renders below 16px — and
+   the height-locked TV screen can't recover gracefully. Force a 16px minimum on
+   phones (visual only; desktop keeps each control's designed size). */
+@media (max-width: 767.98px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* 4. Divider replacements */

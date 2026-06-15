@@ -518,12 +518,12 @@ function AddEmailModal({
   return (
     /* Backdrop */
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
       style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full max-w-md rounded-2xl overflow-hidden"
+        className="w-full max-w-md rounded-2xl overflow-x-hidden overflow-y-auto max-h-[calc(100dvh-2rem)]"
         style={{
           background: "linear-gradient(145deg, rgba(16,18,36,0.98) 0%, rgba(10,12,22,0.99) 100%)",
           border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)",
@@ -1622,7 +1622,7 @@ function DrivePane({
                     href={`https://drive.google.com/drive/folders/${proj.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-text-faint hover:text-text-mid transition-all duration-200 opacity-0 group-hover:opacity-100"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-text-faint hover:text-text-mid transition-all duration-200 opacity-0 group-hover:opacity-100 touch-reveal"
                     style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
                     <ExternalLink size={11} />
@@ -1814,7 +1814,7 @@ function ProjectsPane({
                               target="_blank"
                               rel="noopener noreferrer"
                               title="Open in Google Drive"
-                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-text-faint hover:text-text-mid transition-all duration-200 opacity-0 group-hover:opacity-100"
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-text-faint hover:text-text-mid transition-all duration-200 opacity-0 group-hover:opacity-100 touch-reveal"
                               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
                             >
                               <ExternalLink size={10} />
@@ -1973,9 +1973,9 @@ function ClientRequestsPane({ requests, userEmail, onSubmitRequest }: ClientRequ
 
       {/* New Request Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-black/75 backdrop-blur-md"
              onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}>
-          <div className="w-full max-w-lg rounded-2xl overflow-hidden glass-heavy border border-accent-1/25 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl overflow-x-hidden overflow-y-auto max-h-[calc(100dvh-2rem)] glass-heavy border border-accent-1/25 shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/6">
               <div className="flex items-center gap-3">
@@ -2734,16 +2734,16 @@ export function DashboardShell({
             <Menu size={18} />
           </button>
           <div className="flex items-center gap-2 text-sm text-text-low min-w-0">
-            <span className="text-text-faint">YantraCore</span>
-            <ChevronRight size={13} className="text-text-faint shrink-0" />
+            <span className="hidden xs:inline text-text-faint shrink-0">YantraCore</span>
+            <ChevronRight size={13} className="hidden xs:block text-text-faint shrink-0" />
             {activeSection === "email" && activeEmailAccount && (
               <>
-                <span className="text-text-faint">Email</span>
-                <ChevronRight size={13} className="text-text-faint" />
+                <span className="text-text-faint shrink-0">Email</span>
+                <ChevronRight size={13} className="text-text-faint shrink-0" />
                 <ProviderBadge provider={activeEmailAccount.provider} />
               </>
             )}
-            <span className="text-text-mid font-medium">{breadcrumbLabel}</span>
+            <span className="text-text-mid font-medium truncate min-w-0">{breadcrumbLabel}</span>
           </div>
 
           {/* Refresh accounts button when in email section */}

@@ -55,6 +55,11 @@ export function LogoMark({ centerY = "34%", onClick, parallax = true, spin = tru
     // Ambient/persistent usages (e.g. the orbital Sun) opt out so this rAF loop
     // + mousemove listener don't run forever on a never-unmounting node.
     if (!parallax) return;
+    // Touch / no-hover devices can never meaningfully drive the tilt, and
+    // reduced-motion opts out — skip the perpetual rAF + mousemove there.
+    if (typeof window !== "undefined" &&
+        (window.matchMedia("(hover: none)").matches ||
+         window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
     const wrap   = wrapRef.current;
     const tilt   = tiltRef.current;
     if (!wrap || !tilt) return;

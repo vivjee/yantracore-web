@@ -551,8 +551,9 @@ export default function MusicPage() {
             </div>
           </div>
 
-          {/* Main workspace */}
-          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden relative">
+          {/* Main workspace — scrolls on phones (the TV screen is height-locked),
+              side-by-side and clipped on md+. */}
+          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-y-auto md:overflow-hidden no-scrollbar relative">
 
             {/* Left Column: Player Console */}
             <div className="flex-1 flex flex-col gap-4 min-h-0 relative">
@@ -565,7 +566,7 @@ export default function MusicPage() {
                   relative flex flex-col overflow-hidden transition-[border-color,box-shadow] duration-300
                   ${isFs
                     ? "bg-black w-screen h-screen p-0 gap-0"
-                    : "bg-black/60 border border-white/5 rounded-xl p-3 gap-2 flex-1 min-h-[220px] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"
+                    : "bg-black/60 border border-white/5 rounded-xl p-3 gap-2 flex-1 min-h-[150px] sm:min-h-[220px] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"
                   }
                   ${isFs && !controlsVisible ? "cursor-none" : ""}
                 `}
@@ -1140,7 +1141,7 @@ export default function MusicPage() {
             </div>
 
             {/* Right Column: Track Search and Playlist Library */}
-            <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-0 select-none">
+            <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-[45vh] md:min-h-0 select-none">
 
               {/* Search Box */}
               <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0">
