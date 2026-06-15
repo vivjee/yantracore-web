@@ -121,9 +121,10 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
       <YantraElectricTitle as={as} text="YantraCore" size={compact ? "lg" : "xl"} />
 
       {!compact && (
-        <p className="max-w-[40ch] text-sm leading-relaxed" style={{ color: "var(--text-low)" }}>
-          We engineer software, AI &amp; infrastructure — for ambitious companies and the
-          communities we belong to.
+        <p className="max-w-[52ch] text-sm leading-relaxed" style={{ color: "var(--text-low)" }}>
+          At YantraCore, we transform bold ideas into powerful digital products - apps,
+          platforms, and intelligent systems that are fast, elegant, practical, and built to
+          make life simpler, work smarter, and communities stronger.
         </p>
       )}
 
