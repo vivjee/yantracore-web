@@ -35,10 +35,10 @@ import { audioSynth } from "@/lib/audio";
    gives each its own drift so they never move in unison. */
 const SATELLITES = [
   { name: "Projects",     tagline: "What we've built",     href: "/projects",     accent: "var(--accent-2)",    Icon: Boxes,            side: "top",   angle: 90,  bob: { dur: "9.5s", delay: "-2s",   x: "0px",  y: "-9px"  } },
-  { name: "Technologies", tagline: "The stack we wield",   href: "/technologies", accent: "var(--accent-1)",    Icon: StellarOrbitIcon, side: "right", angle: 40,  bob: { dur: "9s",   delay: "-3s",   x: "5px",  y: "-8px"  } },
-  { name: "Reach",        tagline: "Where our work lands", href: "/reach",        accent: "var(--accent-warm)", Icon: Globe2,           side: "right", angle: -10, bob: { dur: "11s",  delay: "-1s",   x: "6px",  y: "-6px"  } },
-  { name: "About",        tagline: "Who we are",           href: "/about",        accent: "var(--accent-3)",    Icon: Info,             side: "left",  angle: 140, bob: { dur: "8.5s", delay: "-4s",   x: "-5px", y: "-10px" } },
-  { name: "Contact",      tagline: "Start a conversation", href: "/contact",      accent: "var(--accent-2)",    Icon: Mail,             side: "left",  angle: 190, bob: { dur: "10s",  delay: "-2.5s", x: "-4px", y: "-7px"  } },
+  { name: "Technologies", tagline: "The stack we wield",   href: "/technologies", accent: "var(--accent-1)",    Icon: StellarOrbitIcon, side: "left",  angle: 140, bob: { dur: "8.5s", delay: "-4s",   x: "-5px", y: "-10px" } },
+  { name: "Reach",        tagline: "Where our work lands", href: "/reach",        accent: "var(--accent-warm)", Icon: Globe2,           side: "left",  angle: 190, bob: { dur: "10s",  delay: "-2.5s", x: "-4px", y: "-7px"  } },
+  { name: "About",        tagline: "Who we are",           href: "/about",        accent: "var(--accent-3)",    Icon: Info,             side: "right", angle: 40,  bob: { dur: "9s",   delay: "-3s",   x: "5px",  y: "-8px"  } },
+  { name: "Contact",      tagline: "Start a conversation", href: "/contact",      accent: "var(--accent-2)",    Icon: Mail,             side: "right", angle: -10, bob: { dur: "11s",  delay: "-1s",   x: "6px",  y: "-6px"  } },
 ] as const;
 
 /* ── Entrance choreography ────────────────────────────────────────────────
@@ -122,13 +122,6 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
         >
           Book a Consultation
         </GlassButton>
-        <GlassButton
-          variant="secondary"
-          onMouseEnter={() => audioSynth.playHover()}
-          onClick={() => go("/projects")}
-        >
-          Explore Projects
-        </GlassButton>
       </Rise>
     </div>
   );
@@ -144,6 +137,13 @@ export function HomeOrbital() {
       <nav className="home-orbit" aria-label="Explore YantraCore">
         {/* The orbit path the satellites ride (decorative). */}
         <span className="home-orbit__path" aria-hidden />
+
+        {/* Sun hover sensor — a centred disc over the logo. The persistent Sun is
+            pointer-events:none and sits beneath this layer, so it can't feel the
+            cursor itself; hovering this disc 'wakes' it (the rings brighten and a
+            soft bloom rises behind the logo) via CSS :has on .orbital-stage.
+            Purely decorative — the logo isn't a link. */}
+        <span className="home-orbit__sun-sense" aria-hidden />
 
         {/* The satellites, placed by angle on the ring. */}
         <ul className="home-orbit__ring">

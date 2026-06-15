@@ -2975,7 +2975,7 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
 .orbital-rings {
   transform: scale(0.5);
   transform-origin: 50% 44%;
-  transition: transform 0.6s var(--ease-out-soft);
+  transition: transform 0.6s var(--ease-out-soft), filter 0.5s var(--ease-out-soft);
 }
 @media (min-width: 640px) {
   .orbital-rings { transform: scale(0.62); }
@@ -2991,6 +2991,44 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
 }
 @media (max-height: 680px) {
   .orbital-rings { transform: scale(0.56) !important; }
+}
+
+/* Hover-to-wake — a soft radial bloom behind the logo, invisible at rest. Lives
+   in the persistent Sun (so it never re-mounts), centred on the logo (50% / 44%)
+   and scaled with it via the parent's transform. It rises only when the Home
+   sense disc over the logo is hovered (see the :has rule below); the violet→cyan
+   tint and `screen` blend read as the Sun quietly catching light. */
+.orbital-sun__bloom {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 360px;
+  height: 360px;
+  transform: translate(-50%, -50%) scale(0.85);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent-1) 26%, transparent) 0%,
+    color-mix(in srgb, var(--accent-2) 13%, transparent) 42%,
+    transparent 70%
+  );
+  opacity: 0;
+  z-index: 4; /* between the rings (z2) and the logo (z5) — glows behind the mark */
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.55s var(--ease-out-soft), transform 0.6s var(--ease-out-soft);
+}
+
+/* The wake itself. The sense disc lives in the Home satellite layer (the only
+   layer that can feel the cursor — the Sun beneath is pointer-events:none), so
+   we reach across the shared .orbital-stage with :has to light up the Sun: the
+   bloom rises and the whole ring system brightens a touch. Pure CSS, no JS. */
+.orbital-stage:has(.home-orbit__sun-sense:hover) .orbital-sun__bloom {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.orbital-stage:has(.home-orbit__sun-sense:hover) .orbital-rings {
+  filter: brightness(1.16) saturate(1.08);
 }
 
 /* Showcase solar-system (the /projects + Home desktop scene). It's engineered
@@ -3293,6 +3331,23 @@ html[data-theme="light"] .orbital-node__emblem {
   animation: home-orbit-in 1s var(--ease-out-soft) 0.35s both;
 }
 
+/* The Sun hover sensor — a centred, invisible disc over the logo. The orbit
+   layer is pointer-events:none, so this re-enables events just for itself; it's
+   the cursor target that wakes the Sun (see the .orbital-stage:has rule). Kept
+   well inside the node ring (radius < the closest satellite) so it never steals
+   hover from the satellites or the centre CTAs. md+ only (it rides .home-orbit,
+   which is hidden on phones — a hover affordance touch can't use anyway). */
+.home-orbit__sun-sense {
+  position: absolute;
+  left: 50%;
+  top: var(--orbit-cy);
+  width: clamp(200px, 19vw, 290px);
+  height: clamp(200px, 19vw, 290px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
 /* Satellite list + slot. Each slot is anchored on the orbit and vertically
    centred; the side modifier picks which edge meets the ring (the top crown
    node is centred horizontally instead). */
@@ -3308,7 +3363,10 @@ html[data-theme="light"] .orbital-node__emblem {
 }
 .home-orbit__planet--left  { transform: translate(-100%, -50%); }
 .home-orbit__planet--right { transform: translate(0, -50%); }
-.home-orbit__planet--top   { transform: translate(-50%, -50%); }
+/* The crown node rests its BOTTOM edge on the orbit (centred horizontally), so
+   the whole tile sits above the ring like the side nodes sit outside it —
+   rather than straddling the line and dipping toward the logo. */
+.home-orbit__planet--top   { transform: translate(-50%, -100%); }
 
 /* Slow, independent drift — the satellites hold station and breathe. The
    per-slot amplitude / tempo / phase arrive as inline custom properties. */
