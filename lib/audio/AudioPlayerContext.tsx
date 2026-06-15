@@ -16,6 +16,9 @@ export interface Track {
 export const TRACKS: Track[] = [
   { id: 1, title: "Deep Work Lounge", duration: "Stream", isPlayable: true, src: "/music/deep-work-lounge.mp3", description: "Ambient downtempo lofi music for deep work and relaxation.", tempo: "65 BPM", key: "C Minor" },
   { id: 2, title: "Meadow Sleepwalk", duration: "Stream", isPlayable: true, src: "/music/meadow-sleepwalk.mp3", description: "Ethereal ambient chillout soundscape with gentle downtempo grooves.", tempo: "72 BPM", key: "D Major" },
+  { id: 3, title: "Island Drift", duration: "Stream", isPlayable: true, src: "/music/island-drift.mp3", description: "Sun-soaked lounge groove drifting on breezy, tropical textures.", tempo: "70 BPM", key: "A Major" },
+  { id: 4, title: "Mango Moon", duration: "Stream", isPlayable: true, src: "/music/mango-moon.mp3", description: "Warm nocturnal chillout with mellow, fruit-ripe synth pads.", tempo: "68 BPM", key: "F Major" },
+  { id: 5, title: "Sunlit Strings", duration: "Stream", isPlayable: true, src: "/music/sunlit-strings.mp3", description: "Golden-hour ambient piece carried by soft, sunlit strings.", tempo: "60 BPM", key: "G Major" },
 ];
 
 export interface AudioPlayerContextType {
