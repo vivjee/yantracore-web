@@ -568,7 +568,7 @@ html.prefers-reduced-motion *::after {
 
 .yantra-electric-title::before,
 .yantra-electric-title::after {
-  content: "YantraCore";
+  content: attr(data-text);
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -1580,6 +1580,11 @@ body.brochure-mode-active header {
     inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
+.tv-console-account-btn.active {
+  color: var(--accent-2) !important;
+  text-shadow: 0 0 8px rgba(0, 224, 203, 0.5) !important;
+}
+
 /* Docked state — peels off and attaches to viewport top */
 .tv-console-nav-panel.console-docked {
   position: fixed;
@@ -2199,6 +2204,21 @@ html[data-theme="light"] .glass-primary.active {
 }
 
 /* 2. Global Navigation overrides */
+
+/* yantra-electric-title light-mode: the dark-mode gradient is white→white
+   which is invisible on a light background. Override with saturated colors. */
+html[data-theme="light"] .yantra-electric-title {
+  background:
+    linear-gradient(110deg, var(--accent-1) 0%, #5b3ff8 25%, var(--accent-2) 50%, #8b5cf6 75%, var(--accent-1) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 0 6px rgba(110, 86, 255, 0.35))
+    drop-shadow(0 0 12px rgba(0, 224, 203, 0.2));
+}
+
 html[data-theme="light"] .nav-pill-scroll {
   background: #EEF2F6 !important;
   backdrop-filter: none !important;
@@ -2289,7 +2309,7 @@ html[data-theme="light"] .tv-console-btn {
 html[data-theme="light"] .tv-console-btn:hover {
   background: #F3F6FA !important;
   border-color: var(--accent-1) !important;
-  color: var(--accent-1) !important;
+  color: var(--text-hi) !important;
   box-shadow: 
     1px 1px 3px #cbd5e1, 
     -1px -1px 3px #ffffff,
@@ -2301,7 +2321,20 @@ html[data-theme="light"] .tv-console-btn.active {
     inset 2px 2px 5px #cbd5e1, 
     inset -2px -2px 5px #ffffff !important;
   background: #E2E8F0 !important;
-  color: var(--accent-1) !important;
+  color: var(--text-hi) !important;
+}
+
+html[data-theme="light"] .tv-console-account-btn:hover {
+  border-color: var(--accent-2) !important;
+  color: var(--text-hi) !important;
+  box-shadow: 
+    1px 1px 3px #cbd5e1, 
+    -1px -1px 3px #ffffff,
+    0 0 10px rgba(0, 158, 143, 0.15) !important;
+}
+
+html[data-theme="light"] .tv-console-account-btn.active {
+  color: var(--text-hi) !important;
 }
 
 html[data-theme="light"] .tv-console-btn .tooltip {
