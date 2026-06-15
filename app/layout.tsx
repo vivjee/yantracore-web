@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Orbitron, Space_Grotesk, Syncopate, Syne, Outfit } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
@@ -83,6 +83,15 @@ export const metadata: Metadata = {
       "YantraCore engineers software, AI, and infrastructure for ambitious companies — and for the communities we belong to.",
     images: ["/images/brand/frame-hero-og.png"],
   },
+};
+
+// `viewportFit: "cover"` lets the layout extend under notches/rounded corners so
+// our `env(safe-area-inset-*)` padding can reclaim that space deliberately.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#06070D",
 };
 
 export default function RootLayout({

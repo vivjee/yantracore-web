@@ -58,6 +58,14 @@
   --r-md: 16px;
   --r-lg: 24px;
   --r-xl: 32px;
+
+  /* Safe-area insets (notch / rounded corners / home indicator).
+     Resolve to 0px on devices without insets; consumed via the `.*-safe`
+     utilities below or directly in calc() for fixed UI. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 /* Alternate palettes — uncomment one to swap entire site
@@ -80,6 +88,10 @@
    ============================================================ */
 
 @theme inline {
+  /* Extra small-phone breakpoint (≈400px). Tailwind keeps its sm/md/lg/xl/2xl
+     defaults; this only adds `xs:` (≥400) and `max-xs:` (<400) variants. */
+  --breakpoint-xs: 25rem;
+
   --color-ink-0: var(--ink-0);
   --color-ink-1: var(--ink-1);
   --color-ink-edge: var(--ink-edge);
@@ -182,6 +194,43 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--accent-1) 35%, transparent);
   color: var(--text-hi);
+}
+
+/* ============================================================
+   Responsive foundation utilities (responsive sweep)
+   ============================================================ */
+
+/* Safe-area padding — adds the device inset on top of the box's own padding.
+   Use the directional variants on edges that meet a notch / home indicator. */
+.pt-safe { padding-top: var(--safe-top); }
+.pr-safe { padding-right: var(--safe-right); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.pl-safe { padding-left: var(--safe-left); }
+.px-safe { padding-left: var(--safe-left); padding-right: var(--safe-right); }
+.py-safe { padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+
+/* Fluid type scale — smooth clamp() ramps so display/heading type never jumps
+   abruptly between breakpoints. Use standalone (not alongside text-* sizes). */
+.text-fluid-display { font-size: clamp(2.5rem, 1.6rem + 4.2vw, 5rem);    line-height: 1.02; letter-spacing: -0.02em; }
+.text-fluid-h1      { font-size: clamp(2rem, 1.4rem + 3vw, 3.75rem);     line-height: 1.05; letter-spacing: -0.015em; }
+.text-fluid-h2      { font-size: clamp(1.5rem, 1.15rem + 1.8vw, 2.5rem); line-height: 1.12; letter-spacing: -0.01em; }
+.text-fluid-h3      { font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); line-height: 1.18; }
+.text-fluid-lead    { font-size: clamp(1rem, 0.93rem + 0.4vw, 1.25rem);  line-height: 1.5; }
+
+/* Touch hit-area helper — guarantees a ≥44px tap target on coarse pointers
+   WITHOUT changing the control's visual size. Apply to small icon buttons/links
+   that don't already use their own ::after; the element gets position:relative. */
+@media (pointer: coarse) {
+  .tap-target { position: relative; }
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* ============================================================
