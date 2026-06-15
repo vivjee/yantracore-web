@@ -469,7 +469,7 @@ export function ReachGlobe() {
               Reach · Live Activity
             </div>
             <h1 className="mt-1 max-w-[16rem] font-display text-lg font-semibold leading-tight tracking-tight text-text-hi sm:text-xl">
-              Where our work is happening, live
+              Our projects, in motion
             </h1>
             <div className="mt-2 flex items-center gap-3 font-mono text-[10px] text-text-mid">
               <span className="flex items-center gap-1.5">
