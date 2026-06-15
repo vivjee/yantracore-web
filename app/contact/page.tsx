@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, type FormEvent } from "react";
+import Link from "next/link";
 import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { TvFrame } from "@/components/layout/TvFrame";
 import { Eyebrow } from "@/components/typography/Eyebrow";
@@ -78,7 +79,16 @@ export default function ContactPage() {
                 </span>
               </h1>
               <p className="text-text-mid text-sm md:text-base mt-3 max-w-lg mx-auto font-sans leading-relaxed">
-                Have a question, feedback, or want to collaborate? Drop us a message below and we'll get back to you shortly.
+                Have a question, feedback, or want to collaborate? Drop us a message below and we’ll get back to you shortly.
+              </p>
+              <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-text-low">
+                Have a specific project in mind?{" "}
+                <Link
+                  href="/book"
+                  className="text-accent-2 underline-offset-4 transition-colors hover:underline"
+                >
+                  Book a consultation →
+                </Link>
               </p>
             </div>
 

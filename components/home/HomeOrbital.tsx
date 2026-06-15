@@ -66,9 +66,9 @@ const DESTINATIONS = [
   {
     name: "About",
     tagline: "Who we are",
+    href: "/about",
     accent: "var(--accent-3)",
     Icon: Info,
-    soon: true,
   },
 ] as const;
 
@@ -132,7 +132,7 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
         <GlassButton
           variant="primary"
           onMouseEnter={() => audioSynth.playHover()}
-          onClick={() => go("/contact")}
+          onClick={() => go("/book")}
         >
           Book a Consultation
         </GlassButton>

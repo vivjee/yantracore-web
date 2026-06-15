@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Orbitron, Space_Grotesk, Syncopate, Syne, Outfit
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
+import { NowPlayingDock } from "@/components/chrome/NowPlayingDock";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { AudioPlayerProvider } from "@/lib/audio/AudioPlayerContext";
 import { ShortcutsProvider } from "@/lib/shortcuts/ShortcutsProvider";
@@ -98,6 +99,7 @@ export default function RootLayout({
           <AudioPlayerProvider>
             <ShortcutsProvider>
               <Cursor />
+              <NowPlayingDock />
               <SmoothScrollProvider>{children}</SmoothScrollProvider>
             </ShortcutsProvider>
           </AudioPlayerProvider>

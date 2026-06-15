@@ -20,9 +20,12 @@
 | Audio (UI synth + music player) | ✅ Built |
 | Glass primitives + motion primitives | ✅ Built (`/lab/playground` reviews them) |
 | Homepage — orbital navigation hub (`HomeOrbital`) | ✅ Live (calm one-screen hub; replaced the `Showcase` scene) |
-| Orbital route group — persistent `Sun` + seamless transitions | ✅ Phase 0+1 foundation shipped (Projects/Technologies/Activity fold in Phases 2–3) |
+| Orbital route group — persistent `Sun` + seamless transitions | ✅ `/` + `/projects` in the group (real seamless nav); Technologies/Activity still to fold in (Phase 3) |
 | Brochure pages (contact, music, entryport, technologies, channels) | ✅ Live |
-| Projects page (`/projects`) — relocated `Showcase` | ✅ Live (client showcase + testimonials pending Phase 2) |
+| Projects page (`/projects`) — `Showcase` in the orbital group | ✅ Live (own products; client work + testimonials moved to `/work`) |
+| `/work` — client work grid + testimonials | ✅ Live (reuses `Work` + `Voices`) |
+| `/about` — studio identity walkthrough | ✅ Live (reuses `Manifesto`/`Capabilities`/`Forge`) |
+| `/book` — Book a Consultation (estimator + intake) | ✅ Live (`submitProject` localStorage stub) |
 | Console / dashboard (Ask AI, Email, Drive, Projects) | ✅ Live, wired to YantraMate |
 | YantraMate proxy routes (`app/api/*`) | ✅ Built |
 | Auth (login/signup) | ⚠️ Demo-grade (sessionStorage, no server session) |
@@ -52,14 +55,14 @@ Grouped by theme. Unordered within a group; promote items as priorities firm up.
 
 ### Orbital makeover (in progress)
 
-Reorganizing the site around one idea: **YantraCore is the sun; every page is a constellation orbiting it.** Orbital pages (`/`, `/projects`, `/technologies`, `/activity`) share one persistent, memoized `Sun` via the `app/(orbital)/` route-group layout (mounts once, never re-mounts) so navigation between them is seamless — while staying distinct, server-rendered, crawlable routes. Channel pages keep the CRT glitch. See [03-sitemap.md](./03-sitemap.md#the-orbital-makeover-in-progress--phase-01-shipped-2026-06-15).
+Reorganizing the site around one idea: **YantraCore is the sun; every page is a constellation orbiting it.** Orbital pages (`/`, `/projects`, `/technologies`) share one persistent, memoized `Sun` via the `app/(orbital)/` route-group layout (mounts once, never re-mounts) so navigation between them is seamless — while staying distinct, server-rendered, crawlable routes. Channel pages (including `/activity`, the globe) keep the CRT glitch. See [03-sitemap.md](./03-sitemap.md#the-orbital-makeover-in-progress--phase-01-shipped-2026-06-15).
 
 - [x] **Phase 0+1 — foundation + new Home.** `(orbital)` route group; persistent `Sun` + `OrbitalRings`; `SatelliteTransition`; `TvFrame` `seamless` prop (gates the channel glitch); removed the root `template.tsx` remount boundary; `SiteBackground` hoist-ready. New calm `HomeOrbital` hub. `Showcase` relocated to `/projects`. *Verified: `tsc` clean, full `next build` passes, `/` + `/projects` static-prerendered with crawlable anchors.*
-- [ ] **Phase 2 — Projects.** Fold `/projects` into the orbital group (strip its own logo, use the persistent `Sun`); add client showcase + testimonials + consultation CTA.
-- [ ] **Phase 3 — Technologies + Activity into the group** (`/entryport` → `/activity` with a redirect); perfect the exit→enter cross-morph (frozen-router `AnimatePresence`).
-- [ ] **Phase 4 — About** (`/about`, WebGL scroll walkthrough).
-- [ ] **Phase 5 — Book a Consultation** (`/book`, project intake + budget estimator).
-- [ ] **Phase 6 — Contact refresh + nav/IA reconcile + docs sweep.** (Staffing deferred.)
+- [x] **Phase 2 — Projects folded into the orbital group.** `Showcase` gained an `externalSun` prop (drops its own centre logo/copy) so the cards orbit the shared `Sun`; `/projects` moved under `app/(orbital)/`. **First real seamless navigation** (Home ⇄ Projects, no glitch, Sun persists). Client work + testimonials were split out to a dedicated **`/work`** page (`WorkWalkthrough`, reusing `Work` + `Voices`) — the orbital screen is height-locked, so scrollable proof content lives better on its own route.
+- [x] **Phase 3 (mostly) — Technologies folded in; Activity renamed.** `/technologies` moved under `app/(orbital)/` for seamless nav — its opaque star-map (own centre star) covers the persistent Sun, sidestepping the big-Sun-vs-small-star scale mismatch. `/entryport` → `/activity` (308 redirect; kept a channel page since the globe is its own centerpiece). *Remaining: perfect the exit→enter cross-morph (frozen-router `AnimatePresence`) — now testable with 3 orbital routes.*
+- [x] **Phase 4 — About** (`/about`). Identity walkthrough assembling the VISION sections (custom hero + `Manifesto` + `Capabilities` + `Forge` + CTA). *Verified: static-prerendered, single `<h1>`, crawlable CTAs.*
+- [x] **Phase 5 — Book a Consultation** (`/book`). Budget estimator (`lib/content/estimator.ts` + `BudgetEstimator`) feeding the `submitProject` intake form. *Verified: static-prerendered, ESLint clean.*
+- [ ] **Phase 6 — nav/IA wiring + docs sweep.** Home ✅ (About node → `/about`; Book CTA → `/book`). Contact refresh ✅ (`/book` cross-link). **Remaining:** chrome-bar buttons for `/projects` · `/about` · `/work` + relabel the Activity link to `/activity` — *deferred while `TvFrame` is under concurrent edit*. (Staffing deferred.)
 
 ### Polish & decisions
 - [x] ~~Decide the homepage~~ — **decided (2026-06-15):** the homepage is the calm **orbital navigation hub**; the `Showcase` product scene moved to `/projects`. [04-hero-concept.md](./04-hero-concept.md)'s scroll-assembled hero remains a possible future treatment for `/about`.

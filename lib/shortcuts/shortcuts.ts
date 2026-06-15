@@ -32,7 +32,7 @@ export interface ShortcutDef {
 export const SHORTCUTS: ShortcutDef[] = [
   // ── Navigation (Shift + mnemonic letter) ──
   { id: "nav-home",         key: "H", display: "⇧H", label: "Home",            group: "Navigation" },
-  { id: "nav-entryport",    key: "L", display: "⇧L", label: "Live Activity",   group: "Navigation" },
+  { id: "nav-entryport",    key: "R", display: "⇧R", label: "Reach",           group: "Navigation" },
   { id: "nav-technologies", key: "T", display: "⇧T", label: "Technologies",    group: "Navigation" },
   { id: "nav-music",        key: "M", display: "⇧M", label: "Music Lab",       group: "Navigation" },
   { id: "nav-contact",      key: "C", display: "⇧C", label: "Contact",         group: "Navigation" },
