@@ -149,7 +149,7 @@ export function BudgetEstimator({
                   onToggleAddOn(a.id);
                 }}
                 className={cn(
-                  "relative cursor-pointer rounded-full px-3.5 py-2 text-[11px] font-medium transition-all duration-300 glass-light",
+                  "relative inline-flex min-h-[40px] cursor-pointer items-center rounded-full px-3.5 py-2 text-[11px] font-medium transition-all duration-300 glass-light",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-1/60",
                   active ? "text-text-hi" : "text-text-mid opacity-75 hover:opacity-100"
                 )}

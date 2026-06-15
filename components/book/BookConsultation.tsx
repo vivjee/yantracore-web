@@ -23,11 +23,14 @@ import { cn } from "@/lib/utils/cn";
 type FormState = "idle" | "loading" | "success" | "error";
 
 /**
- * BookConsultation — the /book page body. A budget estimator that feeds a
- * project-intake form: the visitor configures a project (type · scope ·
- * add-ons), sees an indicative range, then sends it. Submit goes through the
- * existing `submitProject` Zod stub (localStorage in v1; swap to the Node API
- * in v2). Mirrors the contact page's scroll/glass/success patterns.
+ * BookConsultation — the /book page body. Two stacked panels under one form:
+ *   1. Project details — the estimator (type · scope · add-ons), timeline, and brief.
+ *   2. Your details — contact fields + submit.
+ * Submit goes through the `submitProject` Zod stub (localStorage in v1; swap to
+ * the Node API in v2). Mirrors the contact page's scroll/glass/success patterns.
+ *
+ * NOTE: panel titles use <div>, not <header> — `body.app-mode-active header`
+ * (set by TvFrame) is `display:none` site-wide to hide the floating nav pill.
  */
 export function BookConsultation() {
   // Estimator selections
@@ -104,7 +107,7 @@ export function BookConsultation() {
   };
 
   return (
-    <div className="no-scrollbar relative z-10 h-full min-h-screen w-full overflow-y-auto px-6 pb-24 pt-12 md:pt-20">
+    <main className="no-scrollbar relative z-10 h-full min-h-screen w-full overflow-y-auto px-6 pb-24 pt-12 md:pt-20">
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-9 text-center">
@@ -136,7 +139,7 @@ export function BookConsultation() {
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10">
                 <Check className="h-8 w-8 text-emerald-400" />
               </div>
-              <h3 className="mb-3 font-mono text-2xl font-bold text-text-hi">REQUEST RECEIVED</h3>
+              <h2 className="mb-3 font-mono text-2xl font-bold text-text-hi">REQUEST RECEIVED</h2>
               <p className="mx-auto max-w-md text-sm leading-relaxed text-text-mid">
                 Thanks — we’ve got your {typeLabel.toLowerCase()} brief at{" "}
                 <span className="text-text-hi">{bucketLabels[est.bucket]}</span>. We’ll review it and
@@ -150,52 +153,148 @@ export function BookConsultation() {
               </button>
             </motion.div>
           ) : (
-            <motion.div
+            <motion.form
               key="form"
+              onSubmit={handleSubmit}
+              noValidate
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="flex flex-col gap-6"
             >
-              {/* Estimator */}
+              {/* ── Step 01 · Project details ── */}
               <AnimatedBorder variant="sweep" radius={24} duration={9000}>
                 <div className="rounded-3xl glass-heavy p-6 md:p-8">
-                  <header className="mb-8 flex flex-col gap-2">
+                  <div className="mb-8 flex flex-col gap-2">
                     <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
                       Step 01
                     </span>
                     <h2 className="text-xl font-semibold text-text-hi md:text-2xl">
-                      Configure your project
+                      Project details
                     </h2>
                     <p className="text-sm leading-relaxed text-text-mid">
-                      Pick what you’re building, how big it is, and any extras — we’ll shape the plan
-                      and quote to match.
+                      What you’re building, how big it is, when you need it, and a short brief — this
+                      shapes the plan and quote we send back.
                     </p>
-                  </header>
-                  <BudgetEstimator
-                    projectType={projectType}
-                    scope={scope}
-                    selectedAddOns={selectedAddOns}
-                    onTypeChange={setProjectType}
-                    onScopeChange={setScope}
-                    onToggleAddOn={toggleAddOn}
-                  />
+                  </div>
+
+                  <div className="flex flex-col gap-10">
+                    <BudgetEstimator
+                      projectType={projectType}
+                      scope={scope}
+                      selectedAddOns={selectedAddOns}
+                      onTypeChange={setProjectType}
+                      onScopeChange={setScope}
+                      onToggleAddOn={toggleAddOn}
+                    />
+
+                    {/* Timeline */}
+                    <fieldset className="flex flex-col gap-4">
+                      <legend className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+                        When do you need it?{" "}
+                        <span className="text-text-low normal-case tracking-normal">(optional)</span>
+                      </legend>
+                      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                        {timelines.map((t) => {
+                          const active = t.id === timeline;
+                          return (
+                            <button
+                              key={t.id}
+                              type="button"
+                              aria-pressed={active}
+                              onMouseEnter={() => audioSynth.playHover()}
+                              onClick={() => {
+                                audioSynth.playClick();
+                                setTimeline(active ? null : t.id);
+                              }}
+                              disabled={formState === "loading"}
+                              className={cn(
+                                "relative flex cursor-pointer flex-col items-center gap-0.5 rounded-xl px-3 py-2.5 text-center transition-all duration-300",
+                                "glass-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60",
+                                "disabled:cursor-not-allowed disabled:opacity-40",
+                                active ? "" : "opacity-70 hover:opacity-100"
+                              )}
+                            >
+                              <span
+                                aria-hidden
+                                className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300"
+                                style={{
+                                  opacity: active ? 1 : 0,
+                                  boxShadow:
+                                    "inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent), 0 0 16px color-mix(in srgb, var(--accent-2) 25%, transparent)",
+                                }}
+                              />
+                              <span
+                                className="relative z-10 text-[12px] font-semibold"
+                                style={{ color: active ? "var(--accent-2)" : "var(--text-hi)" }}
+                              >
+                                {t.label}
+                              </span>
+                              <span className="relative z-10 text-[9px] leading-tight text-text-low">
+                                {t.blurb}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
+
+                    {/* Project brief */}
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="book-message"
+                          className="font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid"
+                        >
+                          About the project
+                          <span className="ml-0.5 text-accent-2" aria-hidden>
+                            *
+                          </span>
+                        </label>
+                        <span
+                          id="book-message-count"
+                          className={cn(
+                            "font-mono text-[10px]",
+                            message.length > 4000 ? "text-red-400" : "text-text-low"
+                          )}
+                        >
+                          {message.length} / 4000
+                        </span>
+                      </div>
+                      <textarea
+                        id="book-message"
+                        name="message"
+                        rows={5}
+                        maxLength={4000}
+                        placeholder="What are you trying to build, and what does success look like?"
+                        required
+                        aria-required
+                        aria-describedby="book-message-count"
+                        aria-invalid={message.length > 0 && message.trim().length < 10 ? true : undefined}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        disabled={formState === "loading"}
+                        onFocus={() => audioSynth.playClick()}
+                        className="glass-light w-full resize-none rounded-xl border border-white/[0.04] px-4 py-3.5 text-sm text-text-hi transition-all duration-300 placeholder:text-text-low focus:border-accent-1/30 focus:outline-none"
+                        style={{ minHeight: "120px" }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </AnimatedBorder>
 
-              {/* Intake form */}
+              {/* ── Step 02 · Your details ── */}
               <div className="flex flex-col gap-6 rounded-3xl glass-heavy p-6 md:p-8">
-                <header className="flex flex-col gap-2">
+                <div className="mb-2 flex flex-col gap-2">
                   <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
                     Step 02
                   </span>
                   <h2 className="text-xl font-semibold text-text-hi md:text-2xl">Your details</h2>
                   <p className="text-sm leading-relaxed text-text-mid">
-                    Where to reach you, your timeline, and a few words about the project — we’ll reply
-                    with a tailored plan.
+                    Where to reach you — we’ll reply with a tailored plan and quote.
                   </p>
-                </header>
+                </div>
 
                 {errorMessage && (
                   <div
@@ -210,7 +309,7 @@ export function BookConsultation() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+                <div className="flex flex-col gap-5">
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <GlassInput
                       id="book-name"
@@ -282,100 +381,12 @@ export function BookConsultation() {
                     onFocus={() => audioSynth.playClick()}
                   />
 
-                  {/* Timeline */}
-                  <fieldset className="flex flex-col gap-4">
-                    <legend className="mb-1 font-mono text-xs uppercase tracking-wider text-text-mid">
-                      Timeline{" "}
-                      <span className="text-text-low normal-case tracking-normal">(optional)</span>
-                    </legend>
-                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                      {timelines.map((t) => {
-                        const active = t.id === timeline;
-                        return (
-                          <button
-                            key={t.id}
-                            type="button"
-                            aria-pressed={active}
-                            onMouseEnter={() => audioSynth.playHover()}
-                            onClick={() => {
-                              audioSynth.playClick();
-                              setTimeline(active ? null : t.id);
-                            }}
-                            disabled={formState === "loading"}
-                            className={cn(
-                              "relative flex cursor-pointer flex-col items-center gap-0.5 rounded-xl px-3 py-2.5 text-center transition-all duration-300",
-                              "glass-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60",
-                              "disabled:cursor-not-allowed disabled:opacity-40",
-                              active ? "" : "opacity-70 hover:opacity-100"
-                            )}
-                          >
-                            <span
-                              aria-hidden
-                              className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300"
-                              style={{
-                                opacity: active ? 1 : 0,
-                                boxShadow:
-                                  "inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent), 0 0 16px color-mix(in srgb, var(--accent-2) 25%, transparent)",
-                              }}
-                            />
-                            <span
-                              className="relative z-10 text-[12px] font-semibold"
-                              style={{ color: active ? "var(--accent-2)" : "var(--text-hi)" }}
-                            >
-                              {t.label}
-                            </span>
-                            <span className="relative z-10 text-[9px] leading-tight text-text-low">
-                              {t.blurb}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </fieldset>
-
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between text-sm font-medium">
-                      <label
-                        htmlFor="book-message"
-                        className="font-mono text-xs uppercase tracking-wider text-text-mid"
-                      >
-                        About the project
-                        <span className="ml-0.5 text-accent-2" aria-hidden>
-                          *
-                        </span>
-                      </label>
-                      <span
-                        className={cn(
-                          "font-mono text-[10px]",
-                          message.length > 4000 ? "text-red-400" : "text-text-faint"
-                        )}
-                      >
-                        {message.length} / 4000
-                      </span>
-                    </div>
-                    <textarea
-                      id="book-message"
-                      name="message"
-                      rows={5}
-                      maxLength={4000}
-                      placeholder="What are you trying to build, and what does success look like?"
-                      required
-                      aria-required
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      disabled={formState === "loading"}
-                      onFocus={() => audioSynth.playClick()}
-                      className="glass-light w-full resize-none rounded-xl border border-white/[0.04] px-4 py-3.5 text-sm text-text-hi transition-all duration-300 placeholder:text-text-low focus:border-accent-1/30 focus:outline-none"
-                      style={{ minHeight: "120px" }}
-                    />
-                  </div>
-
                   <button
                     type="submit"
                     onMouseEnter={() => audioSynth.playHover()}
                     disabled={!canSubmit}
                     className={cn(
-                      "glass-primary group inline-flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5",
+                      "glass-primary group mt-1 inline-flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5",
                       "font-mono text-[0.95rem] font-semibold uppercase tracking-wider text-text-hi",
                       "cursor-pointer transition-all duration-500 ease-out",
                       "hover:shadow-[0_20px_40px_-10px_rgba(110,86,255,0.45)]",
@@ -403,17 +414,17 @@ export function BookConsultation() {
                     Fields marked <span className="text-accent-2">*</span> are required. We’ll only use
                     your details to reply about your project — no spam, ever.
                   </p>
-                </form>
+                </div>
 
-                <div className="flex items-center justify-between border-t border-white/[0.04] pt-4 font-mono text-[10px] text-text-faint">
+                <div className="flex items-center justify-between border-t border-white/[0.04] pt-4 font-mono text-[10px] text-text-low">
                   <span>ESTIMATE: INDICATIVE</span>
                   <span>STORAGE: LOCAL</span>
                 </div>
               </div>
-            </motion.div>
+            </motion.form>
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </main>
   );
 }
