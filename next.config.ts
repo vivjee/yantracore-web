@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "yantracore.com" },
     ],
   },
+  async redirects() {
+    return [
+      // /entryport was renamed to /activity in the orbital makeover.
+      { source: "/entryport", destination: "/activity", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
