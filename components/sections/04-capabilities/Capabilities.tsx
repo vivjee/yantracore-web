@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils/cn";
 import { Container } from "@/components/layout/Container";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { Reveal } from "@/components/motion/Reveal";
+import { Tag } from "@/components/ui/Tag";
 import { capabilities } from "@/lib/content/capabilities";
 
 /* ─── Illustration map ───────────────────────────────────────────────── */
@@ -458,25 +459,21 @@ function DetailPanel({ capIndex, phase }: DetailPanelProps) {
             }}
           >
             {cap.stack.map((s, si) => (
-              <span
+              <Tag
                 key={s}
+                tone="accent"
+                shape="square"
+                size="sm"
+                accentColor={accentColor}
                 style={{
-                  fontSize: 10,
-                  fontFamily: "var(--font-mono, monospace)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  padding: "4px 10px",
-                  borderRadius: 8,
-                  border: `1px solid color-mix(in srgb, ${accentColor} 22%, rgba(255,255,255,0.08))`,
-                  color: "var(--text-low)",
-                  background: `color-mix(in srgb, ${accentColor} 6%, rgba(255,255,255,0.02))`,
-                  animation: phase !== "out"
-                    ? `cap-chip-in 0.4s cubic-bezier(0.22,1,0.36,1) ${0.42 + si * 0.055}s both`
-                    : undefined,
+                  animation:
+                    phase !== "out"
+                      ? `cap-chip-in 0.4s cubic-bezier(0.22,1,0.36,1) ${0.42 + si * 0.055}s both`
+                      : undefined,
                 }}
               >
                 {s}
-              </span>
+              </Tag>
             ))}
           </div>
         </div>
@@ -666,12 +663,9 @@ export function Capabilities() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             {["Shopify", "WordPress", "AWS", "GCP", "Azure", "Firebase", "Stripe", "Twilio"].map(
               (tech) => (
-                <span
-                  key={tech}
-                  className="text-xs font-mono uppercase tracking-wider text-text-low px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03]"
-                >
+                <Tag key={tech} size="md">
                   {tech}
-                </span>
+                </Tag>
               )
             )}
           </div>
