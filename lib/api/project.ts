@@ -4,8 +4,11 @@ export const ProjectSchema = z.object({
   name: z.string().min(1).max(120),
   email: z.string().email(),
   company: z.string().max(120).optional(),
+  phone: z.string().max(40).optional(),
+  website: z.string().url().max(200).optional(),
   projectType: z.enum(["web", "app", "api", "cloud", "ai", "design", "other"]),
   budget: z.enum(["under-10k", "10k-25k", "25k-50k", "50k-plus", "discuss"]).optional(),
+  timeline: z.enum(["asap", "1-3mo", "3-6mo", "flexible"]).optional(),
   message: z.string().min(10).max(4000),
 });
 

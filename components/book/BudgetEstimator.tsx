@@ -6,10 +6,8 @@ import {
   projectTypes,
   scopes,
   addOns,
-  formatUSD,
   type ProjectTypeId,
   type ScopeId,
-  type Estimate,
 } from "@/lib/content/estimator";
 
 interface BudgetEstimatorProps {
@@ -19,7 +17,6 @@ interface BudgetEstimatorProps {
   onTypeChange: (id: ProjectTypeId) => void;
   onScopeChange: (id: ScopeId) => void;
   onToggleAddOn: (id: string) => void;
-  est: Estimate;
 }
 
 /**
@@ -37,13 +34,12 @@ export function BudgetEstimator({
   onTypeChange,
   onScopeChange,
   onToggleAddOn,
-  est,
 }: BudgetEstimatorProps) {
   return (
-    <div className="flex flex-col gap-7">
+    <div className="flex flex-col gap-8">
       {/* ── Project type ── */}
-      <fieldset className="flex flex-col gap-3">
-        <legend className="font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           What are we building?
         </legend>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
@@ -62,7 +58,8 @@ export function BudgetEstimator({
                 }}
                 style={{ ["--opt-accent" as string]: t.accent } as React.CSSProperties}
                 className={cn(
-                  "group relative flex flex-col items-start gap-1.5 rounded-2xl p-3 text-left transition-all duration-300",
+                  "group relative flex cursor-pointer flex-col items-start gap-1.5 rounded-2xl p-3 text-left transition-all duration-300",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60",
                   active ? "glass-light" : "glass-light opacity-80 hover:opacity-100"
                 )}
               >
@@ -88,8 +85,8 @@ export function BudgetEstimator({
       </fieldset>
 
       {/* ── Scope ── */}
-      <fieldset className="flex flex-col gap-3">
-        <legend className="font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           How big is it?
         </legend>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -106,8 +103,8 @@ export function BudgetEstimator({
                   onScopeChange(s.id);
                 }}
                 className={cn(
-                  "relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-2.5 text-center transition-all duration-300",
-                  "glass-light",
+                  "relative flex cursor-pointer flex-col items-center gap-0.5 rounded-xl px-3 py-2.5 text-center transition-all duration-300",
+                  "glass-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60",
                   active ? "" : "opacity-70 hover:opacity-100"
                 )}
               >
@@ -134,8 +131,8 @@ export function BudgetEstimator({
       </fieldset>
 
       {/* ── Add-ons ── */}
-      <fieldset className="flex flex-col gap-3">
-        <legend className="font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           Anything else? <span className="text-text-low normal-case tracking-normal">(optional)</span>
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -152,7 +149,8 @@ export function BudgetEstimator({
                   onToggleAddOn(a.id);
                 }}
                 className={cn(
-                  "relative rounded-full px-3.5 py-1.5 text-[11px] font-medium transition-all duration-300 glass-light",
+                  "relative cursor-pointer rounded-full px-3.5 py-2 text-[11px] font-medium transition-all duration-300 glass-light",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-1/60",
                   active ? "text-text-hi" : "text-text-mid opacity-75 hover:opacity-100"
                 )}
               >
@@ -171,31 +169,6 @@ export function BudgetEstimator({
           })}
         </div>
       </fieldset>
-
-      {/* ── Result ── */}
-      <div className="relative overflow-hidden rounded-2xl glass-medium px-5 py-4">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px"
-          style={{ background: "linear-gradient(90deg, transparent, var(--accent-2) 50%, transparent)" }}
-        />
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-low">
-              Indicative estimate
-            </span>
-            <span
-              className="bg-gradient-to-r from-accent-1 to-accent-2 bg-clip-text text-2xl font-bold text-transparent md:text-3xl"
-              aria-live="polite"
-            >
-              {formatUSD(est.low)} – {formatUSD(est.high)}
-            </span>
-          </div>
-          <span className="max-w-[44%] text-right text-[9.5px] leading-tight text-text-low">
-            A ballpark to anchor the conversation — your real quote follows the consultation.
-          </span>
-        </div>
-      </div>
     </div>
   );
 }

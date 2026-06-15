@@ -11,9 +11,11 @@ import {
   estimate,
   projectTypes,
   scopes,
+  timelines,
   bucketLabels,
   type ProjectTypeId,
   type ScopeId,
+  type TimelineId,
 } from "@/lib/content/estimator";
 import { submitProject } from "@/lib/api/project";
 import { audioSynth } from "@/lib/audio";
@@ -38,6 +40,9 @@ export function BookConsultation() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [timeline, setTimeline] = useState<TimelineId | null>(null);
   const [message, setMessage] = useState("");
 
   const [formState, setFormState] = useState<FormState>("idle");
@@ -47,6 +52,7 @@ export function BookConsultation() {
 
   const typeLabel = projectTypes.find((t) => t.id === projectType)?.label ?? projectType;
   const scopeLabel = scopes.find((s) => s.id === scope)?.label ?? scope;
+  const timelineLabel = timelines.find((t) => t.id === timeline)?.label;
 
   const toggleAddOn = (id: string) =>
     setSelectedAddOns((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -62,12 +68,19 @@ export function BookConsultation() {
 
     await new Promise((r) => setTimeout(r, 900));
 
+    // Accept bare domains (example.com) by assuming https://
+    const rawSite = website.trim();
+    const normalizedSite = rawSite && !/^https?:\/\//i.test(rawSite) ? `https://${rawSite}` : rawSite;
+
     const res = await submitProject({
       name: name.trim(),
       email: email.trim(),
       company: company.trim() ? company.trim() : undefined,
+      phone: phone.trim() ? phone.trim() : undefined,
+      website: normalizedSite ? normalizedSite : undefined,
       projectType,
       budget: est.bucket,
+      timeline: timeline ?? undefined,
       message: message.trim(),
     });
 
@@ -87,6 +100,9 @@ export function BookConsultation() {
     setName("");
     setEmail("");
     setCompany("");
+    setPhone("");
+    setWebsite("");
+    setTimeline(null);
     setMessage("");
   };
 
@@ -156,7 +172,6 @@ export function BookConsultation() {
                     onTypeChange={setProjectType}
                     onScopeChange={setScope}
                     onToggleAddOn={toggleAddOn}
-                    est={est}
                   />
                 </div>
               </AnimatedBorder>
@@ -164,7 +179,11 @@ export function BookConsultation() {
               {/* Intake form */}
               <div className="flex flex-col gap-6 rounded-3xl glass-heavy p-6 md:p-8">
                 {errorMessage && (
-                  <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 font-mono text-sm text-red-400">
+                  <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 font-mono text-sm text-red-400"
+                  >
                     <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-500" />
                     <div>
                       <span className="font-bold">ERROR:</span> {errorMessage}
@@ -182,6 +201,11 @@ export function BookConsultation() {
                   {selectedAddOns.length > 0 && (
                     <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
                       +{selectedAddOns.length} add-on{selectedAddOns.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {timelineLabel && (
+                    <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
+                      {timelineLabel}
                     </span>
                   )}
                   <span className="ml-auto text-accent-2">{bucketLabels[est.bucket]}</span>
@@ -217,18 +241,98 @@ export function BookConsultation() {
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <GlassInput
+                      id="book-company"
+                      name="company"
+                      type="text"
+                      label="Company (optional)"
+                      placeholder="Company or project name"
+                      autoComplete="organization"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      disabled={formState === "loading"}
+                      onFocus={() => audioSynth.playClick()}
+                    />
+                    <GlassInput
+                      id="book-phone"
+                      name="phone"
+                      type="tel"
+                      inputMode="tel"
+                      label="Phone (optional)"
+                      placeholder="+1 555 000 1234"
+                      autoComplete="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={formState === "loading"}
+                      onFocus={() => audioSynth.playClick()}
+                    />
+                  </div>
+
                   <GlassInput
-                    id="book-company"
-                    name="company"
-                    type="text"
-                    label="Company (optional)"
-                    placeholder="Company or project name"
-                    autoComplete="organization"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
+                    id="book-website"
+                    name="website"
+                    type="url"
+                    inputMode="url"
+                    label="Website (optional)"
+                    placeholder="yourcompany.com"
+                    autoComplete="url"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
                     disabled={formState === "loading"}
                     onFocus={() => audioSynth.playClick()}
                   />
+
+                  {/* Timeline */}
+                  <fieldset className="flex flex-col gap-3">
+                    <legend className="font-mono text-xs uppercase tracking-wider text-text-mid">
+                      Timeline{" "}
+                      <span className="text-text-low normal-case tracking-normal">(optional)</span>
+                    </legend>
+                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                      {timelines.map((t) => {
+                        const active = t.id === timeline;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            aria-pressed={active}
+                            onMouseEnter={() => audioSynth.playHover()}
+                            onClick={() => {
+                              audioSynth.playClick();
+                              setTimeline(active ? null : t.id);
+                            }}
+                            disabled={formState === "loading"}
+                            className={cn(
+                              "relative flex cursor-pointer flex-col items-center gap-0.5 rounded-xl px-3 py-2.5 text-center transition-all duration-300",
+                              "glass-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60",
+                              "disabled:cursor-not-allowed disabled:opacity-40",
+                              active ? "" : "opacity-70 hover:opacity-100"
+                            )}
+                          >
+                            <span
+                              aria-hidden
+                              className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300"
+                              style={{
+                                opacity: active ? 1 : 0,
+                                boxShadow:
+                                  "inset 0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent), 0 0 16px color-mix(in srgb, var(--accent-2) 25%, transparent)",
+                              }}
+                            />
+                            <span
+                              className="relative z-10 text-[12px] font-semibold"
+                              style={{ color: active ? "var(--accent-2)" : "var(--text-hi)" }}
+                            >
+                              {t.label}
+                            </span>
+                            <span className="relative z-10 text-[9px] leading-tight text-text-low">
+                              {t.blurb}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-sm font-medium">
@@ -237,6 +341,9 @@ export function BookConsultation() {
                         className="font-mono text-xs uppercase tracking-wider text-text-mid"
                       >
                         About the project
+                        <span className="ml-0.5 text-accent-2" aria-hidden>
+                          *
+                        </span>
                       </label>
                       <span
                         className={cn(
@@ -251,8 +358,10 @@ export function BookConsultation() {
                       id="book-message"
                       name="message"
                       rows={5}
+                      maxLength={4000}
                       placeholder="What are you trying to build, and what does success look like?"
                       required
+                      aria-required
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       disabled={formState === "loading"}
@@ -290,6 +399,11 @@ export function BookConsultation() {
                       </>
                     )}
                   </button>
+
+                  <p className="text-center text-[11px] leading-relaxed text-text-low">
+                    Fields marked <span className="text-accent-2">*</span> are required. We’ll only use
+                    your details to reply about your project — no spam, ever.
+                  </p>
                 </form>
 
                 <div className="flex items-center justify-between border-t border-white/[0.04] pt-4 font-mono text-[10px] text-text-faint">
