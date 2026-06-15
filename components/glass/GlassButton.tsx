@@ -101,43 +101,31 @@ export function GlassButton({
     );
   }
 
-  // Primary — sweep border + bright accent halo on hover
+  // Primary
   if (variant === "primary") {
     return (
       <div
         className={cn(
           wrapperBase,
-          baseShadow,
-          "hover:-translate-y-1",
-          "hover:shadow-[0_32px_64px_-16px_rgba(110,86,255,0.55),0_12px_30px_-8px_rgba(0,0,0,0.45)]",
-          "active:translate-y-0",
-          "active:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]"
+          "active:translate-y-0"
         )}
         style={wrapperTransition}
       >
-        <AnimatedBorder variant="sweep" radius={9999} duration={6000}>
-          {innerButton}
-        </AnimatedBorder>
+        {innerButton}
       </div>
     );
   }
 
-  // Secondary — sweep border + neutral elevation on hover
+  // Secondary
   return (
     <div
       className={cn(
         wrapperBase,
-        baseShadow,
-        "hover:-translate-y-1",
-        "hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6),0_8px_20px_-6px_rgba(0,0,0,0.35)]",
-        "active:translate-y-0",
-        "active:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]"
+        "active:translate-y-0"
       )}
       style={wrapperTransition}
     >
-      <AnimatedBorder variant="sweep" radius={9999} duration={6000}>
-        {innerButton}
-      </AnimatedBorder>
+      {innerButton}
     </div>
   );
 }

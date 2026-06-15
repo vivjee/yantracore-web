@@ -17,6 +17,11 @@
   --accent-3: #FF4FB0;
   --accent-warm: #FFB454;
 
+  /* Particles / Floating Stars */
+  --particle-color-1: var(--accent-2);
+  --particle-color-2: var(--text-hi);
+  --particle-color-3: var(--accent-1);
+
   /* Text */
   --text-hi: #F4F5FA;
   --text-mid: #B4B9CC;
@@ -26,6 +31,16 @@
   /* Glass recipe */
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-hover: rgba(255, 255, 255, 0.20);
+
+  /* Neumorphic shadow tokens */
+  --nm-raised-soft: 5px 5px 12px #020305, -5px -5px 12px #121626;
+  --nm-raised-medium: 8px 8px 18px #020305, -8px -8px 18px #121626;
+  --nm-raised-large: 12px 12px 28px #010204, -12px -12px 28px #14192d;
+  --nm-sunken-soft: inset 3px 3px 6px #020305, inset -3px -3px 6px #121626;
+  --nm-sunken-medium: inset 5px 5px 10px #020305, inset -5px -5px 10px #121626;
+  --nm-sunken-deep: inset 8px 8px 16px #010204, inset -8px -8px 16px #14192d;
+  --nm-line-soft: rgba(255, 255, 255, 0.04);
+  --nm-line-faint: rgba(255, 255, 255, 0.02);
 
   /* Motion */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -79,12 +94,52 @@
   --color-text-low: var(--text-low);
   --color-text-faint: var(--text-faint);
 
-  --font-display: "General Sans", var(--font-inter), system-ui, sans-serif;
-  --font-body: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-display-val);
+  --font-body: var(--font-body-val);
+  --font-sans: var(--font-body-val);
+  --font-mono: var(--font-mono-val);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   Global Font Styles Mapping
+   ============================================================ */
+
+/* 1. Default Style: Crystal Tech */
+:root, [data-font-style="default"] {
+  --font-display-val: var(--font-space-grotesk), "General Sans", var(--font-inter), system-ui, sans-serif;
+  --font-body-val: var(--font-inter), system-ui, sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 2. Aero Cyber (Futuristic) */
+[data-font-style="cyber"] {
+  --font-display-val: var(--font-orbitron), sans-serif;
+  --font-body-val: var(--font-space-grotesk), var(--font-inter), sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 3. Quantum Wide (Wide Display) */
+[data-font-style="wide"] {
+  --font-display-val: var(--font-syncopate), sans-serif;
+  --font-body-val: var(--font-inter), sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 4. Neo-Chrono (Retro Mono) */
+[data-font-style="mono"] {
+  --font-display-val: var(--font-jetbrains-mono), monospace;
+  --font-body-val: var(--font-jetbrains-mono), monospace;
+  --font-mono-val: var(--font-jetbrains-mono), monospace;
+}
+
+/* 5. Chroma Organic (Avant Garde) */
+[data-font-style="avant-garde"] {
+  --font-display-val: var(--font-syne), sans-serif;
+  --font-body-val: var(--font-outfit), var(--font-inter), sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 /* ============================================================
@@ -130,71 +185,76 @@ body {
 }
 
 /* ============================================================
-   Glass surface classes — three variants
+   Glass surface classes — three variants (Neumorphic Dark Theme)
    ============================================================ */
 
 .glass-light {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid var(--glass-border);
+  background: #0A0C16 !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-    0 16px 40px -16px rgba(0, 0, 0, 0.4);
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 0.03),
+    var(--nm-raised-soft) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+.glass-light:active, .glass-light.active {
+  box-shadow: var(--nm-sunken-soft) !important;
+  background: transparent !important;
 }
 
 .glass-medium {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid var(--glass-border);
+  background: #0A0C16 !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 24px 60px -20px rgba(0, 0, 0, 0.5);
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 0.03),
+    var(--nm-raised-medium) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+.glass-medium:active, .glass-medium.active {
+  box-shadow: var(--nm-sunken-medium) !important;
+  background: transparent !important;
 }
 
 .glass-heavy {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-  backdrop-filter: blur(32px) saturate(150%);
-  -webkit-backdrop-filter: blur(32px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: #0A0C16 !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
-    0 32px 80px -20px rgba(0, 0, 0, 0.6);
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 0.03),
+    var(--nm-raised-large) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
 }
 
-/* Primary-button surface — visibly violet-tinted glass.
-   Distinct from .glass-light/medium/heavy at rest AND when dimmed (disabled). */
+.glass-heavy:active, .glass-heavy.active {
+  box-shadow: var(--nm-sunken-deep) !important;
+  background: transparent !important;
+}
+
+/* Primary-button surface — visually distinct via neumorphism */
 .glass-primary {
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--accent-1) 28%, transparent) 0%,
-      color-mix(in srgb, var(--accent-2) 10%, transparent) 100%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid color-mix(in srgb, var(--accent-1) 40%, transparent);
+  background: #0A0C16 !important;
+  background-clip: padding-box !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 24px 60px -20px rgba(0, 0, 0, 0.5);
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 0.03),
+    var(--nm-raised-medium) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+.glass-primary:active, .glass-primary.active {
+  box-shadow: var(--nm-sunken-medium) !important;
+  background: transparent !important;
 }
 
 /* ============================================================
@@ -470,6 +530,16 @@ html.prefers-reduced-motion *::after {
   50%      { opacity: 1; }
 }
 
+/* Hero — subtle heartbeat squish for the whole coin */
+@keyframes logo-heartbeat {
+  0%, 100% { transform: scale(1, 1); }
+  6%       { transform: scale(1.06, 0.94); }
+  12%      { transform: scale(0.96, 1.04); }
+  18%      { transform: scale(1.02, 0.98); }
+  24%      { transform: scale(0.99, 1.01); }
+  30%, 100%{ transform: scale(1, 1); }
+}
+
 .showcase-copy-stack {
   transform: translateY(clamp(1rem, 3vh, 2rem));
 }
@@ -477,9 +547,10 @@ html.prefers-reduced-motion *::after {
 .yantra-electric-title {
   position: relative;
   display: inline-block;
-  font-family: "Clash Display", var(--font-display);
-  line-height: 0.92;
-  letter-spacing: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: 0.06em;
   color: transparent;
   background:
     linear-gradient(110deg, #ffffff 0%, #c9f8ff 20%, var(--accent-2) 38%, var(--accent-1) 62%, #fff4fb 82%, #ffffff 100%);
@@ -487,11 +558,12 @@ html.prefers-reduced-motion *::after {
   -webkit-background-clip: text;
   background-clip: text;
   filter:
-    drop-shadow(0 0 8px rgba(0, 224, 203, 0.45))
-    drop-shadow(0 0 18px rgba(110, 86, 255, 0.28));
+    drop-shadow(0 0 4px rgba(0, 224, 203, 0.3))
+    drop-shadow(0 0 10px rgba(110, 86, 255, 0.2))
+    drop-shadow(0 0 20px rgba(255, 79, 176, 0.1));
   animation:
-    yantra-electric-flow 5s ease-in-out infinite,
-    yantra-electric-pulse 3.4s ease-in-out infinite;
+    yantra-electric-flow 16s ease-in-out infinite,
+    yantra-electric-pulse 10s ease-in-out infinite;
 }
 
 .yantra-electric-title::before,
@@ -509,15 +581,17 @@ html.prefers-reduced-motion *::after {
   background-image: linear-gradient(90deg, transparent, rgba(0, 224, 203, 0.9), transparent);
   background-size: 45% 100%;
   background-repeat: no-repeat;
-  animation: yantra-electric-scan 3.6s ease-in-out infinite;
-  opacity: 0.72;
+  animation: yantra-electric-scan 12s ease-in-out infinite;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 2px rgba(0, 224, 203, 0.3));
 }
 
 .yantra-electric-title::after {
-  background-image: linear-gradient(90deg, rgba(255, 79, 176, 0.45), rgba(0, 224, 203, 0.55));
+  background-image: linear-gradient(90deg, rgba(255, 79, 176, 0.65), rgba(0, 224, 203, 0.75));
   transform: translateX(1px);
   opacity: 0;
-  animation: yantra-electric-flicker 4.8s steps(1, end) infinite;
+  animation: yantra-electric-flicker 14s steps(1, end) infinite;
+  filter: drop-shadow(0 0 2px rgba(255, 79, 176, 0.25));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -547,19 +621,21 @@ html.prefers-reduced-motion *::after {
 @keyframes yantra-electric-pulse {
   0%, 100% {
     filter:
-      drop-shadow(0 0 8px rgba(0, 224, 203, 0.42))
-      drop-shadow(0 0 18px rgba(110, 86, 255, 0.26));
+      drop-shadow(0 0 4px rgba(0, 224, 203, 0.25))
+      drop-shadow(0 0 10px rgba(110, 86, 255, 0.15))
+      drop-shadow(0 0 20px rgba(255, 79, 176, 0.1));
   }
   50% {
     filter:
-      drop-shadow(0 0 14px rgba(0, 224, 203, 0.62))
-      drop-shadow(0 0 26px rgba(110, 86, 255, 0.36));
+      drop-shadow(0 0 8px rgba(0, 224, 203, 0.45))
+      drop-shadow(0 0 20px rgba(110, 86, 255, 0.3))
+      drop-shadow(0 0 35px rgba(255, 79, 176, 0.2));
   }
 }
 
 @keyframes yantra-electric-scan {
   0%, 18% { background-position: -65% 0; opacity: 0; }
-  38%, 54% { opacity: 0.75; }
+  38%, 54% { opacity: 0.45; }
   78%, 100% { background-position: 165% 0; opacity: 0; }
 }
 
@@ -633,16 +709,16 @@ html.prefers-reduced-motion *::after {
 /* LogoMark hover — GREEN ghost completes the RGB prism triad */
 @keyframes logo-chroma-g {
   0%, 100% { transform: translate(0px, 0px); }
-  25%       { transform: translate(0px, -7px); }
-  50%       { transform: translate(7px, 4px); }
-  75%       { transform: translate(-7px, 3px); }
+  25%       { transform: translate(0px, -3px); }
+  50%       { transform: translate(3px, 2px); }
+  75%       { transform: translate(-3px, 1px); }
 }
 
 /* LogoMark hover — shockwave ring fires outward on hover enter */
 @keyframes logo-shockwave {
-  0%   { width: 0;    height: 0;    opacity: 1;   border-width: 3px; }
-  60%  { opacity: 0.6; border-width: 1.5px; }
-  100% { width: 520px; height: 520px; opacity: 0;  border-width: 0.5px; }
+  0%   { width: 0;    height: 0;    opacity: 0.6;   border-width: 2px; filter: blur(0px); }
+  60%  { opacity: 0.35; border-width: 1px; }
+  100% { width: 380px; height: 380px; opacity: 0;  border-width: 0.5px; filter: blur(1.5px); }
 }
 
 /* LogoMark hover — orbital spark particles pop in at their fixed positions */
@@ -681,6 +757,40 @@ html.prefers-reduced-motion *::after {
 @keyframes star-twinkle {
   0%, 100% { opacity: var(--tw-opacity, 0.2); transform: scale(1);   }
   50%       { opacity: 1;                     transform: scale(1.6); }
+}
+
+/* Zero-gravity float drift animations for stars */
+@keyframes float-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(10px, -15px); }
+}
+
+@keyframes float-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-12px, -10px); }
+}
+
+@keyframes float-drift-3 {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(8px, -20px); }
+}
+
+.star-drift-container {
+  display: block;
+  pointer-events: none;
+  animation-name: float-drift-1;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.star-drift-1 { animation-name: float-drift-1; }
+.star-drift-2 { animation-name: float-drift-2; }
+.star-drift-3 { animation-name: float-drift-3; }
+
+.star-particle {
+  animation-name: star-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
 /* Showcase — orbital ring clockwise */
@@ -938,7 +1048,8 @@ body:has([data-layout="auth"]) > header {
 .tv-frame-outer {
   width: 100%;
   height: 100%;
-  padding: 12px;
+  padding: 6px;
+  padding-top: 0;
   background: linear-gradient(135deg, #101222 0%, #0a0b14 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
@@ -958,9 +1069,12 @@ body:has([data-layout="auth"]) > header {
   background: #0d0f1a;
   border-radius: 12px;
   border: 4px solid #141829;
-  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.9),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   position: relative;
+  margin: 0 0 0 0; /* uniform inset via tv-frame-outer padding: 6px */
 }
 
 .tv-screen-glass {
@@ -979,7 +1093,7 @@ body:has([data-layout="auth"]) > header {
   position: relative;
   z-index: 2;
   overflow: hidden;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease, filter 0.5s ease;
 }
 
 /* CRTRetro active overlays */
@@ -1021,18 +1135,85 @@ body:has([data-layout="auth"]) > header {
   box-shadow: inset 0 0 80px rgba(0, 224, 203, 0.08);
 }
 
-/* TV Bezel Console bar */
+/* TV Bezel Console bar (legacy — kept for reference, not rendered) */
 .tv-frame-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 0px 8px;
+  height: unset;
+  flex-shrink: 0;
   background: linear-gradient(180deg, #101222 0%, #07080f 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--text-low);
   z-index: 12;
+}
+
+/* ── Top Chrome Control Bar — layout wrapper only, NO visual styling ── */
+.tv-chrome-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 0 14px;
+  height: 52px;
+  flex-shrink: 0;
+  z-index: 12;
+}
+
+.tv-chrome-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  transition: opacity 0.25s var(--ease-out-soft), transform 0.25s var(--ease-out-soft);
+}
+
+.tv-chrome-logo:hover {
+  transform: scale(1.08);
+}
+
+.tv-chrome-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.tv-chrome-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Subtle divider between groups */
+.tv-chrome-btn-group + .tv-chrome-btn-group {
+  padding-left: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 760px) {
+  .tv-chrome-bar {
+    padding: 0 10px 0 8px;
+    height: 44px;
+  }
+  .tv-chrome-controls {
+    gap: 12px;
+  }
+  .tv-chrome-btn-group + .tv-chrome-btn-group {
+    padding-left: 12px;
+  }
+}
+
+/* Hide scrollbars for overflow scrollable areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .tv-badge {
@@ -1278,7 +1459,7 @@ body.brochure-mode-active header {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 
+  box-shadow:
     0 -12px 30px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition:
@@ -1304,7 +1485,7 @@ body.brochure-mode-active header {
   border-left-color: rgba(0, 224, 203, 0.2);
   border-right-color: rgba(0, 224, 203, 0.2);
   color: var(--text-hi);
-  box-shadow: 
+  box-shadow:
     0 -12px 30px rgba(0, 224, 203, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   z-index: 10;
@@ -1342,7 +1523,7 @@ body.brochure-mode-active header {
   align-items: center;
   gap: 10px;
   z-index: 60;
-  box-shadow: 
+  box-shadow:
     0 -12px 30px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition:
@@ -1393,10 +1574,10 @@ body.brochure-mode-active header {
 }
 
 .tv-console-account-btn:hover {
-  border-color: var(--accent-2);
+  border-color: var(--accent-2) !important;
   box-shadow:
     0 0 16px rgba(0, 224, 203, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Docked state — peels off and attaches to viewport top */
@@ -1405,7 +1586,6 @@ body.brochure-mode-active header {
   top: 0;
   right: 0;
   left: auto;
-  /* Flat top (against the ceiling), curved bottom corners */
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-bottom-left-radius: 16px;
@@ -1460,10 +1640,47 @@ body.brochure-mode-active header {
   transition: opacity 0.4s var(--ease-out-soft);
 }
 
-/* Hide the blend bar when docked — no longer needed */
+/* Hide the blend bar when docked */
 .console-docked .tv-console-nav-blend {
   opacity: 0;
   pointer-events: none;
+}
+
+.tv-console-logo-panel:not(.console-docked),
+.tv-console-nav-panel:not(.console-docked),
+.tv-console-user-panel:not(.console-docked) {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.console-docked {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 760px) {
+  .tv-console-tabs-container {
+    left: 12px;
+    gap: 6px;
+  }
+
+  .tv-console-tab {
+    padding: 0 3px;
+  }
+
+  .tv-console-nav-panel {
+    right: 66px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .tv-console-user-panel {
+    right: 12px;
+    width: 44px;
+    padding: 0 6px;
+  }
 }
 
 .tv-console-btn {
@@ -1471,8 +1688,8 @@ body.brochure-mode-active header {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -1503,130 +1720,16 @@ body.brochure-mode-active header {
   transform: rotate(45deg);
 }
 
-/* ============================================================
-   TV Frame — Sticky top bar (detaches from TV on scroll)
-   ============================================================ */
-
-/**
- * The sticky bar sits permanently at top:0, fixed, off-screen by default
- * (translateY(-100%)). When .tv-sticky-bar--visible is added (on scroll),
- * it slides down into view with a spring-like ease.
- *
- * Shape: flat on top (hugs the viewport edge), rounded on the bottom.
- * Background: deep TV-frame glass matching the console tab aesthetic.
- */
-.tv-sticky-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 60;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-
-  /* Flat top, rounded bottom — attached to viewport edge */
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-
-  /* TV frame glass recipe */
-  background: linear-gradient(180deg, #101222 0%, #0d0f1a 90%, rgba(13, 15, 26, 0.95) 100%);
-  border-left: 1px solid rgba(255, 255, 255, 0.10);
-  border-right: 1px solid rgba(255, 255, 255, 0.10);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-  border-top: none;
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-  box-shadow:
-    0 8px 32px -4px rgba(0, 0, 0, 0.7),
-    0 0 0 0 rgba(110, 86, 255, 0),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-    0 0 40px -12px rgba(110, 86, 255, 0.25);
-
-  /* Hidden state — slid fully above the viewport */
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-
-  transition:
-    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Visible state — slides down flush to top */
-.tv-sticky-bar--visible {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-  box-shadow:
-    0 12px 40px -4px rgba(0, 0, 0, 0.8),
-    0 0 60px -16px rgba(110, 86, 255, 0.35),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-}
-
-/* Thin violet accent line along the bottom edge */
-.tv-sticky-bar--visible::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(110, 86, 255, 0.5) 30%,
-    rgba(0, 224, 203, 0.4) 70%,
-    transparent 100%
-  );
-  border-radius: 0 0 16px 16px;
-  pointer-events: none;
-}
-
-.tv-sticky-bar__logo {
-  display: flex;
-  align-items: center;
-}
-
-.tv-sticky-bar__nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tv-sticky-bar__account {
-  flex-shrink: 0;
-  color: var(--accent-2);
-}
-
-/* When the TV console panels are docked, fade them out
-   so only the sticky bar is visible — no double-up */
-.console-docked {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tv-console-logo-panel:not(.console-docked),
-.tv-console-nav-panel:not(.console-docked),
-.tv-console-user-panel:not(.console-docked) {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
+/* Obsolete sticky top bar and panel docking styles removed */
 
 
 /* Tooltip container */
 .tv-console-btn .tooltip {
   position: absolute;
-  top: 36px;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
+  margin-top: 8px;
   padding: 4px 8px;
   background: rgba(6, 7, 13, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1650,47 +1753,9 @@ body.brochure-mode-active header {
 }
 
 @media (max-width: 760px) {
-  .tv-console-tabs-container {
-    left: 12px;
-    gap: 6px;
-  }
-
-  .tv-console-tab {
-    padding: 0 3px;
-  }
-
-  .tv-console-nav-panel {
-    right: 66px;
-    padding: 0 8px;
-    gap: 6px;
-  }
-
-  .tv-console-user-panel {
-    right: 12px;
-    width: 44px;
-    padding: 0 6px;
-  }
-
   .tv-console-btn {
     width: 30px;
     height: 30px;
-  }
-
-  .tv-sticky-bar {
-    gap: 10px;
-    padding: 0 12px;
-  }
-
-  .tv-sticky-bar__logo {
-    min-width: 0;
-  }
-
-  .tv-sticky-bar__logo span {
-    display: none;
-  }
-
-  .tv-sticky-bar__nav {
-    gap: 5px;
   }
 }
 
@@ -1777,6 +1842,243 @@ body.brochure-mode-active header {
 }
 
 /* ============================================================
+   Neumorphic Dark Theme (Default Dark Style)
+   ============================================================ */
+
+/* 1. Global Navigation overrides */
+.nav-pill-scroll {
+  background: #0A0C16 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+  box-shadow:
+    inset 1px 1px 0px 0px rgba(255, 255, 255, 0.03),
+    4px 4px 12px #020305,
+    -4px -4px 12px #121626 !important;
+}
+
+/* Obsolete dark theme sticky bar styles removed */
+
+/* 2. TV Console & Controls */
+.tv-frame-outer {
+  background: #06070D !important;
+  box-shadow: var(--nm-raised-large) !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+}
+
+.tv-frame-bezel {
+  background: #0A0C16 !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+  border: 1px solid rgba(255, 255, 255, 0.01) !important;
+}
+
+.tv-screen-glass {
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.tv-frame-controls {
+  background: #0A0C16 !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+/* tv-chrome-bar has no visual overrides — it is a transparent layout wrapper */
+
+
+
+/* Obsolete dark theme panel styles removed */
+
+.tv-console-tab.active {
+  background: #0A0C16 !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+  color: var(--accent-2) !important;
+  text-shadow: 0 0 8px rgba(0, 224, 203, 0.5) !important;
+}
+
+.tv-console-tab:not(.active) {
+  border-color: transparent !important;
+}
+
+.tv-console-tab:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.tv-console-tab.active:hover {
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+.tv-console-btn {
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+  background: #0A0C16 !important;
+  color: var(--text-mid) !important;
+  box-shadow: 3px 3px 6px #020305, -3px -3px 6px #121626 !important;
+  transition: all 250ms var(--ease-out-soft) !important;
+}
+
+.tv-console-btn:hover {
+  background: #0d0f1e !important;
+  border-color: var(--accent-1) !important;
+  color: var(--accent-2) !important;
+  box-shadow: 
+    1px 1px 3px #020305, 
+    -1px -1px 3px #121626,
+    0 0 10px rgba(0, 224, 203, 0.3) !important;
+}
+
+.tv-console-btn.active {
+  box-shadow: inset 2px 2px 5px #020305, inset -2px -2px 5px #121626 !important;
+  background: #05060b !important;
+  color: var(--accent-1) !important;
+  text-shadow: 0 0 8px rgba(110, 86, 255, 0.5) !important;
+}
+
+/* 3. Settings shells and generic cards updates */
+.rounded-xl.border.border-white\/5 {
+  background: #0A0C16 !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+.rounded-2xl.border.border-white\/10 {
+  background: #0A0C16 !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-raised-soft) !important;
+}
+
+input[type="text"],
+textarea,
+select {
+  background: #06070D !important;
+  color: var(--text-hi) !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+  transition: border-color 300ms var(--ease-out-soft), box-shadow 300ms var(--ease-out-soft) !important;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: var(--accent-2) !important;
+  box-shadow: var(--nm-sunken-medium), 0 0 12px rgba(0, 224, 203, 0.35) !important;
+}
+
+/* 4. Divider replacements */
+.bg-white\/\[0\.10\] {
+  background-color: var(--nm-line-faint) !important;
+}
+
+.border-white\/\[0\.06\],
+.border-white\/5,
+.border-white\/10,
+.border-b.border-white\/5,
+.border-t.border-white\/\[0\.04\],
+.border-b.border-white\/\[0\.04\],
+.border-r.border-white\/5 {
+  border-color: var(--nm-line-soft) !important;
+}
+
+.bg-white\/5,
+.bg-white\/\[0\.02\],
+.bg-white\/\[0\.03\],
+.bg-white\/\[0\.04\] {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.bg-black\/30.border,
+.bg-black\/40.border,
+.bg-black\/50.border,
+.bg-black\/60.border,
+.bg-black\/75.border {
+  background-color: #06070D !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+/* 5. Showcase adjustments & card refinements */
+#showcase {
+  --card-top: 10%;
+  --card-bottom: 8%;
+}
+
+@media (min-width: 1024px) {
+  #showcase {
+    --card-top: 10%;
+    --card-bottom: 8%;
+  }
+}
+
+@media (min-width: 1280px) and (min-height: 850px) {
+  #showcase {
+    --card-top: 12%;
+    --card-bottom: 10%;
+  }
+}
+
+@media (min-width: 1536px) and (min-height: 950px) {
+  #showcase {
+    --card-top: 14%;
+    --card-bottom: 12%;
+  }
+}
+
+#showcase .glass-light {
+  box-shadow: var(--nm-raised-soft) !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  background: #0A0C16 !important;
+}
+
+/* YantraCore technologies grid items */
+.group\/tech {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+  transition: all 250ms var(--ease-out-soft) !important;
+}
+.group\/tech:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--accent-1) !important;
+  box-shadow: 0 0 12px rgba(110, 86, 255, 0.25) !important;
+}
+.group\/tech > div:first-child {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Equalizer panels */
+.group\/equalizer {
+  background-color: #0A0C16 !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+.group\/equalizer > div:nth-child(2) {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Restroverse search bar */
+#showcase .my-1 > div:first-child {
+  background-color: #06070D !important;
+  border-color: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: var(--nm-sunken-soft) !important;
+}
+
+/* Restroverse Swiper details box & badges */
+#showcase .swiper-slide .bg-black\/35 {
+  background-color: rgba(10, 12, 22, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Shramdaan slider dots indicators */
+#showcase .bg-white\/30 {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  transition: all 200ms ease !important;
+}
+#showcase .bg-white\/30:hover {
+  background-color: var(--accent-2) !important;
+  box-shadow: 0 0 8px var(--accent-2) !important;
+}
+
+/* ============================================================
    Neumorphic Light Theme (White Theme) Overrides
    ============================================================ */
 
@@ -1791,6 +2093,11 @@ html[data-theme="light"] {
   --accent-2: #009E8F; /* Deep Forest Teal */
   --accent-3: #DB2777; /* Deep Hot Pink */
   --accent-warm: #D97706; /* Amber Honey */
+
+  /* Particles / Floating Stars */
+  --particle-color-1: var(--accent-2); /* Teal */
+  --particle-color-2: #ffffff;          /* Pure White - looks like a clean glint/bubble */
+  --particle-color-3: var(--accent-1); /* Royal Indigo */
 
   /* Text Colors (extreme high contrast charcoal palette) */
   --text-hi: #121420;
@@ -1821,43 +2128,74 @@ html[data-theme="light"] body {
 /* 1. Neumorphic Glass Surfaces */
 html[data-theme="light"] .glass-light {
   background: #EEF2F6 !important;
+  background-clip: padding-box !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(255, 255, 255, 0.9) !important;
   box-shadow: 
     inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
     var(--nm-raised-soft) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+html[data-theme="light"] .glass-light:active,
+html[data-theme="light"] .glass-light.active {
+  box-shadow: var(--nm-sunken-soft) !important;
+  background: transparent !important;
 }
 
 html[data-theme="light"] .glass-medium {
   background: #EEF2F6 !important;
+  background-clip: padding-box !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
   box-shadow: 
     inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
     var(--nm-raised-medium) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+html[data-theme="light"] .glass-medium:active,
+html[data-theme="light"] .glass-medium.active {
+  box-shadow: var(--nm-sunken-medium) !important;
+  background: transparent !important;
 }
 
 html[data-theme="light"] .glass-heavy {
   background: #EEF2F6 !important;
+  background-clip: padding-box !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(255, 255, 255, 0.7) !important;
   box-shadow: 
     inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
     var(--nm-raised-large) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+html[data-theme="light"] .glass-heavy:active,
+html[data-theme="light"] .glass-heavy.active {
+  box-shadow: var(--nm-sunken-deep) !important;
+  background: transparent !important;
 }
 
 html[data-theme="light"] .glass-primary {
-  background: linear-gradient(135deg, #F0F4F9 0%, #E2EAF4 100%) !important;
+  background: #EEF2F6 !important;
+  background-clip: padding-box !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border: 1px solid rgba(79, 53, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   box-shadow: 
     inset 1px 1px 0px 0px rgba(255, 255, 255, 1),
-    4px 4px 12px rgba(79, 53, 255, 0.06),
-    -4px -4px 12px #ffffff !important;
+    var(--nm-raised-medium) !important;
+  transition: all 300ms var(--ease-out-soft) !important;
+}
+
+html[data-theme="light"] .glass-primary:active,
+html[data-theme="light"] .glass-primary.active {
+  box-shadow: var(--nm-sunken-medium) !important;
+  background: transparent !important;
 }
 
 /* 2. Global Navigation overrides */
@@ -1872,31 +2210,7 @@ html[data-theme="light"] .nav-pill-scroll {
     -4px -4px 12px #ffffff !important;
 }
 
-html[data-theme="light"] .tv-sticky-bar {
-  background: #EEF2F6 !important;
-  border-left: 1px solid rgba(255, 255, 255, 0.9) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.9) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow:
-    0 8px 24px rgba(163, 177, 198, 0.2),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.8) !important;
-}
-
-html[data-theme="light"] .tv-sticky-bar--visible {
-  box-shadow:
-    0 10px 26px rgba(163, 177, 198, 0.26),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.9) !important;
-}
-
-html[data-theme="light"] .tv-sticky-bar--visible::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(79, 53, 255, 0.16) 35%,
-    rgba(0, 158, 143, 0.14) 65%,
-    transparent 100%
-  ) !important;
-}
+/* Obsolete light theme sticky bar styles removed */
 
 /* 3. TV Frame console design */
 html[data-theme="light"] .tv-frame-outer {
@@ -1924,10 +2238,20 @@ html[data-theme="light"] .tv-screen-glass {
 
 html[data-theme="light"] .tv-frame-controls {
   background: linear-gradient(180deg, #F5F7FA 0%, #E6ECF4 100%) !important;
-  border-top: 1px solid rgba(255, 255, 255, 1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 1) !important;
+  border-top: none !important;
 }
 
-html[data-theme="light"] .tv-badge,
+/* tv-chrome-bar light theme — no overrides, inherits casing surface */
+
+html[data-theme="light"] .tv-chrome-logo:hover {
+  background: rgba(79, 53, 255, 0.06);
+}
+
+html[data-theme="light"] .tv-chrome-btn-group + .tv-chrome-btn-group {
+  border-left-color: rgba(0, 0, 0, 0.08) !important;
+}
+
 html[data-theme="light"] .crt-toggle-btn,
 html[data-theme="light"] .tv-scroll-btn {
   background: #EEF2F6 !important;
@@ -1951,53 +2275,7 @@ html[data-theme="light"] .tv-light-dot {
   box-shadow: inset 1px 1px 2px rgba(97, 116, 139, 0.18) !important;
 }
 
-html[data-theme="light"] .tv-console-logo-panel,
-html[data-theme="light"] .tv-console-nav-panel,
-html[data-theme="light"] .tv-console-user-panel,
-html[data-theme="light"] .tv-console-tab.active {
-  background: linear-gradient(180deg, #F5F7FA 0%, #EEF2F6 100%) !important;
-  border-top: 1px solid rgba(255, 255, 255, 1) !important;
-  border-left: 1px solid rgba(255, 255, 255, 1) !important;
-  border-right: 1px solid rgba(255, 255, 255, 1) !important;
-  box-shadow: 
-    0 -8px 16px rgba(163, 177, 198, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-  color: var(--text-hi) !important;
-}
-
-html[data-theme="light"] .tv-console-nav-blend {
-  background: #EEF2F6 !important;
-}
-
-html[data-theme="light"] .tv-console-tab:not(.active) {
-  background: linear-gradient(180deg, #E2E8F0 0%, #cbd5e1 100%) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.8) !important;
-  border-left: 1px solid rgba(255, 255, 255, 0.8) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 
-    0 -4px 8px rgba(163, 177, 198, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-  color: var(--text-mid) !important;
-}
-
-html[data-theme="light"] .tv-console-tab:hover {
-  background: linear-gradient(180deg, #ECF0F5 0%, #E2E8F0 100%) !important;
-  color: var(--text-hi) !important;
-}
-
-html[data-theme="light"] .tv-console-tab.active:hover {
-  background: linear-gradient(180deg, #F5F7FA 0%, #EEF2F6 100%) !important;
-}
-
-html[data-theme="light"] .tv-console-logo-panel.console-docked,
-html[data-theme="light"] .tv-console-nav-panel.console-docked,
-html[data-theme="light"] .tv-console-user-panel.console-docked {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-  background: rgba(238, 242, 246, 0.95) !important;
-  box-shadow:
-    0 4px 20px rgba(163, 177, 198, 0.2),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.9) !important;
-}
+/* Obsolete light theme panel styles removed */
 
 html[data-theme="light"] .tv-console-btn {
   border: 1px solid rgba(255, 255, 255, 0.9) !important;
@@ -2037,19 +2315,19 @@ html[data-theme="light"] .tv-console-btn .tooltip {
 
 /* 4. Background enhancements */
 html[data-theme="light"] .fixed.inset-0.z-0 {
-  background: #EEF2F6 !important;
+  background: linear-gradient(135deg, #F5F7FA 0%, #E3E7F0 100%) !important;
 }
 
 /* Subdue colored mesh gradients */
 html[data-theme="light"] .fixed.inset-0.z-0 > div:first-child {
-  opacity: 0.15 !important;
+  opacity: 0.35 !important;
 }
 
 /* Light overlay scan lines */
 html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(2) {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.012) 1px, transparent 1px), 
-    linear-gradient(90deg, rgba(0, 0, 0, 0.012) 1px, transparent 1px) !important;
+    linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px), 
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px) !important;
 }
 
 /* Soft white cones */
@@ -2057,18 +2335,17 @@ html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(3),
 html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(4),
 html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(5),
 html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(6) {
-  opacity: 0.10 !important;
+  opacity: 0.25 !important;
 }
 
 /* Subdue vignette */
 html[data-theme="light"] .fixed.inset-0.z-0 > div:nth-child(7) {
-  background: radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(238, 242, 246, 0.4) 100%) !important;
+  background: radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(227, 231, 240, 0.5) 100%) !important;
 }
 
-/* Convert stars to elegant soft twilight dots */
-html[data-theme="light"] .fixed.inset-0.z-0 > div:last-child > div {
-  background: var(--text-faint) !important;
-  opacity: 0.20 !important;
+/* Enhance floating star particles in light mode */
+html[data-theme="light"] .star-particle {
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
 }
 
 /* 5. Custom cursor adaptation */
@@ -2107,100 +2384,7 @@ html[data-theme="light"] textarea:focus {
   box-shadow: var(--nm-sunken-medium), 0 0 8px rgba(79, 53, 255, 0.1) !important;
 }
 
-/* TV frame-attached console preview. Keep these controls inside the current
-   frame footprint so the top casing height does not grow. */
-.tv-frame-outer .tv-console-tabs-container {
-  top: 12px !important;
-  left: 20px !important;
-  height: 38px !important;
-  align-items: flex-start;
-  gap: 8px;
-  z-index: 80;
-}
-
-.tv-frame-outer .tv-console-tab,
-.tv-frame-outer .tv-console-tab.active {
-  height: 38px !important;
-  border-top: none !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 0 0 10px 10px !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    4px 4px 10px rgba(0, 0, 0, 0.32) !important;
-}
-
-.tv-frame-outer .tv-console-tab:hover {
-  transform: translateY(1px);
-}
-
-.tv-frame-outer .tv-console-nav-panel {
-  top: 12px !important;
-  right: 82px !important;
-  height: 38px !important;
-  padding: 0 10px !important;
-  gap: 7px;
-  border-top: none !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 0 0 10px 10px !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    4px 4px 10px rgba(0, 0, 0, 0.32) !important;
-  z-index: 80;
-}
-
-.tv-frame-outer .tv-console-user-panel {
-  top: 12px !important;
-  right: 24px !important;
-  width: 46px !important;
-  height: 38px !important;
-  padding: 0 7px !important;
-  border-top: none !important;
-  border-bottom: 1px solid rgba(0, 224, 203, 0.16) !important;
-  border-radius: 0 0 10px 10px !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    4px 4px 10px rgba(0, 0, 0, 0.32) !important;
-  z-index: 81;
-}
-
-.tv-frame-outer .tv-console-btn {
-  width: 28px;
-  height: 28px;
-}
-
-.tv-frame-outer .tv-console-nav-blend {
-  display: none;
-}
-
-@media (max-width: 760px) {
-  .tv-frame-outer .tv-console-tabs-container {
-    left: 12px !important;
-    height: 34px !important;
-  }
-
-  .tv-frame-outer .tv-console-tab,
-  .tv-frame-outer .tv-console-tab.active {
-    height: 34px !important;
-  }
-
-  .tv-frame-outer .tv-console-nav-panel {
-    right: 60px !important;
-    height: 34px !important;
-    padding: 0 6px !important;
-    gap: 5px;
-  }
-
-  .tv-frame-outer .tv-console-user-panel {
-    right: 12px !important;
-    width: 40px !important;
-    height: 34px !important;
-  }
-
-  .tv-frame-outer .tv-console-btn {
-    width: 26px;
-    height: 26px;
-  }
-}
+/* Obsolete panel casing positioning styles removed */
 
 /* 7. Divider replacements */
 html[data-theme="light"] .bg-white\/\[0\.10\] {
@@ -2306,4 +2490,47 @@ html[data-theme="light"] #showcase .bg-white\/30 {
 }
 html[data-theme="light"] #showcase .bg-white\/30:hover {
   background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Top bezel controls tooltips (renders downward) */
+.tv-frame-controls .tv-console-btn .tooltip {
+  top: 100% !important;
+  bottom: auto !important;
+  transform: translateX(-50%) translateY(4px) !important;
+}
+
+.tv-frame-controls .tv-console-btn:hover .tooltip {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+/* TV Frame Controls - bottom right console button active/inactive states */
+.tv-frame-controls .tv-console-btn.tv-off {
+  opacity: 0.4 !important;
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-low) !important;
+}
+.tv-frame-controls .tv-console-btn.tv-off[disabled] {
+  cursor: not-allowed !important;
+}
+.tv-frame-controls .tv-console-btn.tv-off:not([disabled]):hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--accent-3) !important;
+  color: var(--text-hi) !important;
+}
+
+/* Light theme overrides for bottom bezel buttons when TV is off */
+html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: none !important;
+  color: rgba(0, 0, 0, 0.35) !important;
+  opacity: 0.5 !important;
+}
+html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled]):hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: var(--accent-1) !important;
+  color: var(--text-mid) !important;
 }

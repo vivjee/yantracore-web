@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Orbitron, Space_Grotesk, Syncopate, Syne, Outfit } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
-import { Header } from "@/components/chrome/Header";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
+import { AudioPlayerProvider } from "@/lib/audio/AudioPlayerContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,6 +16,37 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-jetbrains-mono",
+});
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-orbitron",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-grotesk",
+});
+
+const syncopate = Syncopate({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-syncopate",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-syne",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
 });
 
 export const metadata: Metadata = {
@@ -58,14 +89,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} ${syncopate.variable} ${syne.variable} ${outfit.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-ink-0 text-text-hi antialiased">
         <ThemeProvider>
-          <Cursor />
-          <Header />
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <AudioPlayerProvider>
+            <Cursor />
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          </AudioPlayerProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -119,17 +119,32 @@ export function SiteBackground() {
         {stars.map((s) => (
           <div
             key={s.id}
-            className="absolute rounded-full"
+            className={`absolute star-drift-container star-drift-${(s.id % 3) + 1}`}
             style={{
               left: `${s.x}%`,
               top: `${s.y}%`,
-              width: s.size,
-              height: s.size,
-              background: s.id % 3 === 0 ? "var(--accent-2)" : "var(--text-hi)",
-              opacity: s.opacity,
-              animation: `star-twinkle ${s.dur}s ease-in-out ${s.delay}s infinite`,
+              animationDuration: `${s.dur * 5}s`,
+              animationDelay: `${s.delay}s`,
             }}
-          />
+          >
+            <div
+              className="rounded-full star-particle"
+              style={{
+                width: s.size,
+                height: s.size,
+                background:
+                  s.id % 3 === 0
+                    ? "var(--particle-color-1)"
+                    : s.id % 3 === 1
+                    ? "var(--particle-color-2)"
+                    : "var(--particle-color-3)",
+                opacity: s.opacity,
+                animationDuration: `${s.dur}s`,
+                animationDelay: `${s.delay}s`,
+                "--tw-opacity": s.opacity,
+              } as React.CSSProperties}
+            />
+          </div>
         ))}
       </div>
     </div>

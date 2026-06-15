@@ -14,8 +14,10 @@ const STORAGE_KEY = "yantra_theme_palette";
 const CURSOR_STORAGE_KEY = "yantra_theme_cursor";
 const CURSOR_TOGGLE_STORAGE_KEY = "yantra_theme_cursor_toggle";
 const MOTION_TOGGLE_STORAGE_KEY = "yantra_theme_motion_toggle";
+const LOGO_HEARTBEAT_STORAGE_KEY = "yantra_theme_logo_heartbeat";
 
 export type CursorStyleType = "default" | "arrow" | "crosshair" | "dot";
+export type FontStyleType = "default" | "cyber" | "wide" | "mono" | "avant-garde";
 
 interface ThemeContextValue {
   palette: Palette;
@@ -30,6 +32,10 @@ interface ThemeContextValue {
   resetCursorSettings: () => void;
   reducedMotionEnabled: boolean;
   setReducedMotionEnabled: (enabled: boolean) => void;
+  logoHeartbeatEnabled: boolean;
+  setLogoHeartbeatEnabled: (enabled: boolean) => void;
+  fontStyle: FontStyleType;
+  setFontStyle: (style: FontStyleType) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
@@ -45,6 +51,10 @@ const ThemeContext = createContext<ThemeContextValue>({
   resetCursorSettings: () => {},
   reducedMotionEnabled: false,
   setReducedMotionEnabled: () => {},
+  logoHeartbeatEnabled: true,
+  setLogoHeartbeatEnabled: () => {},
+  fontStyle: "default",
+  setFontStyle: () => {},
 });
 
 export function useTheme() {
@@ -72,12 +82,20 @@ function applyReducedMotion(enabled: boolean) {
   }
 }
 
+/** Writes font style attribute to the <html> element */
+function applyFontStyle(fontStyle: FontStyleType) {
+  if (typeof document === "undefined") return;
+  document.documentElement.setAttribute("data-font-style", fontStyle);
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [paletteId, setPaletteIdState] = useState<string>(DEFAULT_PALETTE_ID);
   const [themeMode, setThemeModeState] = useState<"dark" | "light">("dark");
   const [cursorStyle, setCursorStyleState] = useState<CursorStyleType>("default");
   const [customCursorEnabled, setCustomCursorEnabledState] = useState<boolean>(false);
   const [reducedMotionEnabled, setReducedMotionEnabledState] = useState<boolean>(false);
+  const [logoHeartbeatEnabled, setLogoHeartbeatEnabledState] = useState<boolean>(true);
+  const [fontStyle, setFontStyleState] = useState<FontStyleType>("default");
 
   // On mount, read persisted preferences
   useEffect(() => {
@@ -115,6 +133,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const motionVal = savedMotionToggle === "true";
         setReducedMotionEnabledState(motionVal);
         applyReducedMotion(motionVal);
+      }
+
+      const savedLogoHeartbeat = localStorage.getItem(LOGO_HEARTBEAT_STORAGE_KEY);
+      if (savedLogoHeartbeat !== null) {
+        setLogoHeartbeatEnabledState(savedLogoHeartbeat === "true");
+      }
+
+      const savedFontStyle = localStorage.getItem("yantra_font_style") as FontStyleType;
+      if (savedFontStyle && ["default", "cyber", "wide", "mono", "avant-garde"].includes(savedFontStyle)) {
+        setFontStyleState(savedFontStyle);
+        applyFontStyle(savedFontStyle);
+      } else {
+        applyFontStyle("default");
       }
     } catch {
       // ignore (SSR / private mode)
@@ -203,6 +234,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setLogoHeartbeatEnabled = useCallback((enabled: boolean) => {
+    setLogoHeartbeatEnabledState(enabled);
+    try {
+      localStorage.setItem(LOGO_HEARTBEAT_STORAGE_KEY, String(enabled));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setFontStyle = useCallback((style: FontStyleType) => {
+    setFontStyleState(style);
+    applyFontStyle(style);
+    try {
+      localStorage.setItem("yantra_font_style", style);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const palette = getPalette(paletteId);
 
   return (
@@ -220,6 +270,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         resetCursorSettings,
         reducedMotionEnabled,
         setReducedMotionEnabled,
+        logoHeartbeatEnabled,
+        setLogoHeartbeatEnabled,
+        fontStyle,
+        setFontStyle,
       }}
     >
       {children}
