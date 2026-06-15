@@ -120,7 +120,7 @@ Music plays globally (the `<audio>` element + `AudioPlayerProvider` live in the 
 | Key | Action | | Key | Action |
 |---|---|---|---|---|
 | `F` | Fullscreen | | `⇧H` | Home |
-| `?` | Cheat sheet (Esc closes) | | `⇧R` | Reach (`/activity`) |
+| `?` | Cheat sheet (Esc closes) | | `⇧R` | Reach (`/reach`) |
 | `⇧P` | Play / Pause | | `⇧T` | Technologies |
 | `⟩` (`⇧.`) | Next track | | `⇧M` | Music Lab |
 | `⟨` (`⇧,`) | Previous track | | `⇧C` | Contact |

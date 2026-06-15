@@ -6,7 +6,7 @@ Entry point for any coding agent (Claude, Antigravity, Copilot, Cursor, …) wor
 
 `yantra-web` is the Next.js app behind **yantracore.com**. It is two surfaces in one shell:
 
-- **Brochure** — the public marketing site (homepage, contact, music, entryport globe, technologies, channels).
+- **Brochure** — the public marketing site (homepage, contact, music, reach globe, technologies, channels).
 - **Console** — an authenticated app (`/dashboard`) wired to the **YantraMate** AI backend (RAG/Ask over Google Drive, IMAP email chat, projects).
 
 Everything renders inside a retro-CRT `TvFrame` shell and a runtime-themeable design system. Full picture: **[docs/00-overview.md](./docs/00-overview.md)**.

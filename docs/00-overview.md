@@ -12,7 +12,7 @@ This is the single starting point for anyone — human or coding agent — worki
 
 `yantra-web` is the Next.js application behind **yantracore.com**. It started as a static marketing site (that origin story lives in the VISION docs) and has since grown into **two products sharing one shell**:
 
-1. **The brochure** — the public marketing surface. Homepage (`/`), plus story/section components, contact, channels, technologies, an interactive globe (`/entryport`), and an ambient music player (`/music`). This is the "Dark workshop / glass machinery" experience.
+1. **The brochure** — the public marketing surface. Homepage (`/`), plus story/section components, contact, channels, technologies, an interactive globe (`/reach`), and an ambient music player (`/music`). This is the "Dark workshop / glass machinery" experience.
 2. **The console** — an authenticated app surface. Login/signup, a **dashboard** (`/dashboard`) that talks to the **YantraMate** AI backend (RAG over Google Drive, IMAP email chat, project/file browsing), and user settings.
 
 Both run inside a signature **retro-CRT "TV" shell** (`TvFrame`) and share one runtime-themeable design system.
@@ -86,7 +86,7 @@ app/                 # Next.js App Router: pages, layouts, and /api proxy routes
   book/              # /book — Book a Consultation (budget estimator + intake form)
   dashboard/         # The console (DashboardShell)
   login/ signup/     # Auth surfaces (currently localStorage/demo)
-  music/ entryport/  # Brochure feature pages
+  music/ reach/      # Brochure feature pages
   channels/[slug]/   # Per-channel dashboards
   technologies/      # StarSystem tech visualization
   globals.css        # ~2,840 lines: ALL design tokens, glass classes, keyframes, CRT/TV + orbital styles
@@ -102,7 +102,7 @@ components/
   about/ work/ book/ # Channel pages: identity walkthrough, client work, consultation (estimator+form)
   sections/          # 01-arrival … 09-signal chapters (VISION-era; now assembled into /about & /work)
   dashboard/         # DashboardShell, SettingsShell
-  auth/ channels/ entryport/ assistant/ brand/   # feature components
+  auth/ channels/ reach/ assistant/ brand/   # feature components
 lib/
   api/               # yantramate.ts (live SDK) + contact/project/notify/posts (stubs)
   content/           # typed static content (capabilities, channels, team, testimonials, client-work)
