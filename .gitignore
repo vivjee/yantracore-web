@@ -29,6 +29,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+next-dev.log
+next-dev.err.log
+
+# temp directories
+/temp_ffmpeg/
+
+# utility scripts (one-off)
+modify_tv.py
 
 # env files (can opt-in for committing if needed)
 .env*
