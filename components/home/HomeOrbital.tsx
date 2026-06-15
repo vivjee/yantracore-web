@@ -71,6 +71,35 @@ const DESTINATIONS = [
   },
 ] as const;
 
+/**
+ * ColumnHeading — a quiet cap above one Home column. A mono eyebrow with an
+ * accent dot and a hairline rule that fades toward the outer edge, mirroring
+ * the column it labels (left columns hug their right/inner edge, and vice
+ * versa). Purely decorative: pointer-events stay with the nodes below.
+ */
+function ColumnHeading({
+  label,
+  side,
+  accent,
+}: {
+  label: string;
+  side: "left" | "right";
+  accent: string;
+}) {
+  return (
+    <div
+      className={`orbital-col-heading orbital-col-heading--${side}`}
+      style={{ "--col-accent": accent } as React.CSSProperties}
+    >
+      <span className="orbital-col-heading__label">
+        <span className="orbital-col-heading__dot" aria-hidden />
+        {label}
+      </span>
+      <span className="orbital-col-heading__rule" aria-hidden />
+    </div>
+  );
+}
+
 function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h1" | "p" }) {
   const router = useRouter();
 
@@ -122,11 +151,14 @@ export function HomeOrbital() {
     <section className="relative h-full w-full overflow-hidden" aria-label="YantraCore — home">
       {/* ── DESKTOP / TABLET ─────────────────────────────────────────── */}
       <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(340px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:gap-x-10">
-        {/* Left — initiatives (proof) */}
-        <div className="pointer-events-auto flex flex-col items-end justify-center gap-5 lg:gap-7">
-          {INITIATIVES.map((node) => (
-            <OrbitNode key={node.name} {...node} />
-          ))}
+        {/* Left — wayfinding (where to go next) */}
+        <div className="pointer-events-auto flex flex-col items-end justify-center gap-4">
+          <ColumnHeading label="Explore" side="left" accent="var(--accent-2)" />
+          <div className="flex flex-col items-end gap-5 lg:gap-7">
+            {DESTINATIONS.map((node) => (
+              <OrbitNode key={node.name} {...node} />
+            ))}
+          </div>
         </div>
 
         {/* Centre — sun shows through from the layout; copy sits at the base */}
@@ -136,11 +168,14 @@ export function HomeOrbital() {
           </div>
         </div>
 
-        {/* Right — wayfinding (where to go) */}
-        <div className="pointer-events-auto flex flex-col items-start justify-center gap-5 lg:gap-7">
-          {DESTINATIONS.map((node) => (
-            <OrbitNode key={node.name} {...node} />
-          ))}
+        {/* Right — our projects (the YantraCore products) */}
+        <div className="pointer-events-auto flex flex-col items-start justify-center gap-4">
+          <ColumnHeading label="Our Projects" side="right" accent="var(--accent-warm)" />
+          <div className="flex flex-col items-start gap-5 lg:gap-7">
+            {INITIATIVES.map((node) => (
+              <OrbitNode key={node.name} {...node} />
+            ))}
+          </div>
         </div>
       </div>
 

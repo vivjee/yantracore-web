@@ -104,7 +104,7 @@ Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components al
 ### Notes
 - **Fullscreen** lives in `useFullscreen()`, shared by the chrome button and the `F` key (one implementation, no duplication). The chrome button keeps its `isPowered` gate; the `F` key works regardless (fullscreen is OS-level).
 - **TV power** state is page-local to `TvFrame`, so `⇧Q` dispatches a `POWER_TOGGLE_EVENT` (`"yantra:toggle-power"`) window event that the mounted `TvFrame` listens for.
-- **Hints on buttons:** `KeyHint` renders a small `.kbd-hint` badge from the registry. Icon-only chrome buttons show it inside the `.tooltip`; labeled nav buttons reveal an inline `.tv-console-key` on hover; the music player uses native `title` text. All hints hide under `@media (pointer: coarse)` (no keyboard, no point).
+- **Hints on buttons:** `KeyHint` renders a small `.kbd-hint` badge from the registry, shown inside the `.tooltip` that reveals on hover — for both icon-only and labeled chrome buttons (labeled buttons stay static; only the tooltip appears). The music player uses native `title` text. All hints hide under `@media (pointer: coarse)` (no keyboard, no point).
 
 ---
 

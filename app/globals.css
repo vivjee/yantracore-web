@@ -2869,3 +2869,79 @@ html[data-theme="light"] .orbital-node__emblem {
 .orbital-node--compact .orbital-node__tag {
   font-size: 8.5px;
 }
+
+/* Roomier nodes on large screens so every tagline reads in full (the desktop
+   columns have the space; the mobile compact grid keeps width:100%). */
+@media (min-width: 1024px) {
+  .orbital-node:not(.orbital-node--compact) {
+    width: 228px;
+  }
+  .orbital-node:not(.orbital-node--compact) .orbital-node__tag {
+    font-size: 10px;
+  }
+}
+
+/* ── Home column heading — a quiet cap that labels each side ───────────
+   A mono eyebrow with an accent dot and a hairline rule that fades toward the
+   outer edge, mirroring the column beneath it. Width tracks the node width so
+   the rule reads as a clean cap over the stack. --col-accent is set inline. */
+.orbital-col-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 200px;
+}
+@media (min-width: 1024px) {
+  .orbital-col-heading {
+    width: 228px;
+  }
+}
+.orbital-col-heading--left {
+  align-items: flex-end;
+}
+.orbital-col-heading--right {
+  align-items: flex-start;
+}
+
+.orbital-col-heading__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+}
+.orbital-col-heading--left .orbital-col-heading__label {
+  flex-direction: row-reverse;
+}
+
+.orbital-col-heading__dot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--col-accent, var(--accent-1));
+  box-shadow: 0 0 9px color-mix(in srgb, var(--col-accent, var(--accent-1)) 75%, transparent);
+}
+
+.orbital-col-heading__rule {
+  width: 100%;
+  height: 1px;
+}
+.orbital-col-heading--left .orbital-col-heading__rule {
+  background: linear-gradient(
+    to left,
+    color-mix(in srgb, var(--col-accent, var(--accent-1)) 55%, transparent),
+    transparent
+  );
+}
+.orbital-col-heading--right .orbital-col-heading__rule {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--col-accent, var(--accent-1)) 55%, transparent),
+    transparent
+  );
+}
