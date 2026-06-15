@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Boxes, Info } from "lucide-react";
 import { OrbitNode } from "./OrbitNode";
+import { OrbitalHud } from "./OrbitalHud";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { StellarOrbitIcon } from "@/components/chrome/NavIcons";
@@ -149,6 +150,9 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
 export function HomeOrbital() {
   return (
     <section className="relative h-full w-full overflow-hidden" aria-label="YantraCore — home">
+      {/* Ambient mission-control HUD framing the empty space (desktop only) */}
+      <OrbitalHud />
+
       {/* ── DESKTOP / TABLET ─────────────────────────────────────────── */}
       <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(340px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:gap-x-10">
         {/* Left — wayfinding (where to go next) */}
