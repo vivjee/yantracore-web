@@ -15,15 +15,12 @@ import {
   Music,
   Radio,
   Sliders,
-  Terminal,
   Activity,
   AlertTriangle,
   RotateCcw,
   Shuffle,
   Maximize2,
   Minimize2,
-  Upload,
-  Link as LinkIcon,
   Wind,
   CloudRain,
   Cpu,
@@ -31,7 +28,7 @@ import {
   ChevronDown,
   Wand2,
 } from "lucide-react";
-import { useAudioPlayer, Track } from "@/lib/audio/AudioPlayerContext";
+import { useAudioPlayer } from "@/lib/audio/AudioPlayerContext";
 import { audioSynth } from "@/lib/audio";
 import { useElementFullscreen } from "@/lib/hooks/useElementFullscreen";
 import {
@@ -57,7 +54,6 @@ export default function MusicPage() {
     isFallbackActive,
     currentTime,
     simulatedDuration,
-    logs,
     repeatMode,
     isShuffle,
     tracks,
@@ -89,13 +85,10 @@ export default function MusicPage() {
     setWindVol,
     humVol,
     setHumVol,
-    // Custom Track Loaders
-    addCustomTrack,
   } = useAudioPlayer();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeConsoleTab, setActiveConsoleTab] = useState<"eq" | "ambient">("ambient");
-  const [customUrl, setCustomUrl] = useState("");
   const [visualizerStyle, setVisualizerStyle] = useState<string>("mixed");
   const [visualizerColor, setVisualizerColor] = useState<ColorKey>("teal");
   const [isVizMenuOpen, setIsVizMenuOpen] = useState(false);
@@ -273,7 +266,6 @@ export default function MusicPage() {
   const analysisRef = useRef<Analysis | null>(null);
   // Per-visualizer scratch space (particles, ring lists, spectrogram buffers…).
   const vizStateRef = useRef<Record<string, unknown>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Audio Visualizer render loop.
   //
@@ -412,50 +404,6 @@ export default function MusicPage() {
       clearTimeout(settleId);
     };
   }, [isFs]);
-
-  // Handle local file upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const objectURL = URL.createObjectURL(file);
-    const newTrack: Track = {
-      id: tracks.length + 1,
-      title: file.name.replace(/\.[^/.]+$/, ""),
-      duration: "00:00", // will load metadata
-      isPlayable: true,
-      src: objectURL,
-      description: "User uploaded local ambient core file.",
-      tempo: "Local",
-      key: "Custom"
-    };
-
-    addCustomTrack(newTrack);
-    setTimeout(() => {
-      handleTrackSelect(tracks.length, { autoplay: true });
-    }, 100);
-  };
-
-  // Handle URL stream loading
-  const handleUrlLoad = () => {
-    if (!customUrl) return;
-    const newTrack: Track = {
-      id: tracks.length + 1,
-      title: "Custom Stream " + (tracks.length - 19),
-      duration: "Stream",
-      isPlayable: true,
-      src: customUrl,
-      description: `External streaming network feed: ${customUrl}`,
-      tempo: "Network",
-      key: "Remote"
-    };
-
-    addCustomTrack(newTrack);
-    setCustomUrl("");
-    setTimeout(() => {
-      handleTrackSelect(tracks.length, { autoplay: true });
-    }, 100);
-  };
 
   const filteredTracks = tracks.filter((t) =>
     t.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1175,8 +1123,8 @@ export default function MusicPage() {
             {/* Right Column: Track Search and Playlist Library */}
             <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-0 select-none">
 
-              {/* Search Box + add-source row */}
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0 flex flex-col gap-2.5">
+              {/* Search Box */}
+              <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0">
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-2.5 text-text-low pointer-events-none" />
                   <input
@@ -1194,43 +1142,6 @@ export default function MusicPage() {
                       ×
                     </button>
                   )}
-                </div>
-
-                {/* Load your own: local file or stream URL */}
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="audio/*"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload a local audio file"
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-mono text-text-mid hover:text-text-hi hover:border-accent-2/40 transition-colors flex-shrink-0 uppercase tracking-wider"
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    Upload
-                  </button>
-                  <div className="relative flex-1 min-w-0">
-                    <LinkIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-low pointer-events-none" />
-                    <input
-                      type="text"
-                      value={customUrl}
-                      onChange={(e) => setCustomUrl(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") handleUrlLoad(); }}
-                      placeholder="Stream URL…"
-                      className="w-full bg-black/40 border border-white/5 focus:border-accent-2/50 rounded-lg py-1.5 pl-8 pr-14 text-[10px] font-mono text-text-hi placeholder-text-faint outline-none transition-all"
-                    />
-                    <button
-                      onClick={handleUrlLoad}
-                      disabled={!customUrl}
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded bg-accent-2/15 border border-accent-2/30 text-accent-2 text-[8px] font-mono uppercase tracking-wider disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent-2/25 transition-colors"
-                    >
-                      Load
-                    </button>
-                  </div>
                 </div>
               </div>
 
@@ -1309,19 +1220,6 @@ export default function MusicPage() {
                       <p className="text-[10px] font-mono text-text-low">No channels found matching query.</p>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Console log footer (retro style log) */}
-              <div className="h-[100px] bg-black/75 border border-white/5 rounded-xl p-2.5 font-mono text-[8.5px] text-accent-2 overflow-y-auto flex flex-col-reverse gap-0.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.7)] flex-shrink-0">
-                {logs.length > 0 ? (
-                  logs.map((log, i) => <div key={i} className="truncate select-none leading-relaxed">{log}</div>)
-                ) : (
-                  <div className="text-text-faint select-none animate-pulse">TERMINAL LOG ACTIVE (IDLE)</div>
-                )}
-                <div className="text-text-low border-b border-white/5 pb-1 mb-1 select-none flex items-center gap-1">
-                  <Terminal className="w-3 h-3 text-text-low" />
-                  <span>DECODER LOG SUMMARY</span>
                 </div>
               </div>
 

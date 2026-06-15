@@ -56,7 +56,7 @@ Used by `TvFrame`, `Header`, `Showcase`, `SettingsShell` for tactile UI feedback
 ### 2. Music player — `lib/audio/AudioPlayerContext.tsx`
 A full ambient-music engine behind the `/music` page, exposed via `useAudioPlayer()`. Mounted in the root layout so playback persists across navigation. It wraps a hidden `<audio>` element plus a Web-Audio graph (AnalyserNode for the visualizer, 3-band BiquadFilter EQ, a delay node for echo, oscillator drones, and noise generators for rain/wind/hum ambience).
 
-Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/next/prev, seek, volume/mute, repeat (`none`/`one`/`all`), shuffle, a synth-only fallback when streaming fails, 3-band EQ (`eqBass/Mid/Treble`), ambient layer volumes (`echoVol/rainVol/windVol/humVol`), custom-track loading (`addCustomTrack`), and a `logs` array for the on-screen console.
+Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/next/prev, seek, volume/mute, repeat (`none`/`one`/`all`), shuffle, a synth-only fallback when streaming fails, 3-band EQ (`eqBass/Mid/Treble`), ambient layer volumes (`echoVol/rainVol/windVol/humVol`), custom-track loading (`addCustomTrack`), and a `logs` activity array. `addCustomTrack` and `logs` remain in the context but are no longer surfaced in the `/music` page — the upload / stream-URL inputs and the decoder-log console were removed; the right column now holds only the search box and the (expanded) channel library.
 
 ---
 
