@@ -47,6 +47,7 @@ import {
   RefreshCw,
   Database,
   Search,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { StaggerContainer, StaggerItem, ScaleFadeItem } from "@/components/motion/AnimationWrappers";
@@ -807,6 +808,9 @@ interface SidebarProps {
   onSettingsClick: () => void;
   userRole: "client" | "staff" | "admin";
   userEmail: string;
+  /** Drawer state on <lg — off-canvas unless open. */
+  mobileOpen: boolean;
+  onClose: () => void;
 }
 
 function Sidebar({
@@ -826,12 +830,20 @@ function Sidebar({
   onSettingsClick,
   userRole,
   userEmail,
+  mobileOpen,
+  onClose,
 }: SidebarProps) {
   const isEmailActive = activeSection === "email";
 
   return (
     <aside
-      className="relative flex flex-col z-10 shrink-0 transition-all duration-300 overflow-hidden"
+      className={cn(
+        "relative flex flex-col z-10 shrink-0 transition-all duration-300 overflow-hidden",
+        // Below lg the rail becomes an off-canvas drawer confined to the
+        // dashboard area (the shell root is relative); above lg it's static.
+        "max-lg:absolute max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 max-lg:shadow-[8px_0_40px_rgba(0,0,0,0.6)]",
+        mobileOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"
+      )}
       style={{
         width: emailOpen ? "260px" : "220px",
         background: "linear-gradient(180deg, rgba(10,12,22,0.97) 0%, rgba(6,7,13,0.99) 100%)",
@@ -839,6 +851,14 @@ function Sidebar({
         backdropFilter: "blur(24px)",
       }}
     >
+      {/* Close button — drawer mode only */}
+      <button
+        onClick={onClose}
+        aria-label="Close menu"
+        className="lg:hidden absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-lg text-text-faint hover:text-text-hi hover:bg-white/5 transition"
+      >
+        <X size={16} />
+      </button>
       {/* Logo */}
       <div className="px-4 pt-4 pb-4 border-b border-white/[0.05] shrink-0 flex justify-center">
         <Link href="/" className="group flex items-center justify-center">
@@ -2347,6 +2367,7 @@ export function DashboardShell({
 
   /* ── email state ── */
   const [emailOpen, setEmailOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [emailAccounts, setEmailAccounts] = useState<EmailAccount[]>([]);
   const [emailLoading, setEmailLoading] = useState(false);
   const [activeEmailId, setActiveEmailId] = useState<string | null>(null);
@@ -2654,8 +2675,19 @@ export function DashboardShell({
     );
   }
 
+  const closeNav = () => setMobileNavOpen(false);
+
   return (
-    <div className="w-full h-full flex" style={{ background: "transparent" }}>
+    <div className="relative w-full h-full flex" style={{ background: "transparent" }}>
+
+      {/* Drawer backdrop — drawer mode only */}
+      {mobileNavOpen && (
+        <div
+          className="lg:hidden absolute inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={closeNav}
+          aria-hidden
+        />
+      )}
 
       <Sidebar
         onLogout={handleLogout}
@@ -2664,16 +2696,18 @@ export function DashboardShell({
         emailAccounts={emailAccounts}
         activeEmailId={activeEmailId}
         activeSection={activeSection}
-        onSelectEmail={handleSelectEmail}
-        onAddEmail={() => setShowAddModal(true)}
+        onSelectEmail={(acct) => { handleSelectEmail(acct); closeNav(); }}
+        onAddEmail={() => { setShowAddModal(true); closeNav(); }}
         emailLoading={emailLoading}
-        onAskClick={() => setActiveSection("ask")}
-        onDriveClick={() => setActiveSection("drive")}
-        onProjectsClick={() => setActiveSection("projects")}
-        onRequestsClick={() => setActiveSection("requests")}
-        onSettingsClick={() => setActiveSection("settings")}
+        onAskClick={() => { setActiveSection("ask"); closeNav(); }}
+        onDriveClick={() => { setActiveSection("drive"); closeNav(); }}
+        onProjectsClick={() => { setActiveSection("projects"); closeNav(); }}
+        onRequestsClick={() => { setActiveSection("requests"); closeNav(); }}
+        onSettingsClick={() => { setActiveSection("settings"); closeNav(); }}
         userRole={userRole}
         userEmail={userEmail}
+        mobileOpen={mobileNavOpen}
+        onClose={closeNav}
       />
 
       {/* Main column */}
@@ -2692,9 +2726,16 @@ export function DashboardShell({
             top: 0,
           }}
         >
-          <div className="flex items-center gap-2 text-sm text-text-low">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open menu"
+            className="lg:hidden -ml-2 mr-1 w-9 h-9 flex items-center justify-center rounded-lg text-text-mid hover:text-text-hi hover:bg-white/5 transition shrink-0"
+          >
+            <Menu size={18} />
+          </button>
+          <div className="flex items-center gap-2 text-sm text-text-low min-w-0">
             <span className="text-text-faint">YantraCore</span>
-            <ChevronRight size={13} className="text-text-faint" />
+            <ChevronRight size={13} className="text-text-faint shrink-0" />
             {activeSection === "email" && activeEmailAccount && (
               <>
                 <span className="text-text-faint">Email</span>
