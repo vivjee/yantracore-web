@@ -34,8 +34,13 @@ import {
   SiFigma,
   SiCanva,
   SiBlender,
+  // CMS & E-commerce platforms
+  SiWordpress,
+  SiShopify,
+  SiWoocommerce,
 } from "react-icons/si";
 import { FaPaw } from "react-icons/fa"; // Paw stands in for Zustand (bear logo)
+import { PhotoshopIcon } from "./tech-icons"; // Adobe marks aren't in react-icons
 
 export interface TechSatellite {
   name: string;
@@ -186,8 +191,23 @@ export const techPlanets: TechPlanet[] = [
     angleOffset: 260,
     direction: 1,
     satellites: [
-      { name: "Canva", radius: 60, speed: 13, color: "#00C4CC", icon: SiCanva, angleOffset: 45 },
-      { name: "Blender", radius: 88, speed: 18, color: "#F5792A", icon: SiBlender, angleOffset: 225, direction: -1 },
+      { name: "Photoshop", radius: 58, speed: 13, color: "#31A8FF", icon: PhotoshopIcon, angleOffset: 0 },
+      { name: "Canva", radius: 85, speed: 18, color: "#00C4CC", icon: SiCanva, angleOffset: 130, direction: -1 },
+      { name: "Blender", radius: 110, speed: 23, color: "#F5792A", icon: SiBlender, angleOffset: 250 },
+    ],
+  },
+  {
+    // CMS & E-commerce — platform-based web builds
+    name: "WordPress",
+    radius: 1280,
+    speed: 170,
+    color: "#21759B",
+    icon: SiWordpress,
+    angleOffset: 150,
+    direction: -1,
+    satellites: [
+      { name: "Shopify", radius: 60, speed: 13, color: "#7AB55C", icon: SiShopify, angleOffset: 70 },
+      { name: "WooCommerce", radius: 90, speed: 18, color: "#96588A", icon: SiWoocommerce, angleOffset: 250, direction: -1 },
     ],
   },
 ];

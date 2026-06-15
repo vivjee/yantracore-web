@@ -184,7 +184,7 @@ Exports three entrance helpers (all extend `HTMLMotionProps<"div">`):
 `{ zoom: number; onReset: () => void }`. Fixed zoom/reset HUD for pannable canvases (pairs with `useCanvasControls`); shows a one-time hint stored in `localStorage`.
 
 ### StarSystem — `components/motion/StarSystem.tsx` · Client.
-`{ onCenterClick: () => void }`. The `/technologies` visualization: a fixed (non-spinning) `LogoMark` star at center, nine tech "planets" on orbits — React, Next.js, Node.js, TypeScript, Python (AI/data), Google Cloud (cloud/hosting), PostgreSQL (databases), Flutter (mobile), Figma (design) — each carrying 2–3 satellite tools. Planets/satellites are data-driven from `lib/content/tech-stack.ts` (`techPlanets`); pan/zoom via `useCanvasControls`. Framer Motion + react-icons. (Feature-scale, listed here as it lives in `motion/`.)
+`{ onCenterClick: () => void }`. The `/technologies` visualization: a fixed (non-spinning) `LogoMark` star at center, ten tech "planets" on orbits — React, Next.js, Node.js, TypeScript, Python (AI/data), Google Cloud (cloud/hosting), PostgreSQL (databases), Flutter (mobile), Figma (design — incl. Photoshop), WordPress (CMS/commerce — Shopify, WooCommerce) — each carrying 2–3 satellite tools. Planets/satellites are data-driven from `lib/content/tech-stack.ts` (`techPlanets`); brands missing from `react-icons` (e.g. Photoshop) use custom marks in `lib/content/tech-icons.tsx`. Pan/zoom via `useCanvasControls`. Framer Motion + react-icons. (Feature-scale, listed here as it lives in `motion/`.)
 
 ---
 
