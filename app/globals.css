@@ -1929,6 +1929,67 @@ body.brochure-mode-active header {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ── Music quick-panel popover (anchored to the Music Lab nav button) ──────
+   Unfurls beneath the Music button while a listening session is live. Reveal
+   is gated to hover-capable pointers so it never fires on a phone tap; the
+   `padding-top` is a transparent bridge so the cursor never crosses a dead gap
+   between the button and the card. */
+.tv-music-control {
+  position: relative;
+}
+
+.tv-music-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 8px;
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s var(--ease-out-soft), transform 0.18s var(--ease-out-soft),
+    visibility 0.18s;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tv-music-control:hover .tv-music-popover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Keyboard users: reveal while focus rests on the button or anything in the card. */
+.tv-music-control:focus-within .tv-music-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tv-music-popover__card {
+  width: 264px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 12, 20, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="light"] .tv-music-popover__card {
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(246, 248, 251, 0.97);
+  box-shadow:
+    6px 6px 16px rgba(163, 177, 198, 0.28),
+    -6px -6px 16px rgba(255, 255, 255, 0.82);
+}
+
 /* ── Keyboard shortcut hints ─────────────────────────────────────────── */
 
 /* Small key-cap badge (⇧H, F, ?) shown in tooltips and the cheat sheet. */

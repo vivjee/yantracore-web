@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Briefcase, Info } from "lucide-react";
+import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Briefcase, Info, Volume2, VolumeX } from "lucide-react";
 import {
   TvConsoleIcon,
   UserIcon,
@@ -43,22 +43,99 @@ function TvMusicDot({ isPowered }: { isPowered: boolean }) {
 }
 
 /**
- * Inline transport for the TV chrome bar — appears next to the nav once a
- * listening session is live, so music is controllable from any app-mode page.
- * Isolated subscriber (see TvMusicDot). Hidden below `sm` (chrome is cramped on
- * phones — the Music Lab dot still signals playback there); title shows on `lg+`.
+ * The Music Lab nav button, plus a hover/focus "now playing" quick-panel that
+ * unfurls beneath it once a listening session is live — so playback is
+ * controllable from any app-mode page without crowding the nav row. The panel
+ * is gated to hover-capable pointers (see `.tv-music-popover` in globals.css):
+ * on touch/phones it never appears — the pulsing dot signals playback and a tap
+ * opens the full `/music` console. Isolated subscriber so live `currentTime`
+ * ticks (the popover header) don't re-render the whole frame.
  */
-function TvInlineControls({ isPowered }: { isPowered: boolean }) {
-  const { isPlaying, currentTime, currentTrack } = useAudioPlayer();
+function TvMusicControl({ isPowered }: { isPowered: boolean }) {
+  const {
+    isPlaying,
+    currentTime,
+    currentTrack,
+    volume,
+    isMuted,
+    handleVolumeChange,
+    toggleMute,
+  } = useAudioPlayer();
   const pathname = usePathname();
+  const { themeMode } = useTheme();
+  const isActive = pathname === "/music";
   const sessionActive = isPlaying || currentTime > 0;
-  if (!isPowered || !sessionActive || pathname === "/music") return null;
+  const showPanel = isPowered && sessionActive && !isActive;
+
   return (
-    <div className="hidden sm:flex items-center gap-1 pl-2 ml-0.5 border-l border-white/10">
-      <span className="hidden lg:block max-w-[160px] truncate text-[11px] font-mono text-text-mid">
-        {currentTrack.title}
-      </span>
-      <MusicMiniControls variant="inline" />
+    <div className="tv-music-control">
+      <Link
+        href="/music"
+        className={`tv-console-btn ${isActive ? "active" : ""}`}
+        aria-label="Music Lab"
+        onMouseEnter={() => isPowered && audioSynth.playHover()}
+        onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }}
+        style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+      >
+        {isPowered && isActive && (
+          <motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />
+        )}
+        <TvMusicDot isPowered={isPowered} />
+        <Headphones className="w-5 h-5 relative z-10" />
+        {/* When the quick-panel is live it replaces the tooltip on hover. */}
+        {!showPanel && <span className="tooltip">Music Lab <KeyHint id="nav-music" /></span>}
+      </Link>
+
+      {showPanel && (
+        <div className="tv-music-popover">
+          <div className="tv-music-popover__card">
+            {/* Header — status dot + track title */}
+            <div className="flex items-center gap-2">
+              <span className={`shrink-0 w-2 h-2 rounded-full bg-accent-2 ${isPlaying ? "signal-dot" : ""}`} aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-[8.5px] font-mono uppercase tracking-[0.18em] text-text-low leading-none mb-1">
+                  {isPlaying ? "Now Playing" : "Paused"}
+                </p>
+                <p className="text-[12px] font-semibold text-text-hi truncate leading-tight">
+                  {currentTrack.title}
+                </p>
+              </div>
+            </div>
+
+            {/* Short description */}
+            {currentTrack.description && (
+              <p className="text-[10px] text-text-low leading-relaxed line-clamp-2">
+                {currentTrack.description}
+              </p>
+            )}
+
+            {/* Transport + compact volume */}
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
+              <MusicMiniControls variant="dock" />
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => { audioSynth.playClick(); toggleMute(); }}
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-text-mid hover:text-text-hi hover:bg-white/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60"
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                  aria-label="Volume"
+                  className="w-16 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -263,21 +340,13 @@ export function TvFrame({ children }: TvFrameProps) {
                 </Link>
               </div>
 
-              {/* Inline music transport — visible while a session is live */}
-              <TvInlineControls isPowered={isPowered} />
-
               {/* Group 2 — Theme and Settings */}
               <div className="tv-chrome-btn-group">
                 <button className="tv-console-btn relative z-10" onClick={() => { if (isPowered) { audioSynth.playClick(); setThemeMode(themeMode === "dark" ? "light" : "dark"); } }} onMouseEnter={() => isPowered && audioSynth.playHover()} aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} theme`} disabled={!isPowered} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {themeMode === "dark" ? <SunCoreIcon className="w-5 h-5 relative z-10" /> : <MoonCrescentIcon className="w-5 h-5 relative z-10" />}
                   <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"} <KeyHint id="view-theme" /></span>
                 </button>
-                <Link href="/music" className={`tv-console-btn ${pathname === "/music" ? "active" : ""}`} aria-label="Music Lab" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
-                  {isPowered && pathname === "/music" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <TvMusicDot isPowered={isPowered} />
-                  <Headphones className="w-5 h-5 relative z-10" />
-                  <span className="tooltip">Music Lab <KeyHint id="nav-music" /></span>
-                </Link>
+                <TvMusicControl isPowered={isPowered} />
                 <Link href="/settings" className={`tv-console-btn ${pathname === "/settings" ? "active" : ""}`} aria-label="System Settings" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/settings" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <ChipSettingsIcon className="w-5 h-5 settings-icon relative z-10" />

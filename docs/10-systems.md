@@ -93,11 +93,11 @@ The tablet/mobile foundation. **Prefer Tailwind breakpoints in markup; reach for
 
 ## Off-page music controls
 
-**Files:** [`components/chrome/NowPlayingDock.tsx`](../components/chrome/NowPlayingDock.tsx), [`components/chrome/MusicMiniControls.tsx`](../components/chrome/MusicMiniControls.tsx), [`lib/hooks/useAppMode.ts`](../lib/hooks/useAppMode.ts), plus the `TvMusicDot` / `TvInlineControls` helpers in [`TvFrame.tsx`](../components/layout/TvFrame.tsx).
+**Files:** [`components/chrome/NowPlayingDock.tsx`](../components/chrome/NowPlayingDock.tsx), [`components/chrome/MusicMiniControls.tsx`](../components/chrome/MusicMiniControls.tsx), [`lib/hooks/useAppMode.ts`](../lib/hooks/useAppMode.ts), plus the `TvMusicDot` / `TvMusicControl` helpers in [`TvFrame.tsx`](../components/layout/TvFrame.tsx).
 
 Music plays globally (the `<audio>` element + `AudioPlayerProvider` live in the root layout), so playback persists across navigation. These surfaces let listeners see and control it without returning to `/music`, choosing the right surface per mode via `useAppMode()` (reads `body.app-mode-active`):
 
-- **App-mode pages (TV chrome):** `TvInlineControls` adds prev / play-pause / next inline in the chrome bar once a session is live (`isPlaying || currentTime > 0`); hidden below `sm`, track title from `lg+`. `TvMusicDot` badges a pulsing `.signal-dot` on the Music Lab button while playing. Both are isolated `useAudioPlayer` subscribers, so live `currentTime` ticks don't re-render the whole frame.
+- **App-mode pages (TV chrome):** `TvMusicControl` wraps the Music Lab nav button with a glass "now playing" quick-panel (`.tv-music-popover`) that unfurls beneath it on hover/focus once a session is live (`isPlaying || currentTime > 0`) — status + title + short description + prev/play-pause/next + a compact volume. Reveal is gated to hover-capable pointers (`@media (hover: hover)`), so on touch/phones the panel never appears: the pulsing `.signal-dot` (`TvMusicDot`) signals playback and a tap opens the full `/music` console. Isolated `useAudioPlayer` subscriber, so live `currentTime` ticks don't re-render the whole frame.
 - **Brochure pages:** `NowPlayingDock` — a floating bottom-right glass mini-player (status dot, track title, progress, transport, link to the console). Mounted once in the root layout; auto-hides on app-mode pages and on `/music`. Respects reduced motion; dismissible (re-arms when the track changes or the session resets).
 
 `MusicMiniControls` is the shared prev / play-pause / next transport both surfaces reuse (`variant="inline" | "dock"`).
