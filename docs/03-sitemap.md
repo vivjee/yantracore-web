@@ -1,6 +1,30 @@
 # 03 — Sitemap & Information Architecture
 
-> Status: **locked.** Chapter order, product treatment, capability list, content sources all confirmed.
+> **Layer: VISION + REFERENCE.** The reference table below is the **routes that actually exist today**. Everything after the divider is the original narrative IA **vision** (the 9-chapter scroll, inner pages, nav structure) — aspirational, not all built. Trust the table for what's real.
+
+## Routes that actually exist (REFERENCE — 2026-06-15)
+
+| Route | Surface | What it is |
+|---|---|---|
+| `/` | Brochure | Homepage — `Showcase` solar-system scene inside `TvFrame` |
+| `/contact` | Brochure | Contact form (client-validated) |
+| `/music` | Brochure | Ambient music player (Web-Audio engine) |
+| `/entryport` | Brochure | Interactive 3D globe of global activity |
+| `/technologies` | Brochure | `StarSystem` tech-stack visualization |
+| `/channels/[slug]` | Brochure/App | Per-channel live dashboard (`jimbo`/`restroverse`/`shramdan`/`yantracore`) |
+| `/lab/playground` | Internal | Glass-primitives showcase / design review surface |
+| `/login`, `/signup` | Auth | Demo auth surfaces (no real backend session) |
+| `/dashboard` | Console | The app — Ask AI / Email / Drive / Projects (`DashboardShell`) |
+| `/dashboard/settings` | Console | Dashboard settings tab |
+| `/settings` | App | Theme/font/cursor preferences (`SettingsShell`) |
+
+**Top nav today** lives in the `TvFrame` chrome bar (Home / Entryport / Technologies / Music / Contact) plus the `Header` pill on brochure pages — **not** the Studio/Capabilities/Atelier/Lab/Signal structure described in the vision below.
+
+**Not built yet** (described in the vision but no route exists): `/work/*` product teasers, `/work` index, `/capabilities`, `/atelier`, `/lab` blog index, `/lab/[slug]`, `/signal`.
+
+---
+
+> Everything below is the original **VISION** for the information architecture. Kept as the north star; reconcile against the table above before treating any of it as built.
 
 ## Principle
 

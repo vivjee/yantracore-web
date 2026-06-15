@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YantraCore Web
 
-## Getting Started
+The Next.js application behind **yantracore.com** — a marketing **brochure** and an authenticated **console** sharing one retro-CRT shell and a runtime-themeable design system.
 
-First, run the development server:
+> **Apps that solve real-world problems — AI enabled.**
+> *YantraCore reveals the machinery that moves modern business — and the site itself demonstrates that craft.*
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The AI/console features call the external **YantraMate** backend (RAG over Drive, IMAP email chat, projects). Run it locally on `:3011` or point the env vars below at a remote instance.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Scripts: `pnpm dev` · `pnpm build` · `pnpm start` · `pnpm lint`. Package manager: **pnpm**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment (`.env.local`)
 
-## Learn More
+| Variable | Used by | Default |
+|---|---|---|
+| `YANTRAMATE_API_URL` | `app/api/*` server proxies | `http://localhost:3011` |
+| `NEXT_PUBLIC_YANTRAMATE_API_URL` | browser SDK (`lib/api/yantramate.ts`) | devtunnel URL |
+| `NEXT_PUBLIC_SITE_URL` | metadata / canonical | `http://localhost:3000` |
 
-To learn more about Next.js, take a look at the following resources:
+## What's inside
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Brochure:** `/` (homepage), `/contact`, `/music`, `/entryport` (3D globe), `/technologies`, `/channels/[slug]`.
+- **Console:** `/login`, `/signup`, `/dashboard` (Ask AI · Email · Drive · Projects), `/settings`.
+- **Design system:** all tokens, glass surfaces, palettes, and animations live in `app/globals.css`; theming is runtime via `lib/theme/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Stack
 
-## Deploy on Vercel
+Next.js 16 · React 19 · TypeScript (strict) · Tailwind CSS v4 · Framer Motion · GSAP · three / React Three Fiber · Zod. See [docs/05-tech-architecture.md](./docs/05-tech-architecture.md).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**`docs/` is the source of truth.** Start at **[docs/00-overview.md](./docs/00-overview.md)**, then the [docs index](./docs/README.md). Docs are labeled **VISION** (north star) or **REFERENCE** (what's built) — trust REFERENCE for facts.
+
+## Contributing / working in this repo
+
+Read **[AGENTS.md](./AGENTS.md)** (applies to humans and AI agents alike). In short: commit on every medium-to-major change, keep REFERENCE docs in sync with your code, never hardcode accent colors, and prefer the existing primitives.

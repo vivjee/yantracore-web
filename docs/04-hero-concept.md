@@ -1,6 +1,6 @@
 # 04 — Hero Concept: "The Machinery"
 
-> Status: **locked.** Headline: *"The mechanisms / that move modern business."*
+> **Layer: VISION.** This is the storyboard for an aspirational hero (3D logo + orbital cards assembling on scroll). **It is not the current live hero.** The homepage today renders the `Showcase` "solar-system" scene (`components/sections/01-arrival/Showcase.tsx`) inside `TvFrame` — a 2D animated `LogoMark` with orbiting product cards, not the scroll-assembled R3F scene below. Keep this as the target if/when the hero is rebuilt; see [06-roadmap.md](./06-roadmap.md).
 
 The hero is the most expensive 800px of pixels on the internet. Every decision below is in service of one outcome: a first-time visitor watches the scene play out, scrolls once, and thinks *I want to see what this studio can do.*
 

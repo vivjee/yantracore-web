@@ -1,6 +1,6 @@
-# YantraCore Web — Planning Docs
+# YantraCore Web — Documentation
 
-These docs are the **proposal** for the yantracore.com rebuild. They exist to align on direction *before* code gets written. Read in order; each one builds on the last.
+**This `docs/` set is the source of truth for the project**, for humans and coding agents alike. If you're starting fresh, read **[00-overview.md](./00-overview.md)** first.
 
 ## The thesis (one line)
 
@@ -8,91 +8,46 @@ These docs are the **proposal** for the yantracore.com rebuild. They exist to al
 
 ### Philosophy
 
-> Apps that solve real world problems — AI enabled.
+> **Apps that solve real-world problems — AI enabled.**
 
-YantraCore reveals the machinery that moves modern business. The site itself becomes a demonstration of that craft — glass surfaces, animated borders, 3D, scroll-driven scenes — not as decoration, but as the sales argument.
+YantraCore reveals the machinery that moves modern business — and the site itself is a demonstration of that craft.
+
+## How these docs are organized
+
+Every doc is labeled with a **layer**:
+
+- 🟢 **REFERENCE** — what is *actually built today*. Trust these for facts. Keep them in sync with the code.
+- 🔭 **VISION** — north-star aspiration and design intent. Inspiring, but not all built. Never cite as current behavior.
+
+> The set was reconciled with the codebase on **2026-06-15** after the original (pre-build) proposal docs drifted from reality. The app outgrew its "static brochure" origin into a full app with a console, an AI backend, runtime theming, and a CRT shell — so REFERENCE docs were added/rewritten and the original proposals kept as VISION.
 
 ## Documents
 
-| # | Doc | What's in it |
-|---|---|---|
-| 01 | [Creative Direction](./01-creative-direction.md) | The thesis, mood, voice, motion language. The "why." |
-| 02 | [Brand System](./02-brand-system.md) | Colors, typography, spacing, motion tokens, glass + animated border specs. The "kit of parts." |
-| 03 | [Sitemap](./03-sitemap.md) | Proposed pages and homepage chapter narrative. The "what we build." |
-| 04 | [Hero Concept](./04-hero-concept.md) | Full storyboard for the showpiece hero scene. The "wow moment." |
-| 05 | [Tech Architecture](./05-tech-architecture.md) | Stack, packages, folder structure, performance budgets. The "how it's engineered." |
-| 06 | [Roadmap](./06-roadmap.md) | Phased build plan with review checkpoints. The "when and in what order." |
-| 07 | [API Reference](./07-api-reference.md) | Endpoints and request/response specifications. |
-| 08 | [Pivot Log](./08-pivot-log.md) | Record of major pivots, layout revisions, and UX sweeps. |
+| # | Doc | Layer | What's in it |
+|---|---|---|---|
+| 00 | [Overview](./00-overview.md) | 🟢 REFERENCE | Read first: mental model, quick start, doc map |
+| 01 | [Creative Direction](./01-creative-direction.md) | 🔭 VISION | Thesis, mood, voice, motion language — the "why" |
+| 02 | [Brand System](./02-brand-system.md) | 🟢 REFERENCE | Real design tokens, palettes, fonts, glass/cursor/CRT |
+| 03 | [Sitemap](./03-sitemap.md) | 🟢/🔭 | Real routes (reference) + narrative IA (vision) |
+| 04 | [Hero Concept](./04-hero-concept.md) | 🔭 VISION | The "assembling machinery" hero (not the live hero) |
+| 05 | [Tech Architecture](./05-tech-architecture.md) | 🟢 REFERENCE | Stack, folder structure, data flow, auth, tooling |
+| 06 | [Roadmap & To-Do](./06-roadmap.md) | 🟢 REFERENCE | Build status + live backlog |
+| 07 | [API Reference (YantraMate)](./07-api-reference.md) | 🟢 REFERENCE | The backend service contract (OpenAPI mirror) |
+| 08 | [Pivot Log](./08-pivot-log.md) | 🟢 REFERENCE | Decision / pivot history |
+| 09 | [Agent Conventions](./09-agent-conventions.md) | 🟢 REFERENCE | Rules every coding agent must follow |
+| 10 | [Systems](./10-systems.md) | 🟢 REFERENCE | Theme, Audio, TV/CRT shell, Cursor, Backgrounds, Motion |
+| 11 | [UI Components](./11-ui-components.md) | 🟢 REFERENCE | Component reference (props & variants) |
+| 12 | [App API (proxy routes)](./12-app-api.md) | 🟢 REFERENCE | The Next.js `/api/*` routes |
 
-## Status
+Plus `api-docs.json` — the OpenAPI source for doc 07. Repo-root companions: [`AGENTS.md`](../AGENTS.md) and [`README.md`](../README.md).
 
-Each doc is now in one of three states:
-- **Locked** — decision made, will be built as-is unless flagged
-- **Mostly locked** — small open items handled in the live chat batch (not in docs)
-- **Proposal** — needs your reaction in chat before lock
+## Reading paths
 
-Open items are **not** tracked in docs anymore — they're consolidated into batched chat questions to avoid scattering reviews across files.
+- **New to the project?** 00 → 05 → 02 → 11.
+- **Doing UI / design work?** 02 → 10 → 11 (and 01/04 for intent).
+- **Doing backend / data work?** 12 → 07 → 05.
+- **Coding agent?** [`AGENTS.md`](../AGENTS.md) → 00 → 09, then whatever your task touches.
 
-## How to give feedback
+## The one rule that keeps this useful
 
-Three useful ways, in order of preference:
-1. **Reply with reactions in the chat** — best for direction-level feedback ("I love the assembly metaphor but the headline copy is off")
-2. **Edit a doc directly** and tell me what you changed — best for precise wording
-3. **Open a question** in chat — best for "is this possible?" and "what if we did X instead?"
-
-## What YantraCore actually does (informs the whole site)
-
-- **Studio products** — *Restroverse* (AI hospitality platform, pre-launch), *Jimbo* (AI agent for WhatsApp/Instagram/Facebook/SMS, deeply integrated with Restroverse)
-- **Community** — *Shramdan* (nonprofit — "by the community, for the community")
-- **Client work** — Shopify, WordPress, custom web/app, databases, APIs, AWS, and more
-
-## Decisions locked
-
-- **Positioning**: hybrid — products + services equal weight, Shramdan as soul
-- **Logo**: at `public/images/logo/` (SVG + GLB)
-- **Dark mode only**
-- **Color palette**: **Crystal** (`#6E56FF` / `#00E0CB` / `#FF4FB0`) — swappable via one CSS file; alternates *Atelier* and *Hearth* sit commented in `styles/palettes.css`
-- **Display font**: **General Sans** (self-hosted)
-- **Build sequencing**: hero-first
-- **Stack**: Next.js 15 + React 19 + Tailwind v4 + GSAP (free) + `split-type` + Lenis + React Three Fiber + next-intl
-- **Package manager**: pnpm
-- **v1 ships fully static**: all content in MDX + typed constants; forms validate locally with no submit; blog uses static placeholder posts
-- **v2 wiring** (deferred): Node API for forms, WordPress for blog, multi-lingual flip, deployment
-- **i18n**: scaffolded from day one with `next-intl`; English-only in v1, structure ready for `hi` and others
-- **Team**: 8 members (5 staff + 3 management); headshots to follow; placeholder avatars until then
-- **Testimonials**: placeholder quotes for v1; real ones swap in later
-- **Case studies**: skipped; client work shown via marquee logo wall + modal
-- **External product domains**: Restroverse, Jimbo, Shramdan will each have their own site. `/work/{product}` pages on yantracore.com are teasers that link out.
-- **Privacy policy + terms**: I draft templates; client reviews with legal later
-- **Homepage chapter list**: Arrival → Manifesto → In the Studio (products) → Capabilities → The Forge → Client Work → Voices → Lab Notes → Signal
-- **Hero CTAs**: two side by side — *"Begin the tour"* (scroll) + *"Start a project"* (jump to Signal)
-- **Hero orbital cards**: Jimbo chat / Restroverse listing / Shramdan moment / Code / AI activity / Client logos
-
-## All planning locked. Build kicked off.
-
-- **Thesis**: *"YantraCore reveals the machinery that moves modern business."*
-- **Hero headline**: *"The mechanisms / that move modern business."*
-
-## Build status
-
-| Phase | Status |
-|---|---|
-| 0 — Foundation | ✅ scaffold + brand tokens + fonts + base layout |
-| 0.5 — i18n scaffold | ⏭ next session (deferred to keep playground review unblocked) |
-| 1 — Glass primitives | ✅ AnimatedBorder, GlassCard, GlassButton, GlassInput, GlassPanel, + 4 background patterns |
-| 1 — Playground | ✅ `/lab/playground` live |
-| 2 — Hero | ⏭ after playground review |
-| 3 — Content drafting | ⏭ |
-| 4 — Homepage chapters | ⏭ |
-| 5 — Inner pages | ⏭ |
-| 6 — Polish + audit | ⏭ |
-| 7 — v2 wiring (Node API + WP + i18n flip) | ⏭ |
-
-Run `pnpm dev` to start the dev server; visit `http://localhost:3000` for the home placeholder and `http://localhost:3000/lab/playground` for the primitives review surface.
-
-## Next step
-
-After the hero headline is picked in chat, I kick off **Phase 0 + Phase 1**: scaffold the Next.js project (with i18n + content + API stubs ready) and build the **glass primitives playground** at `/lab/playground` — the first thing you'll see running locally and react to.
-
-From there, **the hero.**
+**When you change behavior, update the matching REFERENCE doc in the same commit.** The drift this set just corrected is exactly what happens when that rule slips. Mapping table: [09-agent-conventions.md §6](./09-agent-conventions.md).

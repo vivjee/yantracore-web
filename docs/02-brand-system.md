@@ -1,81 +1,23 @@
-# 02 — Brand System
+# 02 — Brand System (Design Reference)
 
-> Status: **locked.** Crystal palette + General Sans confirmed.
+> **Layer: REFERENCE** — the design system as it exists in code today.
+>
+> **Source of truth in code:** [`app/globals.css`](../app/globals.css) (~2,570 lines) holds every token, glass class, keyframe, cursor style, and CRT/TV style. This doc mirrors it. The original aspirational brand spec (blur-based glass, single locked palette) is preserved as VISION at the bottom for context.
 
-The brand system is the kit of parts every component is built from. If we get this right, the whole site stays coherent even as it grows. All tokens will live as CSS custom properties and Tailwind theme extensions so they're tunable in one place.
-
-### Locked decisions
-
-- **Logo**: provided by user at `public/images/logo/` (SVG + GLB 3D versions present)
-- **Light mode**: not building one. Dark is the brand.
-- **Color palette**: **Crystal** (Violet `#6E56FF` / Cyan `#00E0CB` / Magenta `#FF4FB0`). Architected as CSS custom properties + Tailwind theme tokens so the entire palette can be swapped in one file.
-- **Display font**: **General Sans** (Fontshare, self-hosted). Body: Inter (Google). Mono: JetBrains Mono (Google).
+The kit of parts every component is built from. Tokens live as **CSS custom properties** so the whole site re-skins from one place. Many are **swapped at runtime** by `ThemeProvider` (see [10-systems.md](./10-systems.md#theme-system)).
 
 ---
 
-## 1. Color
+## 1. Color tokens
 
-Dark canvas, jewel-bright accents, glass everywhere in between.
-
-### Surface (the canvas)
-
+### Ink (canvas surfaces) — `:root`
 | Token | Hex | Use |
 |---|---|---|
-| `--ink-0` | `#06070D` | Page base, behind everything |
-| `--ink-1` | `#0A0C16` | Section base when separation needed |
-| `--ink-2` | `#11142233` | Subtle elevated surfaces (non-glass) |
+| `--ink-0` | `#06070D` | Page base (a hair of blue, not pure black) |
+| `--ink-1` | `#0A0C16` | Elevated surface; also the glass fill (see §4) |
 | `--ink-edge` | `#1A1E2E` | Hairline dividers, low-contrast borders |
 
-The base is *not* pure black — `#06070D` has a hint of blue so the violet/cyan accents harmonize.
-
-### Glass (the dominant surface)
-
-Glass is built from a layered recipe, not a single color. The recipe:
-
-```css
-.glass {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  backdrop-filter: blur(20px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),  /* top hairline */
-    0 24px 60px -20px rgba(0, 0, 0, 0.5);       /* drop */
-}
-```
-
-Three glass variants:
-- **`glass-light`** — for floating cards over busy backgrounds. blur 16px, opacity 4%.
-- **`glass-medium`** — default card surface. blur 20px, opacity 6%.
-- **`glass-heavy`** — for modal/nav surfaces that must obscure. blur 32px, opacity 10%.
-
-### Accent (the jewelry) — swappable
-
-All accent colors live as CSS custom properties under `:root`. Swapping the palette = editing one file (`styles/globals.css`). v1 ships with **Crystal**.
-
-**Crystal — locked for v1:**
-| Token | Hex | Role |
-|---|---|---|
-| `--accent-1` | `#6E56FF` | Primary (violet) |
-| `--accent-2` | `#00E0CB` | Secondary (cyan) |
-| `--accent-3` | `#FF4FB0` | Tertiary (magenta, used sparingly) |
-| `--accent-warm` | `#FFB454` | Warm callouts (amber) — strongest use in Shramdan + Voices |
-
-Two alternate palettes are kept in `styles/palettes.css` (commented out) for easy swap:
-- *Atelier* — `#3B82F6` / `#14B8A6` / `#F59E0B` / `#F97316` (deeper, more serious)
-- *Hearth* — `#6366F1` / `#34D399` / `#FB7185` / `#FBBF24` (warmer, product-friendly)
-
-**The signature gradient:**
-```css
-linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%)
-```
-This is the gradient used on animated borders, text gradients on key headlines, and the conic-sweep that becomes our visual signature. It re-skins automatically when the palette swaps.
-
 ### Text
-
 | Token | Hex | Use |
 |---|---|---|
 | `--text-hi` | `#F4F5FA` | Headlines, primary body |
@@ -83,174 +25,153 @@ This is the gradient used on animated borders, text gradients on key headlines, 
 | `--text-low` | `#7B8197` | Eyebrow labels, metadata |
 | `--text-faint` | `#4B5066` | Disabled, decorative numerals |
 
+### Accent (the jewelry) — **runtime-swappable**
+The default (`:root`) is the **Crystal** palette. `ThemeProvider` overwrites these four variables on `<html>` when the user picks another palette.
+
+| Token | Crystal default | Role |
+|---|---|---|
+| `--accent-1` | `#6E56FF` | Primary (violet) |
+| `--accent-2` | `#00E0CB` | Secondary (cyan) |
+| `--accent-3` | `#FF4FB0` | Tertiary (magenta) |
+| `--accent-warm` | `#FFB454` | Warm callouts (amber) |
+
+Particle/star colors derive from accents: `--particle-color-1: var(--accent-2)`, `--particle-color-2: var(--text-hi)`, `--particle-color-3: var(--accent-1)`.
+
+> **Rule:** never hardcode an accent hex in a component. Reference `var(--accent-1)` etc. (or the Tailwind classes `text-accent-1`, `bg-accent-2`, …) so palette switching works. Mix with `color-mix(in srgb, var(--accent-1) 30%, transparent)` for translucency — this pattern is used throughout `globals.css`.
+
+### The 5 runtime palettes
+Defined in [`lib/theme/palettes.ts`](../lib/theme/palettes.ts). Each has `accent1–4`, a `previewGradient`, and `glow1–3` rgba values.
+
+| Palette | `--accent-1` | `--accent-2` | `--accent-3` | `--accent-warm` | Vibe |
+|---|---|---|---|---|---|
+| **Crystal** (default) | `#6E56FF` | `#00E0CB` | `#FF4FB0` | `#FFB454` | Violet / cyan / magenta |
+| **Sovereign Ember** | `#E8400A` | `#F5A623` | `#FF6B35` | `#FCD34D` | Fire / amber |
+| **Glacier Deep** | `#0EA5E9` | `#10D9A0` | `#38BDF8` | `#FDE68A` | Ice blue / mint |
+| **Obsidian Sakura** | `#F1F5F9` | `#FB7185` | `#E879F9` | `#FDBA74` | Mono + rose |
+| **Void Chrome** | `#A3E635` | `#818CF8` | `#34D399` | `#FCD34D` | Lime / indigo |
+
+> Legacy alternates *Atelier* and *Hearth* still sit commented in `globals.css` from the original plan — superseded by the palette system above.
+
 ---
 
 ## 2. Typography
 
-We pair three families. Each has one job; none competes with the others.
+Fonts are loaded in [`app/layout.tsx`](../app/layout.tsx) via `next/font/google` and exposed as CSS variables. Fontshare faces (Clash Display, General Sans) are `@import`ed at the top of `globals.css`.
 
-### Display — *General Sans* (locked)
-For hero headlines and section openers. Geometric, modern, slightly characterful. Self-hosted via Fontshare files in `public/fonts/general-sans/`, loaded with `next/font/local` for zero-FOUT and no external CDN dependency.
-- Weights used: 500, 600, 700
-- Tracking: tight on display sizes (`-0.02em`), normal at body sizes
-- Used at 64px–140px on desktop hero
+**Loaded faces:** Inter, JetBrains Mono, Orbitron, Space Grotesk, Syncopate, Syne, Outfit (Google) + Clash Display, General Sans (Fontshare).
 
-### Body — *Inter*
-For all body copy, UI labels, buttons. The workhorse.
-- Weights: 400, 500, 600
-- `font-feature-settings: "cv02", "cv03", "cv04", "cv11"` for the cleaner glyph variants
-- Used at 14px (UI), 16px (body), 18px (emphasized body), 20–24px (lead paragraphs)
+### Font-style system (runtime-swappable)
+The user can switch the whole site's type via `ThemeProvider` (`fontStyle`), which sets `data-font-style` on `<html>`. Each style remaps three role variables — `--font-display-val`, `--font-body-val`, `--font-mono-val` — which the Tailwind theme bridges to `font-display` / `font-body` / `font-sans` / `font-mono`.
 
-### Mono — *JetBrains Mono*
-For technical accents — section numbers (`01 —`), code snippets, metadata, "system labels."
-- Weight 400 only
-- Used at 12px–14px, uppercase with `letter-spacing: 0.08em`
+| `data-font-style` | Name | Display | Body | Mono |
+|---|---|---|---|---|
+| `default` | Crystal Tech | Space Grotesk → General Sans → Inter | Inter | JetBrains Mono |
+| `cyber` | Aero Cyber | Orbitron | Space Grotesk → Inter | JetBrains Mono |
+| `wide` | Quantum Wide | Syncopate | Inter | JetBrains Mono |
+| `mono` | Neo-Chrono | JetBrains Mono | JetBrains Mono | JetBrains Mono |
+| `avant-garde` | Chroma Organic | Syne | Outfit → Inter | JetBrains Mono |
 
-### Type scale
+Use the semantic Tailwind classes (`font-display`, `font-body`, `font-mono`) — never name a specific family directly, or font switching breaks.
 
-```
-display-xl   140px / 0.95 / -0.03em / 600
-display-l     96px / 1.00 / -0.03em / 600
-display-m     72px / 1.05 / -0.025em / 600
-display-s     56px / 1.08 / -0.02em / 600
-heading-l     40px / 1.15 / -0.015em / 600
-heading-m     32px / 1.2  / -0.01em / 600
-heading-s     24px / 1.3  / -0.005em / 600
-body-l        20px / 1.55 / 500
-body-m        16px / 1.6  / 400
-body-s        14px / 1.6  / 400
-label         12px / 1.4  / 0.08em uppercase / 500 (mono)
-```
-
-Mobile scales: display sizes shrink by ~40%; body stays the same.
+The **`.yantra-electric-title`** class is the signature wordmark treatment: gradient text-fill (white → cyan → violet → pink), animated flow + pulse + scan + flicker via `::before`/`::after` and `data-text`. Wrapped by [`YantraElectricTitle`](./11-ui-components.md#yantraelectrictitle).
 
 ---
 
-## 3. Spacing & Layout
+## 3. Spacing, layout, radii
 
-Single 4px base unit. Used scale: `4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128, 160, 200`.
+**Container widths** (via [`Container`](./11-ui-components.md#container)): `narrow` 720px · `default` 1200px · `wide` 1440px · `full` 100%. Default horizontal padding `px-6 md:px-8`.
 
-**Container widths:**
-- `--container-narrow`: 720px (reading, blog posts)
-- `--container-default`: 1200px (most sections)
-- `--container-wide`: 1440px (showcase, gallery)
-- `--container-full`: 100vw (immersive scenes)
-
-**Section vertical rhythm:** sections get `min-height: 100vh` for cinematic moments, otherwise `padding-block: 160px` desktop / `96px` mobile. Generous breathing room is part of the "expensive" feeling.
-
-**Radii:**
-- `--r-sm` 8px (chips, small inputs)
-- `--r-md` 16px (buttons, small cards)
-- `--r-lg` 24px (default glass cards)
-- `--r-xl` 32px (hero cards, large surfaces)
-- `--r-full` 9999px (pills, avatars)
+**Radii tokens:** `--r-sm` 8px · `--r-md` 16px · `--r-lg` 24px · `--r-xl` 32px.
 
 ---
 
-## 4. Motion Tokens
+## 4. Glass / surface system (neumorphic)
+
+> **Reality check:** the live glass is **neumorphic**, not the frosted/blurred recipe in the original spec. `backdrop-filter` is explicitly disabled. Surfaces are the ink fill (`#0A0C16`) shaped by paired light/dark shadows.
+
+Four classes, three "elevations" + a primary:
+
+| Class | Resting shadow | Active/pressed |
+|---|---|---|
+| `.glass-light` | `--nm-raised-soft` | `--nm-sunken-soft`, transparent bg |
+| `.glass-medium` | `--nm-raised-medium` | `--nm-sunken-medium`, transparent bg |
+| `.glass-heavy` | `--nm-raised-large` | `--nm-sunken-deep`, transparent bg |
+| `.glass-primary` | `--nm-raised-medium` (primary buttons) | `--nm-sunken-medium`, transparent bg |
+
+All share: `background: #0A0C16`, `backdrop-filter: none`, `border: 1px solid rgba(255,255,255,0.02)`, a top inset highlight, and a 300ms `--ease-out-soft` transition. Adding the `.active` class (or `:active`) presses the surface *into* the page (inset shadow).
+
+**Neumorphic shadow tokens:**
+```
+--nm-raised-soft:   5px 5px 12px #020305, -5px -5px 12px #121626
+--nm-raised-medium: 8px 8px 18px #020305, -8px -8px 18px #121626
+--nm-raised-large:  12px 12px 28px #010204, -12px -12px 28px #14192d
+--nm-sunken-soft:   inset 3px 3px 6px #020305, inset -3px -3px 6px #121626
+--nm-sunken-medium: inset 5px 5px 10px #020305, inset -5px -5px 10px #121626
+--nm-sunken-deep:   inset 8px 8px 16px #010204, inset -8px -8px 16px #14192d
+--nm-line-soft:  rgba(255,255,255,0.04)
+--nm-line-faint: rgba(255,255,255,0.02)
+```
+
+The **nav pill** (`.nav-pill-scroll`) is the one surface that *does* use true frosted glass (`backdrop-filter: blur()`), driven by a `--scroll-t` custom property.
+
+---
+
+## 5. Motion tokens
 
 ```
---ease-out-soft:    cubic-bezier(0.22, 1, 0.36, 1)   /* default */
---ease-out-snap:    cubic-bezier(0.16, 1, 0.3, 1)    /* slightly snappier */
---ease-in-out:      cubic-bezier(0.65, 0, 0.35, 1)   /* symmetrical */
---ease-linear:      linear                            /* loops, borders */
+--ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1)   /* default */
+--ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1)    /* snappier */
+--ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1)   /* symmetrical */
 
---dur-fast:     200ms   /* micro: hover color, focus */
---dur-base:     400ms   /* default: card lifts, fades */
---dur-slow:     700ms   /* section reveals, scroll-tied */
---dur-cinematic: 1200ms /* hero, big transitions */
---dur-loop:     8000ms  /* background patterns, border sweeps */
+--dur-fast:      200ms    /* micro: hover, focus */
+--dur-base:      400ms    /* card lifts, fades */
+--dur-slow:      700ms    /* section reveals */
+--dur-cinematic: 1200ms   /* hero, big transitions */
+--dur-loop:      8000ms   /* loops, border sweeps */
 ```
 
-`prefers-reduced-motion`: all non-essential animation collapses to fade-only at 200ms. Looping background animations pause entirely.
+**Principles (from VISION, still honored):** slow is the new fast (700–1200ms reveals); `--ease-out-soft` is the default curve — no bounce, no linear except loops. `@property --angle` enables the animated conic border (`border-spin`).
+
+**`prefers-reduced-motion`:** `globals.css` collapses all animations/transitions to ~0ms and disables looping effects (electric title, etc.). `ThemeProvider` can also force this via `reducedMotionEnabled`, toggling `html.prefers-reduced-motion`.
+
+### Keyframe catalog (defined in `globals.css`)
+The file defines ~40 named keyframes. Grouped:
+- **Logo/hero:** `logo-planet-spin`, `logo-breathe`, `logo-heartbeat`, `logo-halo-spin`, `logo-pulse-ring`, `logo-shimmer`, `logo-chroma-r/c/g` (+ `-wide`), `logo-shockwave`, `logo-spark-orbit`, `logo-planet-arrive`, `hero-line-up`, `hero-fade-up`, `scroll-line-pulse`, `light-drift`.
+- **Electric title:** `yantra-electric-flow`, `-pulse`, `-scan`, `-flicker`.
+- **Backgrounds:** `mesh-flow`, `dot-drift`, `weave-flow`, `noise-wash`, `star-twinkle`, `float-drift-1/2/3`.
+- **Showcase/sections:** `ring-spin-cw/ccw`, `orbital-drift`, `forge-fill`, `forge-line-travel`, `radar-pulse`, `bar-scale`.
+- **UI/chrome:** `border-spin`, `pulse-glow`, `button-shine`, `marquee-left/right`, `signal-pulse`, `nav-overlay-in/out`, `nav-item-in/out`, `nav-footer-in`, `bar-{top,mid,bot}-{open,close}` (hamburger), `typing-bounce`, `chat-fade-in`.
+- **CRT/TV:** `crt-flicker`, `crt-distortion`, `light-pulse`, `click-ripple`.
 
 ---
 
-## 5. The Glass Card System
+## 6. Custom cursor
 
-A single `<GlassCard>` component will be the most-used UI primitive in the site. It must handle:
-
-- Three variants (light / medium / heavy)
-- Optional animated border (see below)
-- Hover lift (3D tilt + glow)
-- Inner content slots (eyebrow / title / body / cta / media)
-
-**Hover behavior (the signature card hover):**
-On pointer enter, the card:
-1. Lifts: `translateY(-4px)` and a subtle `rotateX/rotateY` tilt based on cursor position (max ±6°), 400ms `--ease-out-soft`.
-2. Glows: a soft accent halo appears behind via `box-shadow: 0 24px 80px -20px rgba(110, 86, 255, 0.4)`, 700ms.
-3. Border brightens: opacity 0.08 → 0.20, 400ms.
-4. A spotlight follows the cursor inside the card (radial gradient mask at cursor position) — this is the "pleasing common card hover" you asked for. Inspired by Linear / Vercel's product cards but warmer.
-
-Single source of truth for this behavior. Every card on the site uses it; we never reinvent.
+A site-wide custom cursor ([`Cursor`](./11-ui-components.md#cursor) + `.cursor-*` classes). Three designs selectable via `ThemeProvider` (`cursorStyle`): **arrow** (neon, rotated 15°), **crosshair**, **dot**. States: `--active` (hover over interactive), `--click` (press, fires `click-ripple` shockwave), `--text` (over text inputs, shows a glowing beam). Glows use accent drop-shadows. System cursor is hidden via `html.has-custom-cursor` only on `hover:hover`/`pointer:fine` devices; touch and reduced-motion fall back to native. Toggle via `customCursorEnabled`.
 
 ---
 
-## 6. The Animated Border System
+## 7. CRT / TV shell styling
 
-This is the second most-used primitive. Three border styles, all driven by CSS custom properties so they're cheap:
-
-### a) "Conic sweep" — rotating gradient border
-```css
-@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-
-.border-sweep::before {
-  content: '';
-  position: absolute; inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--angle),
-    transparent 0%,
-    var(--accent-1) 30%,
-    var(--accent-2) 50%,
-    var(--accent-3) 70%,
-    transparent 100%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  animation: spin var(--dur-loop) linear infinite;
-}
-@keyframes spin { to { --angle: 360deg; } }
-```
-Used on: primary CTA, hero cards, featured project tiles.
-
-### b) "Trace" — border that draws itself on scroll into view
-SVG path with `stroke-dasharray` animated from 100% → 0% as element enters viewport. Used on: section dividers, the "Forge" process steps, manifesto block.
-
-### c) "Pulse" — soft glowing border, no rotation
-For subtle emphasis without commanding attention. Used on: form inputs on focus, secondary cards.
-
----
-
-## 7. Background Pattern System
-
-Animated backgrounds in specific sections (per your reference to biotz / ptolemay). Four patterns built once, reused:
-
-1. **`<MeshGradient>`** — slow-flowing 4-color gradient blob (R3F shader). Used in hero and AI section.
-2. **`<DotField>`** — animated dot grid with parallax depth and mouse-reactive distortion. Used in capabilities and lab.
-3. **`<LineWeave>`** — animated SVG lines drawing in slow loops (think circuit traces). Used near process / forge section.
-4. **`<NoiseAura>`** — subtle film-grain + slow color wash, no geometry. Used as a soft texture layer beneath glass-heavy sections.
-
-All four implement a common interface so they're drop-in interchangeable per section.
+The `.tv-frame-*`, `.tv-screen-*`, `.crt-*`, and `.tv-console-*` classes implement the television app shell ([`TvFrame`](./11-ui-components.md#tvframe), [10-systems.md](./10-systems.md#tvcrt-shell)). Outer frame → bezel → screen glass → content, with optional CRT overlays (`.crt-scanlines`, `.crt-phosphor`, `.crt-curvature`) and a `crt-distortion` filter when `.crt-active`. Console tabs (`.tv-console-tabs-container`, `.tv-console-tab.active`) dock above the frame as the sticky nav on app pages.
 
 ---
 
 ## 8. Iconography
 
-- **Stroke icons**, 1.5px stroke weight, `lucide-react` as base library (clean, modern, comprehensive)
-- Custom icons where lucide falls short (drawn 24×24, same stroke weight)
-- Icons in technical labels use the mono font's "□ ▸ ▹ ◇ ◆" set for variety
+- `lucide-react` is the base icon library; `react-icons` is used in places (e.g. `StarSystem` tech logos).
+- Custom brand SVGs live in [`components/chrome/NavIcons.tsx`](./11-ui-components.md#navicons) (16×16, `stroke="currentColor"`, theme-aware).
 
 ---
 
-## 9. Imagery
-
-- No stock photos.
-- Project showcases use real product screenshots — composited into the **PhoneFrame** and **BrowserFrame** components (see Hero Concept doc).
-- Where decorative imagery is needed, prefer generated abstract textures (you bring from your tools) over photography.
-- All imagery clipped/masked with rounded corners matching radii scale.
+## 9. Utility classes worth knowing
+- `.btn-shine-target` / `.btn-shining` — diagonal shine sweep on button press (3 cycles).
+- `.no-scrollbar`, `.jimbo-chat-scrollbar`, `.whatsapp-scrollbar` — scrollbar treatments.
+- `.mobile-menu-open`, `body.app-mode-active`, `body.brochure-mode-active` — body-level layout locks.
+- `[data-layout="auth"]` — hides the global `<Header>` on login/signup via CSS.
 
 ---
 
-## All brand decisions locked.
+## Appendix — original VISION spec (superseded, kept for intent)
+
+The first brand doc specified: dark-mode-only, a single locked Crystal palette swapped via one CSS file, **frosted glass** (`backdrop-filter: blur(16–32px)`, white-tint gradients) in three variants, General Sans as the sole display face, and animated borders (conic-sweep / trace / pulse). The *intent* — jewel-bright accents on deep ink, glass as the dominant surface, slow confident motion — still drives the design. The *implementation* evolved to neumorphic surfaces, a runtime palette/font/cursor system, and the CRT shell. When intent and implementation conflict, **the implementation (this doc + `globals.css`) wins** for current work; raise it with the user if the divergence seems wrong.

@@ -1,6 +1,6 @@
 # 01 — Creative Direction
 
-> Status: **proposal**. Needs your reaction before we commit. Push back on anything that feels off.
+> **Layer: VISION.** This is the north-star intent — thesis, mood, voice, motion language. It still drives the design and is largely intact. Where the *implementation* has evolved (neumorphic glass instead of frosted, a CRT shell, runtime palettes), the REFERENCE docs win for current facts — see [02-brand-system.md](./02-brand-system.md) and [00-overview.md](./00-overview.md).
 
 ## The Thesis (locked)
 
