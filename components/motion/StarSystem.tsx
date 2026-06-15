@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useTheme } from "@/lib/theme/ThemeProvider";
+import { useCanvasControls } from "@/lib/hooks/useCanvasControls";
+import { CanvasHUD } from "@/components/motion/CanvasHUD";
 import { LogoMark } from "@/components/sections/01-arrival/LogoMark";
 import { IconType } from "react-icons";
 import { 
@@ -95,12 +96,7 @@ const planets: PlanetProps[] = [
   },
 ];
 
-const GlowingOrb = ({ color, size, name, Icon }: { color: string; size: number; name: string; Icon: IconType }) => {
-  const { themeMode } = useTheme();
-  // We use dark glassmorphism for dark mode, light glassmorphism for light mode
-  const glassBg = themeMode === "light" ? "rgba(255,255,255,0.7)" : "rgba(10,10,15,0.7)";
-  const borderColor = themeMode === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)";
-
+const GlowingOrb = ({ color, size, name, Icon, isSatellite = false }: { color: string; size: number; name: string; Icon: IconType; isSatellite?: boolean }) => {
   return (
     <div className="relative group flex flex-col items-center justify-center cursor-default">
       <div 
@@ -108,8 +104,8 @@ const GlowingOrb = ({ color, size, name, Icon }: { color: string; size: number; 
         style={{ 
           width: size, 
           height: size,
-          backgroundColor: glassBg,
-          border: `1px solid ${borderColor}`,
+          backgroundColor: "rgba(10,10,15,0.7)",
+          border: "1px solid rgba(255,255,255,0.1)",
           boxShadow: `0 0 ${size * 0.8}px ${color}, inset 0 0 ${size * 0.3}px ${color}40`,
         }}
       >
@@ -125,15 +121,15 @@ const GlowingOrb = ({ color, size, name, Icon }: { color: string; size: number; 
           className="relative z-10" 
           size={size * 0.55} 
           style={{ 
-            color: color === "#ffffff" ? (themeMode === "light" ? "#000" : "#fff") : color,
+            color: color === "#ffffff" ? "#fff" : color,
             filter: `drop-shadow(0 0 8px ${color})`
           }} 
         />
       </div>
       
       {/* Name Label permanently below the orb */}
-      <div className="absolute top-[110%] left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none mt-1">
-        <span className="px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white shadow-lg tracking-wide uppercase">
+      <div className="absolute top-[106%] left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
+        <span className={`px-1.5 py-0.5 rounded-full bg-[#08080f] border border-white/10 text-white shadow-lg tracking-wide uppercase font-semibold ${isSatellite ? "text-[7px]" : "text-[9px] sm:text-[10px]"}`}>
           {name}
         </span>
       </div>
@@ -142,19 +138,36 @@ const GlowingOrb = ({ color, size, name, Icon }: { color: string; size: number; 
 };
 
 export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
-  const { themeMode } = useTheme();
+  const { containerRef, zoom, panX, panY, isDragging, resetView } = useCanvasControls({
+    minZoom: 0.25,
+    maxZoom: 4,
+    zoomSensitivity: 0.001,
+  });
 
   return (
-    <div className={`absolute inset-0 overflow-hidden flex items-center justify-center ${themeMode === "light" ? "bg-[#ffffff]" : "bg-[#020205]"}`}>
+    <div
+      ref={containerRef}
+      className="absolute inset-0 flex items-center justify-center bg-[#020205] select-none"
+      style={{ cursor: isDragging ? "grabbing" : "grab" }}
+    >
       
-      {/* Background Deep Space Particles / Nebula */}
+      {/* Background nebula — stays fixed, does not zoom */}
       <div className="absolute inset-0 opacity-50 mix-blend-screen pointer-events-none" style={{
-        background: `radial-gradient(circle at 50% 50%, ${themeMode === "light" ? "rgba(110,86,255,0.03)" : "rgba(110,86,255,0.2)"} 0%, transparent 65%)`
+        background: "radial-gradient(circle at 50% 50%, rgba(110,86,255,0.2) 0%, transparent 65%)"
       }} />
 
+      {/* Canvas layer — receives zoom/pan transform */}
+      <div
+        className="absolute inset-0"
+        style={{
+          transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
+          transformOrigin: "0 0",
+          willChange: "transform",
+        }}
+      >
+
       {/* The System */}
-      {/* We scaled it down slightly more for mobile since orbits are larger now */}
-      <div className="relative w-full h-full flex items-center justify-center scale-[0.4] sm:scale-[0.6] md:scale-[0.85] xl:scale-100 origin-center transition-transform duration-700">
+      <div className="relative w-full h-full flex items-center justify-center scale-[0.4] sm:scale-[0.6] md:scale-[0.85] xl:scale-100 origin-center">
         
         {/* Draw Orbit Rings for Planets */}
         {planets.map((planet, i) => (
@@ -218,7 +231,7 @@ export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
                           transition={{ duration: sat.speed, ease: "linear", repeat: Infinity }}
                           className="pointer-events-auto"
                         >
-                          <GlowingOrb color={sat.color} size={36} name={sat.name} Icon={sat.icon} />
+                          <GlowingOrb color={sat.color} size={28} name={sat.name} Icon={sat.icon} isSatellite />
                         </motion.div>
                       </div>
                     </motion.div>
@@ -242,13 +255,18 @@ export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
             <LogoMark centerY="50%" onClick={onCenterClick} />
           </div>
           {/* Permanent Label for YantraCore below the center star */}
-          <div className="absolute top-[110%] whitespace-nowrap pointer-events-none">
-            <span className="px-3 py-1 text-sm font-bold rounded-full bg-[#111116] border border-accent-1/40 text-accent-1 shadow-[0_0_15px_rgba(110,86,255,0.4)] tracking-widest uppercase">
+          <div className="absolute top-[106%] whitespace-nowrap pointer-events-none">
+            <span className="px-4 py-1.5 text-lg font-extrabold rounded-full bg-[#0a0a12] border border-accent-1/50 text-accent-1 shadow-[0_0_20px_rgba(110,86,255,0.5)] tracking-widest uppercase">
               YantraCore
             </span>
           </div>
         </div>
       </div>
+
+      </div>{/* /canvas-layer */}
+
+      {/* HUD — zoom badge + reset button, always fixed on top */}
+      <CanvasHUD zoom={zoom} onReset={resetView} />
 
     </div>
   );
