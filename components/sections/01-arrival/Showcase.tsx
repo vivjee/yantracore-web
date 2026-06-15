@@ -265,7 +265,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
         </div>
 
       <div 
-        className="hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-12 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
+        className="showcase-solar hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-12 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
         style={{ perspective: 1200 }}
       >
         {/* Column 1: Left Column (Yantracore 1st, Restroverse 3rd) */}

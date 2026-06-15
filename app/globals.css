@@ -2869,6 +2869,19 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
   .orbital-rings { transform: scale(0.56) !important; }
 }
 
+/* Showcase solar-system (the /projects + Home desktop scene). It's engineered
+   for wide (xl+) viewports — its 270px floating cards plus outward offsets
+   overflow the narrow side columns on tablet/small-laptop widths. Scale the
+   whole constellation (cards, connectors, rings, logo) uniformly so the
+   spectacle fits, without disturbing the intricate per-card internals. The
+   scene only renders from md up (`hidden md:grid`), so phones are unaffected. */
+@media (max-width: 1279.98px) {
+  .showcase-solar { transform: scale(0.84); transform-origin: center center; }
+}
+@media (max-width: 1023.98px) {
+  .showcase-solar { transform: scale(0.66); transform-origin: center center; }
+}
+
 /* The satellite layer (each orbital page's content) — a gentle CSS-only fade on
    mount / route re-key. CSS, not JS, so the page ships visible in SSR HTML and
    reads with JS disabled; opacity-only so it stays mild and reduced-motion-safe. */

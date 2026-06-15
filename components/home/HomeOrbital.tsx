@@ -178,7 +178,7 @@ export function HomeOrbital() {
       <OrbitalHud />
 
       {/* ── DESKTOP / TABLET ─────────────────────────────────────────── */}
-      <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(340px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:gap-x-10">
+      <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(240px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:grid-cols-[1fr_minmax(340px,440px)_1fr] lg:gap-x-10">
         {/* Left — wayfinding (where to go next) */}
         <div className="pointer-events-auto flex flex-col items-end justify-center gap-4">
           <Rise delay={COL_BASE} x={-COL_SLIDE}>
