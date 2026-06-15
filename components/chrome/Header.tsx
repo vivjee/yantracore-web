@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { useTheme } from "@/lib/theme/ThemeProvider";
 import { audioSynth } from "@/lib/audio";
+import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 /* ─── Nav link definitions ───────────────────────────────────────────── */
 
@@ -14,6 +15,7 @@ const desktopLinks = [
   { label: "Studio",       href: "#studio" },
   { label: "Capabilities", href: "#capabilities" },
   { label: "Lab",          href: "#lab" },
+  { label: "Technologies", href: "/technologies" },
 ];
 
 /** Mobile full-screen menu links (same destinations) */
@@ -22,6 +24,7 @@ const mobileLinks = [
   { label: "Capabilities", href: "#capabilities" },
   { label: "Lab",          href: "#lab" },
   { label: "Signal",       href: "#signal" },
+  { label: "Technologies", href: "/technologies" },
 ];
 
 /**
@@ -301,8 +304,8 @@ function MobileMenu({
         </Link>
 
         {/* Logo watermark */}
-        <div className="flex items-center gap-3 opacity-25">
-          <img src="/images/logo/logo-white.svg" alt="" aria-hidden className="h-5 w-auto" />
+        <div className="flex items-center gap-3 opacity-40">
+          <ColorfulLogo size={20} animate={false} />
           <span className="font-mono text-[10px] text-text-faint tracking-widest uppercase">
             {new Date().getFullYear()} YantraCore
           </span>
@@ -313,7 +316,7 @@ function MobileMenu({
 }
 
 /* ─── Header Logo with Shiny Glass Effect ───────────────────────────── */
-function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
+export function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
   const [hovered, setHovered] = useState(false);
   const { themeMode } = useTheme();
 
@@ -344,7 +347,7 @@ function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
     "drop-shadow(0 0 8px rgba(0,224,203,0.75)) " +
     "drop-shadow(0 0 28px rgba(255,79,176,0.45))";
 
-  const logoSrc = "/images/logo/logo-white-logo-only.svg";
+  const logoSrc = "/images/logo/logo-white-no-text.svg";
   const logoToneFilter = themeMode === "light" ? "brightness(0) saturate(100%)" : "none";
   const ghostOpacity = themeMode === "light" ? "opacity-10" : "opacity-22";
   const ghostBlendMode = themeMode === "light" ? "multiply" : "screen";
@@ -511,12 +514,22 @@ function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
             </div>
           )}
 
-          {/* Primary logo — always sharp on top */}
-          <img
-            src={logoSrc}
-            alt="YantraCore"
+          {/* Primary logo — gradient mask fill, always sharp on top */}
+          <div
             className="w-full h-full object-contain relative z-10"
-            style={{ filter: logoToneFilter }}
+            style={{
+              WebkitMaskImage: `url('${logoSrc}')`,
+              maskImage: `url('${logoSrc}')`,
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+              background: "linear-gradient(135deg, #00e0cb 0%, #6e56ff 50%, #ff4fb0 100%)",
+              backgroundSize: "200% 200%",
+              animation: "yantra-electric-flow 8s linear infinite",
+            }}
           />
         </div>
       </div>

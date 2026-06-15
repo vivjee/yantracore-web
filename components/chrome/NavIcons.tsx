@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NavIcons.tsx
  * Custom premium SVG icon set for the YantraCore navigation bars.
  *
@@ -190,6 +190,35 @@ export function MoonCrescentIcon({ className = "" }: IconProps) {
       <line x1="12.5" y1="2.5" x2="12.5" y2="4.5" strokeWidth="1" />
       <line x1="11.5" y1="3.5" x2="13.5" y2="3.5" strokeWidth="1" />
       <circle cx="12.5" cy="3.5" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/* StellarOrbit — Atom with three electron orbit rings */
+export function StellarOrbitIcon({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2"
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true" focusable="false">
+      {/* Three elliptical orbit rings at 0°, 60°, 120° */}
+      <ellipse cx="8" cy="8" rx="6.5" ry="2.8" />
+      <ellipse cx="8" cy="8" rx="6.5" ry="2.8" transform="rotate(60 8 8)" />
+      <ellipse cx="8" cy="8" rx="6.5" ry="2.8" transform="rotate(120 8 8)" />
+      {/* Nucleus */}
+      <circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none" />
+      {/* Electron on first orbit */}
+      <circle cx="14.5" cy="8" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/* Contact — Envelope / transceiver icon */
+export function ContactIcon({ className = "" }: IconProps) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25"
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true" focusable="false">
+      <rect x="2" y="3.5" width="12" height="9" rx="1.5" />
+      <path d="M2 4.5 L8 8.5 L14 4.5" />
+      <circle cx="8" cy="8.5" r="0.7" fill="currentColor" stroke="none" />
     </svg>
   );
 }

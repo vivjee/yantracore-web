@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
+import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 const footerLinks = [
   { label: "Studio", href: "#studio" },
@@ -21,11 +22,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <img
-              src="/images/logo/logo-white.svg"
-              alt="YantraCore"
-              className="h-6 w-auto opacity-60"
-            />
+            <ColorfulLogo size={24} animate={false} />
             <span className="text-sm text-text-faint font-mono">
               © {new Date().getFullYear()} YantraCore
             </span>
