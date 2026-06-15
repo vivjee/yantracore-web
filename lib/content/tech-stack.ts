@@ -11,6 +11,29 @@ import {
   SiPrisma,
   SiEslint,
   SiJest,
+  // AI & Data Science
+  SiPython,
+  SiTensorflow,
+  SiPytorch,
+  SiOpenai,
+  // Cloud Solutions & Hosting
+  SiGooglecloud,
+  SiDocker,
+  SiKubernetes,
+  SiCloudflare,
+  // Database Management
+  SiPostgresql,
+  SiMongodb,
+  SiRedis,
+  // Application Development (mobile)
+  SiFlutter,
+  SiDart,
+  SiFirebase,
+  SiSwift,
+  // Design Services
+  SiFigma,
+  SiCanva,
+  SiBlender,
 } from "react-icons/si";
 import { FaPaw } from "react-icons/fa"; // Paw stands in for Zustand (bear logo)
 
@@ -92,6 +115,79 @@ export const techPlanets: TechPlanet[] = [
     satellites: [
       { name: "ESLint", radius: 65, speed: 13, color: "#4b32c3", icon: SiEslint, angleOffset: 30 },
       { name: "Jest", radius: 90, speed: 19, color: "#c21325", icon: SiJest, angleOffset: 210 },
+    ],
+  },
+  {
+    // AI & Data Science
+    name: "Python",
+    radius: 680,
+    speed: 95,
+    color: "#3776AB",
+    icon: SiPython,
+    angleOffset: 300,
+    direction: 1,
+    satellites: [
+      { name: "TensorFlow", radius: 55, speed: 10, color: "#FF6F00", icon: SiTensorflow, angleOffset: 0 },
+      { name: "PyTorch", radius: 82, speed: 15, color: "#EE4C2C", icon: SiPytorch, angleOffset: 140, direction: -1 },
+      { name: "OpenAI", radius: 108, speed: 20, color: "#10A37F", icon: SiOpenai, angleOffset: 250 },
+    ],
+  },
+  {
+    // Cloud Solutions & Web / Email Hosting
+    name: "Google Cloud",
+    radius: 800,
+    speed: 110,
+    color: "#4285F4",
+    icon: SiGooglecloud,
+    angleOffset: 30,
+    direction: -1,
+    satellites: [
+      { name: "Docker", radius: 58, speed: 11, color: "#2496ED", icon: SiDocker, angleOffset: 60 },
+      { name: "Kubernetes", radius: 85, speed: 16, color: "#326CE5", icon: SiKubernetes, angleOffset: 200, direction: -1 },
+      { name: "Cloudflare", radius: 110, speed: 21, color: "#F38020", icon: SiCloudflare, angleOffset: 320 },
+    ],
+  },
+  {
+    // Database Management
+    name: "PostgreSQL",
+    radius: 920,
+    speed: 125,
+    color: "#4169E1",
+    icon: SiPostgresql,
+    angleOffset: 200,
+    direction: 1,
+    satellites: [
+      { name: "MongoDB", radius: 60, speed: 12, color: "#47A248", icon: SiMongodb, angleOffset: 90 },
+      { name: "Redis", radius: 88, speed: 17, color: "#DC382D", icon: SiRedis, angleOffset: 270, direction: -1 },
+    ],
+  },
+  {
+    // Application Development (mobile / cross-platform)
+    name: "Flutter",
+    radius: 1040,
+    speed: 140,
+    color: "#02569B",
+    icon: SiFlutter,
+    angleOffset: 100,
+    direction: -1,
+    satellites: [
+      { name: "Dart", radius: 56, speed: 11, color: "#0175C2", icon: SiDart, angleOffset: 30 },
+      { name: "Firebase", radius: 82, speed: 16, color: "#FFCA28", icon: SiFirebase, angleOffset: 160, direction: -1 },
+      { name: "Swift", radius: 108, speed: 21, color: "#F05138", icon: SiSwift, angleOffset: 280 },
+    ],
+  },
+  {
+    // Design Services
+    name: "Figma",
+    radius: 1160,
+    speed: 155,
+    color: "#F24E1E",
+    icon: SiFigma,
+    angleOffset: 260,
+    direction: 1,
+    satellites: [
+      { name: "Canva", radius: 60, speed: 13, color: "#00C4CC", icon: SiCanva, angleOffset: 45 },
+      { name: "Blender", radius: 88, speed: 18, color: "#F5792A", icon: SiBlender, angleOffset: 225, direction: -1 },
     ],
   },
 ];

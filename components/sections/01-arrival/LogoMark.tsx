@@ -18,6 +18,9 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
  *   8. Chromatic aberration drifting lazily over 14 s
  *   9. Top specular highlight breathing opposite to the blobs
  *
+ * Props: `parallax` (mouse-tilt rAF loop, off for never-unmounting usages) and
+ * `spin` (the Y-axis planet rotation — set false to pin the mark front-facing).
+ *
  * HOVER — graceful awakening (not a punch, a bloom):
  *   • Planet spin pauses → snaps to front-facing with spring
  *   • Halo brightens and spins 4× faster
@@ -37,7 +40,7 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
  *         <Logo layers>  — chroma, primary, shimmer, specular
  *     <Sparks>           — hover-only orbital dots (z 20)
  */
-export function LogoMark({ centerY = "34%", onClick, parallax = true }: { centerY?: string; onClick?: () => void; parallax?: boolean }) {
+export function LogoMark({ centerY = "34%", onClick, parallax = true, spin = true }: { centerY?: string; onClick?: () => void; parallax?: boolean; spin?: boolean }) {
   const { themeMode, logoHeartbeatEnabled } = useTheme();
   const ghostBlendMode = themeMode === "light" ? "multiply" : "screen";
   const wrapRef   = useRef<HTMLDivElement>(null);
@@ -255,7 +258,10 @@ export function LogoMark({ centerY = "34%", onClick, parallax = true }: { center
           position: "relative",
           zIndex: 10,
           transformStyle: "preserve-3d",
-          animation: "logo-planet-spin 30s linear infinite",
+          // `spin={false}` keeps the mark front-facing (e.g. the Technologies
+          // star, where the logo is the fixed centre the system orbits). The
+          // ambient halos/aurora/parallax tilt all keep moving regardless.
+          animation: spin ? "logo-planet-spin 30s linear infinite" : "none",
           willChange: "transform",
         }}
       >

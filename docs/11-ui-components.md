@@ -184,7 +184,7 @@ Exports three entrance helpers (all extend `HTMLMotionProps<"div">`):
 `{ zoom: number; onReset: () => void }`. Fixed zoom/reset HUD for pannable canvases (pairs with `useCanvasControls`); shows a one-time hint stored in `localStorage`.
 
 ### StarSystem — `components/motion/StarSystem.tsx` · Client.
-`{ onCenterClick: () => void }`. The `/technologies` visualization: logo at center, four tech "planets" (React/Next/Node/TypeScript) on orbits with satellites, pan/zoom via `useCanvasControls`. Framer Motion + react-icons. (Feature-scale, listed here as it lives in `motion/`.)
+`{ onCenterClick: () => void }`. The `/technologies` visualization: a fixed (non-spinning) `LogoMark` star at center, nine tech "planets" on orbits — React, Next.js, Node.js, TypeScript, Python (AI/data), Google Cloud (cloud/hosting), PostgreSQL (databases), Flutter (mobile), Figma (design) — each carrying 2–3 satellite tools. Planets/satellites are data-driven from `lib/content/tech-stack.ts` (`techPlanets`); pan/zoom via `useCanvasControls`. Framer Motion + react-icons. (Feature-scale, listed here as it lives in `motion/`.)
 
 ---
 
@@ -238,7 +238,7 @@ Compact prismatic logomark — CSS mask over a flowing cyan→violet→pink grad
 
 Notable section pieces:
 - **`Showcase`** · Client · `{ inTv?: boolean }`. LogoMark center + orbital product cards; Swiper carousel on mobile; rotating ring arcs. Uses `LogoMark`, `AnimatedBorder`, `Eyebrow`, `YantraElectricTitle`, `audioSynth`.
-- **`LogoMark`** · Client · `{ centerY?="34%"; onClick? }`. The animated 2D holographic centerpiece (planet spin, parallax, bloom, halo, shimmer, chromatic aberration; elaborate hover).
+- **`LogoMark`** · Client · `{ centerY?="34%"; onClick?; parallax?=true; spin?=true }`. The animated 2D holographic centerpiece (planet spin, parallax, bloom, halo, shimmer, chromatic aberration; elaborate hover). `parallax={false}` disables the mouse-tilt rAF loop (for never-unmounting usages like the orbital `Sun`); `spin={false}` pins it front-facing (the `/technologies` star).
 - **`OrbitalCard`** · Client · `{ delay?="0s"; duration?="16s"; depth?: "front"|"mid"|"back"; className?; children }`. Drifting glass tile around the hero (hidden on mobile).
 
 ---

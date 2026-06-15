@@ -78,7 +78,7 @@ export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
       >
 
       {/* The System */}
-      <div className="relative w-full h-full flex items-center justify-center scale-[0.4] sm:scale-[0.6] md:scale-[0.85] xl:scale-100 origin-center">
+      <div className="relative w-full h-full flex items-center justify-center scale-[0.2] sm:scale-[0.3] md:scale-[0.42] xl:scale-[0.5] origin-center">
         
         {/* Draw Orbit Rings for Planets */}
         {techPlanets.map((planet, i) => (
@@ -163,7 +163,8 @@ export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
         {/* Scaled to half size for stellar system proportion */}
         <div className="absolute z-50 flex flex-col items-center justify-center" style={{ transform: "scale(0.5)", transformOrigin: "center center" }}>
           <div style={{ width: 260, height: 260 }}>
-            <LogoMark centerY="50%" onClick={onCenterClick} />
+            {/* spin disabled — the star is the fixed centre the system orbits */}
+            <LogoMark centerY="50%" onClick={onCenterClick} spin={false} />
           </div>
           {/* Permanent Label for YantraCore below the center star */}
           <div className="absolute top-[106%] whitespace-nowrap pointer-events-none">
