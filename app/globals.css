@@ -2945,3 +2945,153 @@ html[data-theme="light"] .orbital-node__emblem {
     transparent
   );
 }
+
+/* ── Orbital HUD — ambient mission-control instrumentation ─────────────
+   Frames the Home hub's negative space: viewfinder corners, a bottom
+   telemetry strip, and side spines. All purely decorative; the root is
+   aria-hidden + pointer-events-none so satellites above stay interactive.
+   Shown on md+ only (mobile owns its space) and hidden on short viewports
+   where the height lock would push it into the centre copy. */
+.orbital-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  display: none;
+}
+@media (min-width: 768px) {
+  .orbital-hud {
+    display: block;
+  }
+}
+@media (max-height: 560px) {
+  .orbital-hud {
+    display: none;
+  }
+}
+
+/* Viewfinder corner brackets */
+.orbital-hud__corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  opacity: 0.55;
+  border: 1px solid color-mix(in srgb, var(--accent-1) 32%, transparent);
+}
+.orbital-hud__corner--tl {
+  top: 18px;
+  left: 18px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.orbital-hud__corner--tr {
+  top: 18px;
+  right: 18px;
+  border-left: 0;
+  border-bottom: 0;
+}
+.orbital-hud__corner--bl {
+  bottom: 18px;
+  left: 18px;
+  border-right: 0;
+  border-top: 0;
+}
+.orbital-hud__corner--br {
+  bottom: 18px;
+  right: 18px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Bottom telemetry strip — readouts pinned to the corners so the centred
+   copy + CTAs stay clear between them. */
+.orbital-hud__strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 46px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-low);
+}
+.orbital-hud__readout {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.orbital-hud__sep {
+  opacity: 0.4;
+}
+.orbital-hud__dim {
+  opacity: 0.7;
+}
+.orbital-hud__clock {
+  color: var(--text-mid);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+}
+.orbital-hud__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-2);
+  animation: orbital-hud-pulse 2.4s ease-in-out infinite;
+}
+@keyframes orbital-hud-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.65);
+  }
+}
+
+/* Vertical side spines — value prop set in the gutters, xl screens only. */
+.orbital-hud__spine {
+  position: absolute;
+  top: 50%;
+  display: none;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--text-low);
+  opacity: 0.42;
+}
+.orbital-hud__spine--left {
+  left: 24px;
+  transform: translateY(-50%) rotate(180deg);
+}
+.orbital-hud__spine--right {
+  right: 24px;
+  transform: translateY(-50%);
+}
+@media (min-width: 1280px) {
+  .orbital-hud__spine {
+    display: inline-block;
+  }
+}
+
+/* Reduced motion — still the live pulse, keep the readout legible. */
+html.prefers-reduced-motion .orbital-hud__pulse {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbital-hud__pulse {
+    animation: none;
+  }
+}
