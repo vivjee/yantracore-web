@@ -10,7 +10,6 @@ import { BudgetEstimator } from "./BudgetEstimator";
 import {
   estimate,
   projectTypes,
-  scopes,
   timelines,
   bucketLabels,
   type ProjectTypeId,
@@ -51,8 +50,6 @@ export function BookConsultation() {
   const est = useMemo(() => estimate(projectType, scope, selectedAddOns), [projectType, scope, selectedAddOns]);
 
   const typeLabel = projectTypes.find((t) => t.id === projectType)?.label ?? projectType;
-  const scopeLabel = scopes.find((s) => s.id === scope)?.label ?? scope;
-  const timelineLabel = timelines.find((t) => t.id === timeline)?.label;
 
   const toggleAddOn = (id: string) =>
     setSelectedAddOns((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -122,8 +119,7 @@ export function BookConsultation() {
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-text-mid md:text-base">
-            Shape your project below, get an indicative budget instantly, and send it over — we’ll
-            reply with a tailored plan and quote.
+            Shape your project below and send it over — we’ll reply with a tailored plan and quote.
           </p>
         </div>
 
@@ -165,6 +161,18 @@ export function BookConsultation() {
               {/* Estimator */}
               <AnimatedBorder variant="sweep" radius={24} duration={9000}>
                 <div className="rounded-3xl glass-heavy p-6 md:p-8">
+                  <header className="mb-8 flex flex-col gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
+                      Step 01
+                    </span>
+                    <h2 className="text-xl font-semibold text-text-hi md:text-2xl">
+                      Configure your project
+                    </h2>
+                    <p className="text-sm leading-relaxed text-text-mid">
+                      Pick what you’re building, how big it is, and any extras — we’ll shape the plan
+                      and quote to match.
+                    </p>
+                  </header>
                   <BudgetEstimator
                     projectType={projectType}
                     scope={scope}
@@ -178,6 +186,17 @@ export function BookConsultation() {
 
               {/* Intake form */}
               <div className="flex flex-col gap-6 rounded-3xl glass-heavy p-6 md:p-8">
+                <header className="flex flex-col gap-2">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
+                    Step 02
+                  </span>
+                  <h2 className="text-xl font-semibold text-text-hi md:text-2xl">Your details</h2>
+                  <p className="text-sm leading-relaxed text-text-mid">
+                    Where to reach you, your timeline, and a few words about the project — we’ll reply
+                    with a tailored plan.
+                  </p>
+                </header>
+
                 {errorMessage && (
                   <div
                     role="alert"
@@ -190,26 +209,6 @@ export function BookConsultation() {
                     </div>
                   </div>
                 )}
-
-                <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-text-low">
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
-                    {typeLabel}
-                  </span>
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
-                    {scopeLabel}
-                  </span>
-                  {selectedAddOns.length > 0 && (
-                    <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
-                      +{selectedAddOns.length} add-on{selectedAddOns.length > 1 ? "s" : ""}
-                    </span>
-                  )}
-                  {timelineLabel && (
-                    <span className="rounded-full border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-text-mid">
-                      {timelineLabel}
-                    </span>
-                  )}
-                  <span className="ml-auto text-accent-2">{bucketLabels[est.bucket]}</span>
-                </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -284,8 +283,8 @@ export function BookConsultation() {
                   />
 
                   {/* Timeline */}
-                  <fieldset className="flex flex-col gap-3">
-                    <legend className="font-mono text-xs uppercase tracking-wider text-text-mid">
+                  <fieldset className="flex flex-col gap-4">
+                    <legend className="mb-1 font-mono text-xs uppercase tracking-wider text-text-mid">
                       Timeline{" "}
                       <span className="text-text-low normal-case tracking-normal">(optional)</span>
                     </legend>

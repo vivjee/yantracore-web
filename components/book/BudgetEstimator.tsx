@@ -36,10 +36,10 @@ export function BudgetEstimator({
   onToggleAddOn,
 }: BudgetEstimatorProps) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       {/* ── Project type ── */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+        <legend className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           What are we building?
         </legend>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
@@ -86,7 +86,7 @@ export function BudgetEstimator({
 
       {/* ── Scope ── */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+        <legend className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           How big is it?
         </legend>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -132,7 +132,7 @@ export function BudgetEstimator({
 
       {/* ── Add-ons ── */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-1 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
+        <legend className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-text-mid">
           Anything else? <span className="text-text-low normal-case tracking-normal">(optional)</span>
         </legend>
         <div className="flex flex-wrap gap-2">
