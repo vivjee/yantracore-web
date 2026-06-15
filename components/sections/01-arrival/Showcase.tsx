@@ -15,17 +15,20 @@ import "swiper/css/effect-creative";
 import "swiper/css/effect-cube";
 import type { LucideIcon } from "lucide-react";
 import { audioSynth } from "@/lib/audio";
+import { useTheme } from "@/lib/theme/ThemeProvider";
 import {
   Activity,
   Bot,
   Clock,
   Compass,
   Cpu,
+  ExternalLink,
   Heart,
   HeartHandshake,
   MapPin,
   MoreVertical,
   Phone,
+  RotateCcw,
   Send,
   Sparkles,
   Star,
@@ -36,6 +39,12 @@ import {
   Video,
   Waves,
   Wifi,
+  Terminal,
+  Zap,
+  RefreshCw,
+  Play,
+  CheckCircle,
+  Server,
 } from "lucide-react";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { LogoMark } from "../01-arrival/LogoMark";
@@ -80,36 +89,37 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
 
   const mobileProjects = [
     {
+      name: "YANTRACORE",
+      logoImg: "/images/logo/yantracore_logo.png",
+      desc: "Build amazing apps.",
+      accent: "var(--accent-2)",
+      url: "/channels/yantracore"
+    },
+    {
       name: "JIMBO",
       logoImg: "/images/logo/jimbo_logo.png",
       desc: "Your 24/7 AI business assistant.",
       accent: "var(--accent-1)",
-      url: "https://jimbo.yantracore.com/"
+      url: "/channels/jimbo"
     },
     {
       name: "RESTROVERSE",
       logoImg: "/images/logo/restroverse_logo.png",
       desc: "Discover your perfect experience.",
       accent: "var(--accent-2)",
-      url: "https://restroverse.app"
+      url: "/channels/restroverse"
     },
     {
       name: "SHRAMDAN",
       logoImg: "/images/logo/shramdaan_logo.png",
       desc: "Come together and solve social problems.",
       accent: "var(--accent-warm)",
-      url: "https://shramdan.org"
-    },
-    {
-      name: "YANTRACORE",
-      logoImg: "/images/logo/yantracore_logo.png",
-      desc: "Build amazing apps.",
-      accent: "var(--accent-2)",
-      url: "/stats"
+      url: "/channels/shramdan"
     }
   ];
 
-  const handleMobileTap = (url: string) => {
+  const handleMobileTap = (url?: string) => {
+    if (!url) return;
     if (url.startsWith("http")) {
       window.open(url, "_blank", "noopener,noreferrer");
     } else {
@@ -117,143 +127,263 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
     }
   };
 
+  const [syncTick, setSyncTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSyncTick((prev) => prev + 1);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const cardData: Array<{ component: React.ReactNode; name: string; url?: string }> = [
+    { component: <CardCoreStatus key="core-status" syncTick={syncTick} />, name: "YANTRACORE", url: "/channels/yantracore" },
+    { component: <CardJimbo key="jimbo" />, name: "JIMBO", url: "/channels/jimbo" },
+    { component: <CardRestroverse key="restroverse" syncTick={syncTick} />, name: "RESTROVERSE", url: "/channels/restroverse" },
+    { component: <CardShramdan key="shramdan" syncTick={syncTick} />, name: "SHRAMDAN", url: "/channels/shramdan" },
+  ];
+
   return (
     <section
       id="showcase"
       className="relative w-full overflow-hidden"
       style={{ minHeight: inTv ? "100%" : "100svh" }}
     >
-
-      {/* ── Center Galaxy/Logo System (scaled down on mobile, 30% on desktop) ── */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5]"
-        style={{ transformOrigin: "center center" }}
-        initial={{ scale: 0.2, rotate: -25, opacity: 0 }}
-        animate={{ scale: isMobile ? 0.38 : 0.7, rotate: 0, opacity: 1 }}
-        transition={{
-          type: "spring",
-          stiffness: 40,
-          damping: 15,
-          delay: 0.1,
-        }}
-      >
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* Rotating SVG orbital rings */}
-          <div className="absolute inset-0 z-[2] flex items-center justify-center">
-            <OrbitalRings />
-          </div>
-
-          {/* Deep glow behind logo */}
-          <div
-            className="absolute inset-0 z-[4] pointer-events-none flex items-center justify-center"
-            aria-hidden
-          >
-            <div
-              style={{
-                width: 480,
-                height: 480,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(110,86,255,0.22) 0%, rgba(0,224,203,0.1) 40%, transparent 68%)",
-                filter: "blur(50px)",
-                animation: "logo-breathe 9s ease-in-out infinite",
-              }}
-            />
-          </div>
-
-          {/* Logo centre */}
-          <div className="absolute inset-0 z-[5] pointer-events-none flex items-center justify-center">
-            <LogoCentered />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── Orbital product cards ── */}
-      <div className="absolute inset-0 z-[6] pointer-events-none">
-        <OrbitalCards />
-      </div>
-
-      <motion.div
-        className="showcase-copy-stack pointer-events-none absolute inset-x-0 z-[10] hidden w-full md:flex"
-        style={{
-          top: inTv
-            ? "calc(50% + clamp(8rem, 14vh, 12rem))"
-            : "calc(50% + clamp(9rem, 16vh, 14rem))",
-        }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
-      >
-        <BrandCopy isMobile={isMobile} />
-      </motion.div>
-
-      {/* ── Foreground text (above everything) ── */}
-      <div
-        className={`relative z-[10] flex flex-col pointer-events-none ${
-          inTv 
-            ? "h-full pt-6 pb-6 md:pt-16 md:pb-20" 
-            : "min-h-screen pt-12 pb-8 md:pt-24 md:pb-16"
-        }`}
-      >
-        <div
-          className={inTv ? "h-[56%]" : "h-[56svh]"}
-          style={isLargestScreen ? { height: inTv ? "62%" : "64svh" } : undefined}
-        />
-
-        {/* Mobile Projects Grid */}
-        <div className="block md:hidden pointer-events-auto w-full max-w-[320px] mx-auto px-2 mt-5 mb-4 z-20 order-last">
-          <div className="grid grid-cols-2 gap-2.5">
-            {mobileProjects.map((proj, idx) => {
-              return (
-                <motion.div
-                  key={proj.name}
-                  onClick={() => handleMobileTap(proj.url)}
-                  className="glass-light rounded-xl p-2.5 flex flex-col gap-1 cursor-pointer border border-white/5 active:scale-95 transition-transform select-none"
-                  style={{
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
-                  }}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + idx * 0.1 }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div 
-                      className="w-5.5 h-5.5 rounded-md flex items-center justify-center relative bg-white/[0.03] border border-white/10 overflow-hidden"
-                    >
-                      <div 
-                        className="absolute inset-0 opacity-20 filter blur-[2px] rounded-md"
-                        style={{ background: proj.accent }}
-                      />
-                      <Image
-                        src={proj.logoImg}
-                        alt={`${proj.name} logo`}
-                        width={22}
-                        height={22}
-                        className="object-cover relative z-10"
-                      />
-                    </div>
-                    <span className="text-[11px] font-semibold text-text-hi tracking-wide truncate">
-                      {proj.name}
-                    </span>
-                  </div>
-                  <p className="text-[8.5px] leading-normal text-text-low font-normal line-clamp-2">
-                    {proj.desc}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Brand copy below the center logo */}
+      {/* ── MOBILE ONLY LAYOUT ── */}
+      <div className="block md:hidden relative w-full h-full min-h-[100svh]">
+        {/* Center Galaxy/Logo System for Mobile */}
         <motion.div
-          className="showcase-copy-stack flex md:hidden"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
+          className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5]"
+          style={{ transformOrigin: "center center" }}
+          initial={{ scale: 0.2, rotate: -25, opacity: 0 }}
+          animate={{ scale: 0.38, rotate: 0, opacity: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 40,
+            damping: 15,
+            delay: 0.1,
+          }}
         >
-          <BrandCopy isMobile={isMobile} />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <div className="absolute inset-0 z-[2] flex items-center justify-center">
+              <OrbitalRings />
+            </div>
+
+            <div
+              className="absolute inset-0 z-[4] pointer-events-none flex items-center justify-center"
+              aria-hidden
+            >
+              <div
+                style={{
+                  width: 320,
+                  height: 320,
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(110,86,255,0.22) 0%, rgba(0,224,203,0.1) 40%, transparent 68%)",
+                  filter: "blur(50px)",
+                  animation: "logo-breathe 9s ease-in-out infinite",
+                }}
+              />
+            </div>
+
+            <div className="absolute inset-0 z-[5] pointer-events-none flex items-center justify-center">
+              <LogoCentered />
+            </div>
+          </div>
         </motion.div>
+
+        {/* Foreground copy and mobile projects grid */}
+          <div className="h-[30svh]" />
+          
+          <div className="flex-1 flex flex-col justify-center pointer-events-auto">
+            {/* Brand copy */}
+            <motion.div
+              className="showcase-copy-stack flex mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
+            >
+              <BrandCopy isMobile={true} />
+            </motion.div>
+
+            {/* Mobile Projects Grid */}
+            <div className="w-full max-w-[320px] mx-auto px-2 mb-6 z-20">
+              <div className="grid grid-cols-2 gap-2.5">
+                {mobileProjects.map((proj, idx) => {
+                  return (
+                    <motion.div
+                      key={proj.name}
+                      className="glass-light rounded-xl p-2.5 flex flex-col gap-1 cursor-pointer border border-white/5 select-none active:scale-95 transition-transform"
+                      style={{
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)"
+                      }}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + idx * 0.1 }}
+                      onClick={() => handleMobileTap(proj.url)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-5.5 h-5.5 rounded-md flex items-center justify-center relative bg-white/[0.03] border border-white/10 overflow-hidden"
+                        >
+                          <div 
+                            className="absolute inset-0 opacity-20 filter blur-[2px] rounded-md"
+                            style={{ background: proj.accent }}
+                          />
+                          <Image
+                            src={proj.logoImg}
+                            alt={`${proj.name} logo`}
+                            width={22}
+                            height={22}
+                            className="object-cover relative z-10"
+                          />
+                        </div>
+                        <span className="text-[11px] font-semibold text-text-hi tracking-wide truncate">
+                          {proj.name}
+                        </span>
+                      </div>
+                      <p className="text-[8.5px] leading-normal text-text-low font-normal line-clamp-2">
+                        {proj.desc}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <div 
+        className="hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-12 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
+        style={{ perspective: 1200 }}
+      >
+        {/* Column 1: Left Column (Yantracore 1st, Restroverse 3rd) */}
+        <div className="flex flex-col gap-12 lg:gap-16 items-end justify-center w-full h-full pointer-events-auto">
+          {/* Card 1: Yantracore (index 0) */}
+          <FloatingCard
+            key={0}
+            side="left"
+            vert="top"
+            delay="0s"
+            duration="14s"
+            depth="front"
+            url={cardData[0].url}
+            projectName={cardData[0].name}
+            xOffset={-120}
+            yOffset={-120}
+            index={0}
+          >
+            {cardData[0].component}
+          </FloatingCard>
+
+          {/* Card 3: Restroverse (index 2) */}
+          <FloatingCard
+            key={2}
+            side="left"
+            vert="bottom"
+            delay="-9s"
+            duration="18s"
+            depth="mid"
+            url={cardData[2].url}
+            projectName={cardData[2].name}
+            xOffset={-120}
+            yOffset={120}
+            index={2}
+          >
+            {cardData[2].component}
+          </FloatingCard>
+        </div>
+
+        {/* Column 2: Center Column */}
+        <div className="flex flex-col items-center justify-center w-full h-full relative pointer-events-none min-h-[480px] -mt-16 lg:-mt-24">
+          <motion.div
+            className="relative w-full aspect-square flex items-center justify-center pointer-events-none"
+            style={{ transformOrigin: "center center" }}
+            initial={{ scale: 0.2, rotate: -25, opacity: 0 }}
+            animate={{ scale: 0.7, rotate: 0, opacity: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 40,
+              damping: 15,
+              delay: 0.1,
+            }}
+          >
+            {/* Rotating SVG orbital rings */}
+            <div className="absolute inset-0 z-[2] flex items-center justify-center">
+              <OrbitalRings />
+            </div>
+
+            {/* Deep glow behind logo */}
+            <div
+              className="absolute inset-0 z-[4] pointer-events-none flex items-center justify-center"
+              aria-hidden
+            >
+              <div
+                style={{
+                  width: 420,
+                  height: 420,
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(110,86,255,0.22) 0%, rgba(0,224,203,0.1) 40%, transparent 68%)",
+                  filter: "blur(50px)",
+                  animation: "logo-breathe 9s ease-in-out infinite",
+                }}
+              />
+            </div>
+
+            {/* Logo centre */}
+            <div className="relative w-[320px] h-[320px] z-[5] flex items-center justify-center pointer-events-auto">
+              <LogoCentered />
+            </div>
+          </motion.div>
+
+          {/* Brand Copy below Logo */}
+          <motion.div
+            className="-mt-10 lg:-mt-20 xl:-mt-28 z-[10] flex w-full justify-center pointer-events-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.45 }}
+          >
+            <BrandCopy isMobile={false} />
+          </motion.div>
+        </div>
+
+        {/* Column 3: Right Column (Jimbo 2nd, Shramdan 4th) */}
+        <div className="flex flex-col gap-12 lg:gap-16 items-start justify-center w-full h-full pointer-events-auto">
+          {/* Card 2: Jimbo (index 1) */}
+          <FloatingCard
+            key={1}
+            side="right"
+            vert="top"
+            delay="-5s"
+            duration="17s"
+            depth="mid"
+            url={cardData[1].url}
+            projectName={cardData[1].name}
+            xOffset={120}
+            yOffset={-120}
+            index={1}
+          >
+            {cardData[1].component}
+          </FloatingCard>
+
+          {/* Card 4: Shramdan (index 3) */}
+          <FloatingCard
+            key={3}
+            side="right"
+            vert="bottom"
+            delay="-13s"
+            duration="15s"
+            depth="front"
+            url={cardData[3].url}
+            projectName={cardData[3].name}
+            xOffset={120}
+            yOffset={120}
+            index={3}
+          >
+            {cardData[3].component}
+          </FloatingCard>
+        </div>
       </div>
     </section>
   );
@@ -276,14 +406,16 @@ function BrandCopy({ isMobile }: { isMobile: boolean }) {
         className="max-w-[320px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] md:max-w-none md:text-xs md:tracking-[0.24em]"
         style={{ color: "var(--text-mid)" }}
       >
-        Software for People, Businesses & Society
+        Building a Better World Through Technology
       </p>
       <p
-        className="max-w-[300px] text-xs leading-relaxed md:max-w-xl md:text-sm"
+        className="max-w-[300px] text-xs leading-relaxed md:max-w-2xl md:text-sm"
         style={{ color: "var(--text-low)" }}
       >
-        We turn bold ideas into useful apps -
-        <br />fast, elegant, intelligent, and built to serve the real world.
+        We believe technology should do more than solve problems. It should improve lives, empower people, and help build a smarter, more connected world. At YantraCore, we transform bold ideas into powerful digital products - apps, platforms, and intelligent systems that are fast, elegant, practical, and built to make life simpler, work smarter, and communities stronger.
+        <br />
+        <br />
+        Technology with purpose. Built for impact.
       </p>
     </div>
   );
@@ -403,61 +535,6 @@ function OrbitalRings() {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   OrbitalCards — four glass cards placed at the four quadrants.
-   On desktop they float and drift. On mobile they stack below.
-   ───────────────────────────────────────────────────────────────── */
-function OrbitalCards() {
-  const [syncTick, setSyncTick] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSyncTick((prev) => prev + 1);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Positions: top-left, top-right, bottom-left, bottom-right
-  const slots = [
-    { side: "left",  vert: "top",    delay: "0s",    duration: "14s", depth: "front" as const, xOffset: -120, yOffset: -120 },
-    { side: "right", vert: "top",    delay: "-5s",   duration: "17s", depth: "mid"   as const, xOffset: 120, yOffset: -120 },
-    { side: "left",  vert: "bottom", delay: "-9s",   duration: "18s", depth: "mid"   as const, xOffset: -120, yOffset: 120 },
-    { side: "right", vert: "bottom", delay: "-13s",  duration: "15s", depth: "front" as const, xOffset: 120, yOffset: 120 },
-  ];
-
-  // Cards pulled inward to match the site container edge:
-  // max-w-[1200px] centred + px-8 (32px) padding ≈ calc((100% - 1200px)/2 + 2rem) on wide screens.
-  // We use a CSS clamp so it collapses to px-6 on narrow viewports.
-
-  const cardData = [
-    { component: <CardJimbo key="jimbo" />, url: "https://jimbo.yantracore.com/", name: "JIMBO" },
-    { component: <CardRestroverse key="restroverse" syncTick={syncTick} />, url: "https://restroverse.app", name: "RESTROVERSE" },
-    { component: <CardShramdan key="shramdan" syncTick={syncTick} />, url: "https://shramdan.org", name: "SHRAMDAN" },
-    { component: <CardCoreStatus key="core-status" syncTick={syncTick} />, url: "/stats", name: "YANTRACORE" },
-  ];
-
-  return (
-    <>
-      {slots.map((slot, i) => (
-        <FloatingCard
-          key={i}
-          side={slot.side as "left" | "right"}
-          vert={slot.vert as "top" | "bottom"}
-          delay={slot.delay}
-          duration={slot.duration}
-          depth={slot.depth}
-          url={cardData[i].url}
-          projectName={cardData[i].name}
-          xOffset={slot.xOffset}
-          yOffset={slot.yOffset}
-          index={i}
-        >
-          {cardData[i].component}
-        </FloatingCard>
-      ))}
-    </>
-  );
-}
 
 type Depth = "front" | "mid" | "back";
 
@@ -493,9 +570,18 @@ function FloatingCard({
   index?: number;
 }) {
   const router = useRouter();
+  const { themeMode } = useTheme();
   const cardRef = useRef<HTMLDivElement>(null);
   const [lineTarget, setLineTarget] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [isEntering, setIsEntering] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsEntering(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Framer Motion motion values for drift displacements
   const driftX = useMotionValue(0);
@@ -592,11 +678,7 @@ function FloatingCard({
   });
 
   const pos: React.CSSProperties = {
-    position: "absolute",
-    ...(side === "left"
-      ? { left: "clamp(1.5rem, calc((100% - 1400px) / 2 + 2rem), 8rem)" }
-      : { right: "clamp(1.5rem, calc((100% - 1400px) / 2 + 2rem), 8rem)" }),
-    ...(vert === "top" ? { top: "10%" } : { bottom: "8%" }),
+    position: "relative",
   };
 
   const handleMouseLeave = () => {
@@ -612,44 +694,58 @@ function FloatingCard({
 
   const handleMouseDown = () => {
     audioSynth.playClick();
-    scale.set(1);
+    scale.set(0.975);
   };
 
   const handleMouseUp = () => {
     scale.set(1);
   };
 
-  // Removed direct card click navigation logic as action buttons handle it now
-  const handleTap = () => {};
-  const handleKeyDown = (e: React.KeyboardEvent) => {};
+  const handleCardClick = () => {
+    if (url) {
+      router.push(url);
+    }
+  };
 
   const accentColor =
-    side === "left" && vert === "top"
-      ? "var(--accent-1)"
-      : side === "right" && vert === "top"
-      ? "var(--accent-2)"
-      : side === "left" && vert === "bottom"
-      ? "var(--accent-warm)"
-      : "var(--accent-2)";
+    index === 0
+      ? "var(--accent-2)" // Yantracore
+      : index === 1
+      ? "var(--accent-1)" // Jimbo
+      : index === 2
+      ? "var(--accent-2)" // Restroverse
+      : "var(--accent-warm)"; // Shramdan
+
+  const isReady = lineTarget.x !== 0 || lineTarget.y !== 0;
 
   return (
     <motion.div
       className="hidden md:block pointer-events-auto"
-      style={{ ...pos, ...depthStyle[depth], perspective: 1000, zIndex: 20 }}
-      initial={{ x: xOffset, y: yOffset, opacity: 0, scale: 0.6 }}
-      animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+      style={{ 
+        ...pos, 
+        ...depthStyle[depth], 
+        perspective: 1000, 
+        zIndex: 20,
+        transformOrigin: "center center",
+      }}
+      initial={{ 
+        opacity: 0,
+        scale: 0.85,
+      }}
+      animate={{ 
+        opacity: 1,
+        scale: 1,
+      }}
       transition={{
-        type: "spring",
-        stiffness: 55,
-        damping: 14,
-        delay: 0.6 + index * 0.15,
+        scale: { type: "spring", stiffness: 55, damping: 14, delay: 0.45 + index * 0.15 },
+        opacity: { duration: 0.7, ease: "easeOut", delay: 0.45 + index * 0.15 }
       }}
     >
       {/* Outer drift wrapper */}
       <motion.div style={{ x: driftX, y: driftY }}>
         
         {/* Dynamic Bezier Connector Line */}
-        {lineTarget.x !== 0 && (
+        {isReady && (
           <svg
             className="absolute pointer-events-none overflow-visible"
             style={{
@@ -672,7 +768,9 @@ function FloatingCard({
               fill="none"
               stroke={accentColor}
               strokeWidth="4"
-              opacity="0.12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.12 }}
+              transition={{ delay: 1.0 + index * 0.15, duration: 0.8 }}
               className="filter blur-sm"
             />
             <motion.path
@@ -681,28 +779,33 @@ function FloatingCard({
               stroke={`url(#connector-grad-${side}-${vert})`}
               strokeWidth="1.5"
               strokeDasharray="4 6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.0 + index * 0.15, duration: 0.8 }}
             />
             <motion.circle
               cx={circleCx}
               cy={circleCy}
               r="2.5"
               fill={accentColor}
-              opacity="0.6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              transition={{ delay: 1.0 + index * 0.15, duration: 0.8 }}
             />
           </svg>
         )}
 
         {/* Card wrapper block */}
         <div
-          className="cursor-default"
+          className={url ? "cursor-pointer" : "cursor-default"}
         >
           <AnimatedBorder 
             variant="sweep" 
             radius={24} 
             duration={8000}
             style={{
-              "--border-opacity": isHovered ? 1 : 0,
-              "--border-transition-duration": "0.8s",
+              "--border-opacity": isEntering ? 1 : (isHovered ? 1 : 0.15),
+              "--border-transition-duration": isEntering ? "1.5s" : "0.8s",
             } as React.CSSProperties}
           >
             {/* Interactive card surface */}
@@ -712,15 +815,26 @@ function FloatingCard({
               onMouseLeave={handleMouseLeave}
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
-              className="glass-medium rounded-[24px] p-4 w-[270px] h-[325px] relative overflow-hidden select-none focus-visible:outline-none group flex flex-col"
+              onClick={handleCardClick}
+              className="glass-medium rounded-[24px] p-4 w-[270px] h-[360px] relative overflow-hidden select-none focus-visible:outline-none group flex flex-col cursor-default"
               animate={{
-                boxShadow: isHovered
-                  ? `0 30px 60px -15px rgba(0,0,0,0.95), 
-                     0 0 40px -5px color-mix(in srgb, ${accentColor} 45%, transparent), 
-                     inset 0 1px 0 rgba(255,255,255,0.2)`
-                  : `0 0px 0px 0px rgba(0,0,0,0), 
-                     inset 0 1px 0 rgba(255,255,255,0.08)`,
+                boxShadow: isEntering
+                  ? `var(--nm-raised-medium), 0 0 35px color-mix(in srgb, ${accentColor} 45%, transparent)`
+                  : isHovered
+                  ? themeMode === "light"
+                    ? undefined
+                    : `var(--nm-raised-medium), 0 0 25px color-mix(in srgb, ${accentColor} 30%, transparent)`
+                  : themeMode === "light"
+                  ? undefined
+                  : `var(--nm-raised-medium), 0 0 10px color-mix(in srgb, ${accentColor} 10%, transparent)`,
               }}
+              whileTap={
+                themeMode === "light"
+                  ? undefined
+                  : {
+                      boxShadow: `var(--nm-sunken-medium), 0 0 12px color-mix(in srgb, ${accentColor} 20%, transparent)`,
+                    }
+              }
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 scale: scale,
@@ -749,25 +863,25 @@ function FloatingCard({
   );
 }
 
-interface ProjectCardHeaderProps {
+interface ProductCardHeaderProps {
   logoImg: string;
   unicodeChar: string;
   title: string;
   description?: string;
-  statusDotColor: string;
   accentColor: string;
-  isLive?: boolean;
+  url?: string;
+  showExternalLink?: boolean;
 }
 
-function ProjectCardHeader({
+function ProductCardHeader({
   logoImg,
   unicodeChar,
   title,
   description,
-  statusDotColor,
   accentColor,
-  isLive = false,
-}: ProjectCardHeaderProps) {
+  url,
+  showExternalLink = true,
+}: ProductCardHeaderProps) {
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
@@ -815,13 +929,21 @@ function ProjectCardHeader({
         </div>
       </div>
 
-      {/* ── Status Dot towards the right ── */}
-      <span className="relative flex items-center justify-center w-1.5 h-1.5 mr-0.5">
-        {isLive && (
-          <span className={`absolute w-3 h-3 rounded-full animate-ping opacity-60 ${statusDotColor}`} />
-        )}
-        <span className={`relative w-1.5 h-1.5 rounded-full ${statusDotColor}`} />
-      </span>
+      {/* ── Open in New Tab Icon towards the right ── */}
+      {showExternalLink && url && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-low hover:text-text-hi transition-all p-1.5 pointer-events-auto mr-0.5 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),_0_2px_4px_rgba(0,0,0,0.2)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+          title="Open in new tab"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      )}
     </div>
   );
 }
@@ -830,115 +952,165 @@ function ProjectCardHeader({
    CardJimbo — WhatsApp / AI agent scene
    ============================================================ */
 const CONVERSATION_FLOW = [
-  { sender: "user", text: "Is the Aurora villa available tonight?" },
+  { sender: "user", text: "Is a lake view room at Rupakot Resort available tonight?" },
   { sender: "jimbo", text: "Checking the live calendar... 🏨" },
-  { sender: "jimbo", text: "Yes! The Aurora Villa is open. Would you like me to book it?" },
+  { sender: "jimbo", text: "Yes! A lake view room at Rupakot Resort is open. Would you like me to book it?" },
   { sender: "user", text: "Awesome! Yes, please book it." },
   { sender: "jimbo", text: "Processing reservation... 💳" },
-  { sender: "jimbo", text: "Booking confirmed! 🌟 Check your email for details." },
+  { sender: "jimbo", text: "Booking confirmed! 🌟 Check your WhatsApp/email for details." },
   { sender: "user", text: "Perfect! Thanks for the quick help." },
+  { sender: "jimbo", text: "You're welcome! 💚" },
 ] as const;
 
-const JIMBO_REPLIES = [
-  "Hi there! I'm Jimbo, a custom AI agent. I can handle booking, support, and leads for your business. 🚀",
-  "I sync natively with RestoReverse, databases, and calendars to automate client bookings seamlessly.",
-  "You can integrate me on WhatsApp, Instagram, Telegram, or SMS. Would you like a demo?",
-  "I am built with state-of-the-art NLP models trained on your brand guidelines.",
-  "Interested? Click the 'Hire Jimbo' button below to build an agent for your business!"
-];
 
 function CardJimbo() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Array<{ sender: "user" | "jimbo"; text: string }>>([]);
-  const [stepIndex, setStepIndex] = useState(0);
   const [isInteractive, setIsInteractive] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [typingSender, setTypingSender] = useState<"user" | "jimbo" | null>(null);
+  const [isSending, setIsSending] = useState(false);
+  const [resetNonce, setResetNonce] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const isInteractiveRef = useRef(isInteractive);
+  const inputScrollRef = useRef<HTMLParagraphElement>(null);
+
+  // Scroll to the end of the input text as it is typed to keep the typing visible
+  useEffect(() => {
+    if (inputScrollRef.current) {
+      inputScrollRef.current.scrollLeft = inputScrollRef.current.scrollWidth;
+    }
+  }, [inputValue]);
+
+  // Keep ref synchronized with the latest value of isInteractive
+  useEffect(() => {
+    isInteractiveRef.current = isInteractive;
+  }, [isInteractive]);
 
   // Auto-simulation flow
   useEffect(() => {
     if (isInteractive) return;
-    
-    let rId: number;
-    // Initial load: start with step 0
-    if (stepIndex === 0) {
-      rId = requestAnimationFrame(() => {
-        setMessages([]);
-      });
-    }
 
-    const interval = setInterval(() => {
-      if (stepIndex < CONVERSATION_FLOW.length) {
-        setMessages(prev => [...prev, CONVERSATION_FLOW[stepIndex]]);
-        setStepIndex(prev => prev + 1);
-      } else {
-        // Reset simulation
-        setMessages([]);
-        setStepIndex(0);
+    let timeoutId: NodeJS.Timeout;
+
+    const runSimulationStep = (currentStep: number) => {
+      if (isInteractiveRef.current) return;
+      if (currentStep >= CONVERSATION_FLOW.length) {
+        // Reset simulation and loop back after a pause
+        timeoutId = setTimeout(() => {
+          if (isInteractiveRef.current) return;
+          setMessages([]);
+          setInputValue("");
+          setTypingSender(null);
+          timeoutId = setTimeout(() => {
+            if (isInteractiveRef.current) return;
+            runSimulationStep(0);
+          }, 1000);
+        }, 3000);
+        return;
       }
-    }, 3000);
+
+      const nextMsg = CONVERSATION_FLOW[currentStep];
+
+      if (nextMsg.sender === "user") {
+        setTypingSender(null);
+        let charIndex = 0;
+        setInputValue("");
+
+        const typeChar = () => {
+          if (isInteractiveRef.current) return;
+          if (charIndex < nextMsg.text.length) {
+            const nextText = nextMsg.text.substring(0, charIndex + 1);
+            setInputValue(nextText);
+            charIndex++;
+            const speed = 35 + Math.random() * 45;
+            timeoutId = setTimeout(typeChar, speed);
+          } else {
+            // Finished typing, wait 700ms before sending
+            timeoutId = setTimeout(() => {
+              if (isInteractiveRef.current) return;
+              setIsSending(true);
+              setTimeout(() => setIsSending(false), 150);
+
+              setMessages(prev => [...prev, nextMsg]);
+              setInputValue("");
+
+              // Wait 1.2s before next step (starts Jimbo typing)
+              timeoutId = setTimeout(() => {
+                if (isInteractiveRef.current) return;
+                runSimulationStep(currentStep + 1);
+              }, 1200);
+            }, 700);
+          }
+        };
+
+        // Start typing after a short 600ms hesitation/pause
+        timeoutId = setTimeout(typeChar, 600);
+      } else {
+        // Jimbo typing
+        setTypingSender("jimbo");
+
+        // Show typing animation for 2 seconds
+        timeoutId = setTimeout(() => {
+          if (isInteractiveRef.current) return;
+          setMessages(prev => [...prev, nextMsg]);
+          setTypingSender(null);
+
+          // Wait 1.5 seconds pause before next step
+          timeoutId = setTimeout(() => {
+            if (isInteractiveRef.current) return;
+            runSimulationStep(currentStep + 1);
+          }, 1500);
+        }, 2000);
+      }
+    };
+
+    // Initial load delay
+    timeoutId = setTimeout(() => {
+      if (isInteractiveRef.current) return;
+      runSimulationStep(0);
+    }, 500);
 
     return () => {
-      clearInterval(interval);
-      if (rId) cancelAnimationFrame(rId);
+      clearTimeout(timeoutId);
     };
-  }, [stepIndex, isInteractive]);
+  }, [isInteractive, resetNonce]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages or typing indicators
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
-
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    
-    setIsInteractive(true);
-    const userMsg = { sender: "user" as const, text: inputValue };
-    setMessages(prev => [...prev, userMsg]);
-    setInputValue("");
-    setIsTyping(true);
-
-    // AI response delay
-    setTimeout(() => {
-      const randomReply = JIMBO_REPLIES[Math.floor(Math.random() * JIMBO_REPLIES.length)];
-      setMessages(prev => [...prev, { sender: "jimbo" as const, text: randomReply }]);
-      setIsTyping(false);
-    }, 1200);
-  };
+  }, [messages, typingSender]);
 
   const handleReset = () => {
     setMessages([]);
-    setStepIndex(0);
     setIsInteractive(false);
-    setIsTyping(false);
+    setTypingSender(null);
+    setInputValue("");
+    setResetNonce(prev => prev + 1);
   };
 
-  const handleHire = () => {
-    window.open("https://jimbo.yantracore.com/", "_blank", "noopener,noreferrer");
+  const handleHire = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open("https://jimbo.yantracore.com/#hire-jimbo", "_blank", "noopener,noreferrer");
   };
-
-  const currentTyper = isInteractive
-    ? (isTyping ? "jimbo" : null)
-    : (stepIndex < CONVERSATION_FLOW.length ? CONVERSATION_FLOW[stepIndex].sender : null);
 
   return (
     <div className="flex flex-col h-full w-full gap-2">
       {/* Header */}
-      <ProjectCardHeader
+      <ProductCardHeader
         logoImg="/images/logo/jimbo_logo.png"
         unicodeChar="💬"
         title="JIMBO"
         description="Your 24/7 AI business assistant."
-        statusDotColor="bg-accent-1"
         accentColor="var(--accent-1)"
-        isLive={true}
+        url="https://jimbo.yantracore.com/"
       />
 
       {/* WhatsApp-style phone UI */}
       <div
-        className="rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_28px_-10px_rgba(0,0,0,0.6)] flex flex-col flex-1 min-h-0"
+        className="my-3 rounded-xl overflow-hidden border border-white/5 shadow-[var(--nm-sunken-soft)] flex flex-col flex-1 min-h-0"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
@@ -951,9 +1123,18 @@ function CardJimbo() {
           <div className="flex-1 min-w-0">
             <p className="text-[9px] font-medium text-white leading-tight">Jimbo</p>
             <p className="text-[7.5px] text-emerald-300 leading-tight font-mono">
-              {currentTyper === "jimbo" ? "typing..." : "online"}
+              {typingSender === "jimbo" ? "typing..." : "online"}
             </p>
           </div>
+          {isInteractive && (
+            <button
+              onClick={handleReset}
+              title="Reset simulation"
+              className="p-0.5 rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors flex items-center justify-center mr-1 pointer-events-auto"
+            >
+              <RotateCcw className="w-2.5 h-2.5" />
+            </button>
+          )}
           <Video className="w-2.5 h-2.5 text-white/40" />
           <Phone className="w-2.5 h-2.5 text-white/40" />
           <MoreVertical className="w-2.5 h-2.5 text-white/40" />
@@ -980,9 +1161,19 @@ function CardJimbo() {
                 </div>
               </div>
             ))}
-            {isTyping && (
-              <div className="flex justify-start animate-chat-fade">
-                <div className="bg-[#202c33] px-2.5 py-2 rounded-lg rounded-tl-sm">
+            {typingSender && (
+              <div
+                className={`flex ${
+                  typingSender === "user" ? "justify-end" : "justify-start"
+                } animate-chat-fade`}
+              >
+                <div
+                  className={`${
+                    typingSender === "user"
+                      ? "bg-[#005c4b] rounded-tr-sm"
+                      : "bg-[#202c33] rounded-tl-sm"
+                  } px-2.5 py-2 rounded-lg`}
+                >
                   <TypingDots colorClass="bg-white/70" />
                 </div>
               </div>
@@ -991,22 +1182,28 @@ function CardJimbo() {
         </div>
 
         {/* Chat Input Bar */}
-        <div className="bg-[#1f2c33] px-2 py-1 flex items-center gap-1.5 border-t border-white/5">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage();
-              }
-            }}
-            placeholder="Type a message..."
-            className="flex-1 bg-[#2a3942] text-white text-[10px] px-2.5 py-1 rounded-full outline-none placeholder-white/30 border border-transparent focus:border-emerald-500/30 font-sans"
-          />
+        <div className="bg-[#1f2c33] px-2 py-1 flex items-center gap-1.5 border-t border-white/5 pointer-events-none">
+          <p
+            ref={inputScrollRef}
+            className="flex-1 bg-[#2a3942] text-white text-[10px] px-2.5 py-1 rounded-full outline-none border border-transparent font-sans select-none overflow-hidden whitespace-nowrap flex items-center gap-0.5"
+          >
+            {inputValue ? (
+              <>
+                <span>{inputValue}</span>
+                {!isInteractive && (
+                  <span className="w-1 h-3 bg-emerald-500 animate-[pulse_1s_infinite] flex-shrink-0" style={{ display: 'inline-block' }} />
+                )}
+              </>
+            ) : (
+              <span className="text-white/30">Type a message...</span>
+            )}
+          </p>
           <button 
-            onClick={handleSendMessage}
-            className="w-6 h-6 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition-transform flex items-center justify-center flex-shrink-0"
+            disabled
+            tabIndex={-1}
+            className={`w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 transition-transform select-none ${
+              isSending ? "scale-90" : ""
+            }`}
           >
             <Send className="w-3 h-3 text-[#111b21] stroke-[2.5]" />
           </button>
@@ -1014,17 +1211,11 @@ function CardJimbo() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 w-full pointer-events-auto">
-        <button
-          onClick={handleReset}
-          className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
-        >
-          Learn More
-        </button>
+      <div className="flex w-full pointer-events-auto">
         <button
           onClick={handleHire}
-          className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0"
-          style={{ backgroundColor: "var(--accent-1)", boxShadow: "0 0 12px rgba(110,86,255,0.3)" }}
+          className="w-full py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 cursor-pointer"
+          style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
         >
           Hire Jimbo
         </button>
@@ -1051,66 +1242,128 @@ function TypingDots({ colorClass = "bg-text-mid" }: { colorClass?: string }) {
    CardRestroverse — AI hospitality listing
    ============================================================ */
 const SEARCH_QUERIES = [
-  "traditional ryokan garden kyoto",
-  "cliffside boutique villa amalfi",
-  "sunset cave suite santorini",
-  "eco jungle treehouse tulum",
-  "glass dome aurora cabin iceland"
+  "boutique heritage hotel in kathmandu with traditional courtyard",
+  "peaceful resort in pokhara lakeside with annapurna views",
+  "cozy tea house lodge in namche bazaar for trekkers",
+  "luxury jungle safari resort in chitwan with wildlife tours",
+  "hill resort in dhulikhel with panoramic sunrise views"
 ];
 
-function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
-  const [queryText, setQueryText] = useState("");
-  const [queryIndex, setQueryIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isInteractive, setIsInteractive] = useState(false);
-  const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
+interface HospitalitySearchInputProps {
+  queryIndex: number;
+  isInteractive: boolean;
+  setIsInteractive: (v: boolean) => void;
+  swiperRef: SwiperInstance | null;
+}
 
+function HospitalitySearchInput({
+  queryIndex,
+  isInteractive,
+  setIsInteractive,
+  swiperRef,
+}: HospitalitySearchInputProps) {
+  const [displayText, setDisplayText] = useState("");
+  const [prevQueryIndex, setPrevQueryIndex] = useState(queryIndex);
+  const [prevIsInteractive, setPrevIsInteractive] = useState(isInteractive);
+  const textContainerRef = useRef<HTMLParagraphElement>(null);
+
+  // Sync state during render to avoid synchronous effects and ref lint issues
+  if (prevQueryIndex !== queryIndex || prevIsInteractive !== isInteractive) {
+    setPrevQueryIndex(queryIndex);
+    setPrevIsInteractive(isInteractive);
+    if (!isInteractive) {
+      setDisplayText("");
+    } else {
+      setDisplayText(SEARCH_QUERIES[queryIndex % SEARCH_QUERIES.length] || "");
+    }
+  }
+
+  // Scroll to the end of the text as it is typed to keep the cursor visible
+  useEffect(() => {
+    if (textContainerRef.current) {
+      textContainerRef.current.scrollLeft = textContainerRef.current.scrollWidth;
+    }
+  }, [displayText]);
+
+  // Typing animation cycle for Restroverse search bar query
   useEffect(() => {
     if (isInteractive) return;
-    if (swiperRef) {
-      swiperRef.slideNext(1500);
-    }
-  }, [syncTick, swiperRef, isInteractive]);
 
-  useEffect(() => {
+    const fullQuery = SEARCH_QUERIES[queryIndex % SEARCH_QUERIES.length] || "";
+    if (!fullQuery) return;
+
     let timer: NodeJS.Timeout;
-    const currentQuery = SEARCH_QUERIES[queryIndex];
-    
-    if (isDeleting) {
+
+    if (displayText === fullQuery) {
+      // Pause at full length for 2.5 seconds, then trigger swiper slideNext
       timer = setTimeout(() => {
-        const nextText = currentQuery.substring(0, queryText.length - 1);
-        setQueryText(nextText);
-        if (nextText === "") {
-          setIsDeleting(false);
-          setQueryIndex((prev) => (prev + 1) % SEARCH_QUERIES.length);
+        if (swiperRef) {
+          swiperRef.slideNext(1200);
         }
-      }, 40);
+      }, 2500);
     } else {
+      // Type out character by character
       timer = setTimeout(() => {
-        const nextText = currentQuery.substring(0, queryText.length + 1);
-        setQueryText(nextText);
-        if (nextText === currentQuery) {
-          timer = setTimeout(() => setIsDeleting(true), 2500);
-        }
-      }, 70);
+        setDisplayText(fullQuery.substring(0, displayText.length + 1));
+      }, 50);
     }
 
     return () => clearTimeout(timer);
-  }, [queryText, isDeleting, queryIndex]);
+  }, [displayText, queryIndex, isInteractive, swiperRef]);
+
+  // Reset interaction mode after 8 seconds of inactivity
+  useEffect(() => {
+    if (!isInteractive) return;
+
+    const timer = setTimeout(() => {
+      setIsInteractive(false);
+      setDisplayText("");
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [isInteractive, displayText, queryIndex, setIsInteractive]);
+
+  return (
+    <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 shadow-inner">
+      <Sparkles className="w-3 h-3 text-accent-2 flex-shrink-0 animate-pulse" />
+      <p 
+        ref={textContainerRef}
+        className="text-[10px] text-text-hi font-mono flex-1 flex items-center gap-0.5 overflow-hidden whitespace-nowrap"
+      >
+        <span>{displayText}</span>
+        {!isInteractive && (
+          <span className="w-1 h-3 bg-accent-2 animate-[pulse_1s_infinite] flex-shrink-0" style={{ display: 'inline-block' }} />
+        )}
+      </p>
+    </div>
+  );
+}
+
+function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
+  const router = useRouter();
+  const [queryIndex, setQueryIndex] = useState(0);
+  const [isInteractive, setIsInteractive] = useState(false);
+  const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
+
+  // Auto-simulation flow synced centrally
+  useEffect(() => {
+    if (isInteractive) return;
+    swiperRef?.slideNext(1300);
+  }, [syncTick, isInteractive, swiperRef]);
 
   const hotelSlides = [
     {
-      name: "Hoshinoya Ryokan",
-      location: "Kyoto",
+      name: "Dwarika's Heritage",
+      location: "Kathmandu",
       match: "99%",
-      price: "$480",
+      price: "$240",
       rating: "4.9",
       gradient: "linear-gradient(135deg, rgba(255,180,84,0.35) 0%, rgba(255,79,176,0.25) 50%, rgba(110,86,255,0.15) 100%)",
       amenities: [Sparkles, Wifi, UtensilsCrossed],
-      image: "/images/restroverse/hoshinoya_ryokan.png"
+      image: "/images/restroverse/dwarikas_heritage.png"
     },
     {
-      name: "Lakeside Oasis",
+      name: "Fishtail Lodge",
       location: "Pokhara",
       match: "96%",
       price: "$145",
@@ -1120,7 +1373,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
       image: "/images/restroverse/lakeside_oasis.png"
     },
     {
-      name: "Sherpa Peak Lodge",
+      name: "Yeti Mountain Home",
       location: "Namche",
       match: "95%",
       price: "$180",
@@ -1140,7 +1393,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
       image: "/images/restroverse/meghauli_serai.png"
     },
     {
-      name: "Himalayan Horizon",
+      name: "Dwarika's Resort",
       location: "Dhulikhel",
       match: "94%",
       price: "$190",
@@ -1151,61 +1404,51 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
     }
   ];
 
-  const handlePillClick = (index: number, query: string) => {
+  const handlePillClick = (index: number) => {
     setIsInteractive(true);
-    setQueryText(query);
+    setQueryIndex(index);
     if (swiperRef) {
       swiperRef.slideToLoop(index);
     }
   };
 
-  const handleSearchTrigger = () => {
-    setIsInteractive(false);
-    setQueryText("");
-    setIsDeleting(false);
-    const newIdx = Math.floor(Math.random() * SEARCH_QUERIES.length);
-    setQueryIndex(newIdx);
-    if (swiperRef) {
-      swiperRef.slideToLoop(newIdx);
-    }
-  };
-
-  const handleShowcase = () => {
-    window.open("https://restroverse.app", "_blank", "noopener,noreferrer");
+  const handleShowcase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open("https://restroverse.app/join", "_blank", "noopener,noreferrer");
   };
 
   return (
     <div className="flex flex-col h-full w-full gap-2">
-      <ProjectCardHeader
+      <ProductCardHeader
         logoImg="/images/logo/restroverse_logo.png"
         unicodeChar="✨"
         title="RESTROVERSE"
         description="Discover your perfect experience."
-        statusDotColor="bg-accent-2"
         accentColor="var(--accent-2)"
-        isLive={true}
+        url="https://restroverse.app"
       />
 
-      <div className="flex flex-col gap-2 flex-1 min-h-0">
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 shadow-inner">
-          <Sparkles className="w-3 h-3 text-accent-2 flex-shrink-0 animate-pulse" />
-          <p className="text-[10px] text-text-hi font-mono truncate flex-1 flex items-center gap-0.5">
-            <span>&ldquo;{queryText}</span>
-            <span className="w-1 h-3 bg-accent-2 animate-[pulse_1s_infinite]" style={{ display: 'inline-block' }} />
-            <span>&rdquo;</span>
-          </p>
-        </div>
+      <div className="my-3 flex flex-col gap-2 flex-1 min-h-0 rounded-xl overflow-hidden border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm">
+        <HospitalitySearchInput
+          queryIndex={queryIndex}
+          isInteractive={isInteractive}
+          setIsInteractive={setIsInteractive}
+          swiperRef={swiperRef}
+        />
 
         {/* Filter Pills */}
         <div className="flex gap-1 justify-center pointer-events-auto">
           {[
-            { label: "KTM", index: 0, query: "heritage boutique hotel kathmandu" },
-            { label: "PKR", index: 1, query: "peaceful lakeside resort pokhara" },
-            { label: "CTW", index: 3, query: "luxury safari resort chitwan" }
+            { label: "KTM", index: 0, query: "boutique heritage hotel in kathmandu with traditional courtyard" },
+            { label: "PKR", index: 1, query: "peaceful resort in pokhara lakeside with annapurna views" },
+            { label: "CTW", index: 3, query: "luxury jungle safari resort in chitwan with wildlife tours" }
           ].map((pill) => (
             <button
               key={pill.label}
-              onClick={() => handlePillClick(pill.index, pill.query)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePillClick(pill.index);
+              }}
               className="px-1.5 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 hover:border-white/10 text-[7.5px] font-mono text-text-low hover:text-text-hi transition-all"
             >
               {pill.label}
@@ -1214,7 +1457,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
         </div>
 
         {/* Swiper Coverflow Carousel */}
-        <div className="w-full relative overflow-hidden select-none flex-1 min-h-[145px]">
+        <div className="w-full relative overflow-hidden select-none mt-auto h-[120px]">
           <Swiper
             onSwiper={setSwiperRef}
             effect="coverflow"
@@ -1222,9 +1465,10 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
             centeredSlides={true}
             slidesPerView={1.15}
             loop={true}
-            autoplay={isInteractive ? false : {
-              delay: 3000,
-              disableOnInteraction: false,
+            onTouchStart={() => setIsInteractive(true)}
+            onSlideChange={(swiper) => {
+              const newIdx = swiper.realIndex ?? 0;
+              setQueryIndex(newIdx);
             }}
             coverflowEffect={{
               rotate: 15,
@@ -1233,59 +1477,98 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
               modifier: 1.2,
               slideShadows: false,
             }}
-            modules={[EffectCoverflow, Autoplay]}
+            modules={[EffectCoverflow]}
             className="w-full h-full"
           >
             {hotelSlides.map((hotel, index) => (
               <SwiperSlide key={index} className="w-full flex justify-center">
                 <div 
-                  className="flex flex-col justify-between p-2.5 rounded-xl border border-white/[0.08] w-full h-full text-left relative"
+                  className="flex gap-2.5 p-2 rounded-xl w-full h-full text-left relative group/slide overflow-hidden"
                   style={{
-                    background: hotel.gradient,
-                    boxShadow: "0 6px 20px -6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+                    background: "var(--ink-1)",
+                    border: "1px solid var(--nm-line-soft)",
+                    boxShadow: "var(--nm-raised-soft)",
+                    marginBottom: "15px",
                   }}
                 >
-                  {/* Top Row: Match & Location */}
-                  <div className="flex justify-between items-center gap-1">
-                    <div className="flex items-center gap-1 px-1 py-0.5 rounded-full bg-black/35 backdrop-blur-md border border-white/10">
+                  {/* Decorative digital grid background overlay */}
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:6px_6px]" />
+
+                  {/* Left Side: Large Visual Image with Overlay badges */}
+                  <div className="relative w-[38%] h-full rounded-lg overflow-hidden border border-white/10 shrink-0 bg-black/40">
+                    <Image
+                      src={hotel.image}
+                      alt={hotel.name}
+                      fill
+                      sizes="120px"
+                      className="object-cover transition-transform duration-700 group-hover/slide:scale-110 [.swiper-slide-active_&]:scale-110"
+                    />
+                    {/* Glass gradient overlay on image */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                    
+                    {/* Match percentage badge overlaid on image */}
+                    <div className="absolute top-1 left-1 flex items-center gap-0.5 px-1 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10">
                       <Sparkles className="w-1.5 h-1.5 text-accent-2" />
-                      <span className="text-[7px] font-mono font-medium text-text-hi leading-none">{hotel.match} match</span>
+                      <span className="text-[5.5px] font-mono font-bold text-text-hi leading-none">{hotel.match}</span>
                     </div>
-                    <div className="flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-black/35 backdrop-blur-md border border-white/10">
-                      <MapPin className="w-2 h-2 text-text-low" />
-                      <span className="text-[7px] text-text-hi leading-none">{hotel.location}</span>
+
+                    {/* Location overlay at the bottom of the image */}
+                    <div className="absolute bottom-1 left-1 flex items-center gap-0.5">
+                      <MapPin className="w-1.5 h-1.5 text-accent-2" />
+                      <span className="text-[7px] font-medium text-white truncate max-w-[70px]">{hotel.location}</span>
                     </div>
                   </div>
 
-                  {/* Details Section with Thumbnail */}
-                  <div className="flex gap-2 items-center mt-1 z-10">
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/10 shadow-md flex-shrink-0 bg-black/20">
-                      <Image
-                        src={hotel.image}
-                        alt={hotel.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-0.5">
-                      <div className="flex items-center justify-between gap-1">
-                        <p className="text-[10px] font-semibold text-text-hi leading-tight truncate">{hotel.name}</p>
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
-                          <Star className="w-2 h-2 fill-amber-400 text-amber-400" />
-                          <span className="text-[8.5px] text-text-hi font-medium leading-none">{hotel.rating}</span>
-                        </div>
+                  {/* Right Side: Smart Information Panel */}
+                  <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0 z-10">
+                    
+                    {/* Top: Futuristic Pass Header */}
+                    <div className="flex items-center justify-between border-b border-white/[0.06] pb-1">
+                      <span className="text-[5.5px] font-mono tracking-widest text-text-low uppercase">PREMIUM ACCESS</span>
+                      <div className="w-3.5 h-2 rounded-[2px] bg-white/10 border border-white/20 flex items-center justify-center opacity-85 shrink-0">
+                        {/* Microchip look */}
+                        <div className="w-2 h-1 bg-amber-400/30 rounded-[1px] border border-amber-400/40" />
                       </div>
+                    </div>
+
+                    {/* Middle: Venue Name, Rating, Price */}
+                    <div className="space-y-0.5 my-1">
+                      <p className="text-[10px] font-bold text-text-hi leading-tight tracking-wide font-sans group-hover/slide:text-accent-2 [.swiper-slide-active_&]:text-accent-2 transition-colors truncate">
+                        {hotel.name}
+                      </p>
                       
-                      {/* Price & Amenities Row */}
-                      <div className="flex items-center justify-between gap-1 pt-1 border-t border-white/[0.08] mt-0.5">
-                        <p className="text-[8.5px] text-text-low leading-none">From <span className="text-text-hi font-semibold">{hotel.price}</span></p>
+                      <div className="flex items-center gap-1.5">
                         <div className="flex items-center gap-0.5">
-                          {hotel.amenities.map((Amenity, idx) => (
-                            <div key={idx} className="p-0.5 rounded bg-white/[0.04] border border-white/5">
-                              <Amenity className="w-2 h-2 text-text-low" />
-                            </div>
-                          ))}
+                          <Star className="w-2 h-2 fill-amber-400 text-amber-400" />
+                          <span className="text-[8px] text-text-hi font-bold leading-none">{hotel.rating}</span>
+                        </div>
+                        <span className="w-0.5 h-0.5 rounded-full bg-white/20" />
+                        <p className="text-[8px] text-text-low leading-none">
+                          From <span className="text-text-hi font-bold">{hotel.price}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom: Amenities & Security / Digital Code */}
+                    <div className="flex items-center justify-between pt-1 border-t border-white/[0.06]">
+                      {/* Amenities Row */}
+                      <div className="flex items-center gap-0.5">
+                        {hotel.amenities.map((Amenity, idx) => (
+                          <div key={idx} className="p-0.5 rounded bg-white/[0.04] border border-white/5 transition-all hover:bg-white/10">
+                            <Amenity className="w-2 h-2 text-text-low hover:text-accent-2" />
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Small futuristic barcode or id stamp */}
+                      <div className="flex flex-col items-end opacity-40">
+                        <span className="text-[4px] font-mono text-text-low leading-none">ID-00{index + 9}</span>
+                        <div className="flex gap-[0.5px] h-2.5 mt-0.5">
+                          <div className="w-[1px] h-full bg-white" />
+                          <div className="w-[2px] h-full bg-white" />
+                          <div className="w-[1px] h-full bg-white" />
+                          <div className="w-[1px] h-full bg-white" />
+                          <div className="w-[2px] h-full bg-white" />
                         </div>
                       </div>
                     </div>
@@ -1298,19 +1581,13 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 w-full pointer-events-auto">
-        <button
-          onClick={handleSearchTrigger}
-          className="flex-1 py-1.5 rounded-lg text-[9px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
-        >
-          Learn More
-        </button>
+      <div className="flex w-full pointer-events-auto">
         <button
           onClick={handleShowcase}
-          className="flex-1 py-1.5 rounded-lg text-[9px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center"
+          className="w-full py-1.5 rounded-lg text-[9px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center cursor-pointer"
           style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
         >
-          Showcase Business
+          List Your Business
         </button>
       </div>
     </div>
@@ -1323,34 +1600,53 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
 const SHRAMDAN_PROJECTS = [
   {
     id: "lakeside",
-    name: "Lakeside Cleanup",
+    name: "Fewa Lake Cleanup",
     location: "Pokhara",
+    address: "Fewa Lake Ghat, Ward 6",
+    time: "Every Sat, 7:00 AM",
     volunteers: 48,
     hours: 6,
     initialLikes: 142,
     image: "/images/shramdan-cleanup-result-eg.png",
+    progress: 82,
+    impact: "150kg waste collected",
+    tag: "Clean Up",
+    avatars: ["#f43f5e", "#10b981", "#3b82f6", "#f59e0b"]
   },
   {
     id: "treeplanting",
-    name: "Tree Planting Drive",
+    name: "Sauraha Reforestation",
     location: "Chitwan",
+    address: "Sauraha Buffer Zone",
+    time: "Weekly Sun, 8:00 AM",
     volunteers: 31,
     hours: 4,
     initialLikes: 98,
     image: "/images/shramdan-tree-planting.png",
+    progress: 64,
+    impact: "450 saplings planted",
+    tag: "Ecology",
+    avatars: ["#8b5cf6", "#ec4899", "#10b981", "#06b6d4"]
   },
   {
     id: "fooddist",
-    name: "Food Distribution",
+    name: "Bagmati Cleaning Drive",
     location: "Kathmandu",
+    address: "Gaurighat, Kathmandu",
+    time: "Every Sat, 7:30 AM",
     volunteers: 22,
     hours: 3,
     initialLikes: 84,
     image: "/images/shramdan-food-distribution.png",
+    progress: 95,
+    impact: "2.5 tons waste cleared",
+    tag: "River Cleanup",
+    avatars: ["#3b82f6", "#f59e0b", "#ef4444", "#10b981"]
   },
 ];
 
 function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
+  const router = useRouter();
   const [activeIdx, setActiveIdx] = useState(0);
   const [likes, setLikes] = useState<number[]>(SHRAMDAN_PROJECTS.map(p => p.initialLikes));
   const [hearts, setHearts] = useState<Array<{ id: number; left: number }>>([]);
@@ -1415,17 +1711,16 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
         ))}
       </div>
 
-      <ProjectCardHeader
+      <ProductCardHeader
         logoImg="/images/logo/shramdaan_logo.png"
         unicodeChar="🌱"
         title="SHRAMDAN"
         description="Come together and solve social problems."
-        statusDotColor="bg-accent-warm"
         accentColor="var(--accent-warm)"
-        isLive={true}
+        url="https://shramdan.org"
       />
 
-      <div className="flex flex-col gap-2 flex-1 min-h-0 relative overflow-hidden pointer-events-auto">
+      <div className="my-3 flex flex-col gap-2 flex-1 min-h-0 relative overflow-hidden pointer-events-auto">
         <Swiper
           onSwiper={setSwiperRef}
           effect="creative"
@@ -1435,16 +1730,16 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
           creativeEffect={{
             limitProgress: 2,
             prev: {
-              opacity: 0.2,
-              scale: 0.88,
-              translate: ["-34%", 0, -140],
-              rotate: [0, 0, -5],
+              opacity: 0,
+              scale: 0.9,
+              translate: ["-105%", 0, 0],
+              rotate: [0, 0, 0],
             },
             next: {
-              opacity: 0.2,
-              scale: 0.88,
-              translate: ["34%", 0, -140],
-              rotate: [0, 0, 5],
+              opacity: 0,
+              scale: 0.9,
+              translate: ["105%", 0, 0],
+              rotate: [0, 0, 0],
             },
           }}
           onSlideChange={(swiper) => setActiveIdx(swiper.realIndex)}
@@ -1454,13 +1749,15 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
           {SHRAMDAN_PROJECTS.map((project, index) => (
             <SwiperSlide key={project.id} className="w-full h-full">
               <div
-                className="flex flex-col gap-2 w-full h-full"
-                onClick={() => {
+                className="flex flex-col gap-2 w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
                   setIsInteractive(true);
                   swiperRef?.slideToLoop(index, 1000);
                 }}
               >
-                <div className="relative rounded-xl overflow-hidden border border-white/10 flex-1 min-h-[118px] bg-black/30">
+                {/* 30% reduced image height: min-h-[118px] -> fixed h-[82px] */}
+                <div className="relative rounded-xl overflow-hidden border border-white/10 h-[82px] flex-shrink-0 bg-black/30 w-full">
                   <Image
                     src={project.image}
                     alt={`${project.name} before and after`}
@@ -1468,13 +1765,18 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
                     sizes="(max-width: 768px) 240px, 300px"
                     className="object-cover"
                   />
-                  <div className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
+                  {/* Category Tag overlay on top-left of image */}
+                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[7px] font-mono text-accent-warm leading-none">
+                    {project.tag}
+                  </div>
+
+                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
                     <MapPin className="w-2 h-2 text-text-hi" />
-                    <span className="text-[8px] text-text-hi">{project.location}</span>
+                    <span className="text-[7.5px] text-text-hi leading-none">{project.location}</span>
                   </div>
                   
                   {/* Pagination dots overlay */}
-                  <div className="absolute bottom-2 right-2 flex gap-1 z-30 pointer-events-auto">
+                  <div className="absolute bottom-1.5 right-1.5 flex gap-1 z-30 pointer-events-auto">
                     {SHRAMDAN_PROJECTS.map((_, idx) => (
                       <button
                         key={idx}
@@ -1490,28 +1792,75 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
                   </div>
                 </div>
 
-                <div className="space-y-0.5">
-                  <p className="text-[12px] font-semibold text-text-hi leading-tight">{project.name}</p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-2.5 h-2.5 text-accent-warm" />
-                      <span className="text-[10px] text-text-hi font-medium">{project.volunteers}</span>
-                      <span className="text-[9px] text-text-low">volunteers</span>
+                {/* Details Section utilizing the extra space */}
+                <div className="flex-1 flex flex-col justify-between py-0.5 min-h-0">
+                  {/* Row 1: Title, Address and Likes */}
+                  <div className="flex justify-between items-start gap-1">
+                    <div className="min-w-0">
+                      <p className="text-[11.5px] font-bold text-text-hi leading-tight truncate">{project.name}</p>
+                      <p className="text-[8px] text-text-low font-mono leading-none mt-0.5 truncate">{project.address}</p>
                     </div>
-                    <span className="text-text-faint">/</span>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5 text-accent-warm" />
-                      <span className="text-[10px] text-text-hi font-medium">{project.hours}</span>
-                      <span className="text-[9px] text-text-low">hours</span>
-                    </div>
-                    <span className="text-text-faint">/</span>
                     <button 
-                      className="flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform pointer-events-auto" 
+                      className="flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform pointer-events-auto flex-shrink-0 px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/5" 
                       onClick={handleLike}
                     >
                       <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" />
-                      <span className="text-[10px] text-text-hi font-medium">{likes[index]}</span>
+                      <span className="text-[9.5px] text-text-hi font-medium leading-none">{likes[index]}</span>
                     </button>
+                  </div>
+
+                  {/* Row 2: Impact Stats & Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[8.5px] font-mono leading-none">
+                      <span className="text-text-low flex items-center gap-1">
+                        <TrendingUp className="w-2.5 h-2.5 text-accent-warm" />
+                        {project.impact}
+                      </span>
+                      <span className="text-accent-warm font-semibold">{project.progress}%</span>
+                    </div>
+                    <div className="w-full h-1 bg-white/[0.06] rounded-full overflow-hidden border border-white/5 relative">
+                      <div 
+                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-amber-500 to-orange-400"
+                        style={{ 
+                          width: `${project.progress}%`,
+                          boxShadow: "0 0 6px rgba(255,180,84,0.4)" 
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 3: Volunteers (Participants), Time, and Avatar Stack */}
+                  <div className="flex items-center justify-between border-t border-white/[0.05] pt-1.5 mt-0.5">
+                    <div className="flex flex-col gap-0.5 text-[8px] min-w-0">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                        <span className="text-text-hi font-semibold leading-none">{project.volunteers}</span>
+                        <span className="text-text-low text-[7.5px] leading-none">participants</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                        <span className="text-text-hi font-medium leading-none truncate max-w-[80px]">{project.time}</span>
+                      </div>
+                    </div>
+
+                    {/* Avatar Stack */}
+                    <div className="flex -space-x-1.5 overflow-hidden items-center flex-shrink-0">
+                      {project.avatars.map((color, idx) => (
+                        <div 
+                          key={idx}
+                          className="w-3.5 h-3.5 rounded-full border border-black/50 flex items-center justify-center text-[6.5px] font-bold text-white shadow-sm flex-shrink-0"
+                          style={{ 
+                            backgroundColor: color,
+                            backgroundImage: `radial-gradient(circle at top, rgba(255,255,255,0.2) 0%, transparent 80%)`
+                          }}
+                        >
+                          {["A", "S", "R", "N"][idx]}
+                        </div>
+                      ))}
+                      <div className="w-3.5 h-3.5 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-center text-[5.5px] text-text-low font-bold flex-shrink-0 z-10">
+                        +8
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1521,21 +1870,17 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 w-full pointer-events-auto">
-        <button
-          onClick={handleLike}
-          className="flex-1 py-1.5 rounded-lg text-[9.5px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi flex items-center justify-center gap-1"
-        >
-          <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500 animate-pulse" />
-          <span>Learn More</span>
-        </button>
-        <button
-          onClick={() => window.open("https://shramdan.org", "_blank", "noopener,noreferrer")}
-          className="flex-1 py-1.5 rounded-lg text-[9.5px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center"
-          style={{ backgroundColor: "var(--accent-warm)", boxShadow: "0 0 12px rgba(255,180,84,0.3)" }}
-        >
-          Contribute Labor
-        </button>
+      <div className="flex w-full pointer-events-auto">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open("https://shramdan.org/events", "_blank", "noopener,noreferrer");
+              }}
+              className="w-full py-1.5 rounded-lg text-[9.5px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center cursor-pointer"
+              style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
+            >
+              Participate
+            </button>
       </div>
     </div>
   );
@@ -1544,36 +1889,632 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
 /* ============================================================
    CardCoreStatus — Yantra Core Active Status
    ============================================================ */
-function ActivityEqualizer({ isLive }: { isLive: boolean }) {
-  const bars = 18;
+/* ============================================================
+   CardCoreStatus Components & Main Dashboard Card
+   ============================================================ */
+
+function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pingTrigger: number }) {
+  const { themeMode } = useTheme();
+  const [latency, setLatency] = useState(24.2);
+  const [load, setLoad] = useState(41.8);
+  const [speed, setSpeed] = useState(3.82);
+  const [pulseActive, setPulseActive] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLatency(prev => {
+        const delta = (Math.random() - 0.5) * 1.6;
+        return parseFloat(Math.min(35, Math.max(12, prev + delta)).toFixed(1));
+      });
+      setLoad(prev => {
+        const delta = (Math.random() - 0.5) * 3;
+        return parseFloat(Math.min(60, Math.max(30, prev + delta)).toFixed(1));
+      });
+      setSpeed(prev => {
+        const delta = (Math.random() - 0.5) * 0.15;
+        return parseFloat(Math.min(4.2, Math.max(3.2, prev + delta)).toFixed(2));
+      });
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (pingTrigger > 0) {
+      setPulseActive(true);
+      const timer = setTimeout(() => setPulseActive(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [pingTrigger]);
+
+  const nodes = [
+    { name: "SFO", x: 35, y: 25 },
+    { name: "JFK", x: 105, y: 20 },
+    { name: "FRA", x: 200, y: 30 },
+    { name: "SGP", x: 165, y: 85 },
+    { name: "LHM", x: 65, y: 80 },
+  ];
+  const center = { x: 120, y: 52 };
+
   return (
-    <div className="flex items-end gap-[3px] h-12 lg:h-14 xl:h-16 bg-black/30 border border-white/5 rounded-xl p-2.5 w-full">
-      {Array.from({ length: bars }).map((_, i) => (
-        <div
-          key={i}
-          className="flex-1 rounded-full opacity-80"
+    <div className="flex-1 flex flex-col gap-2.5 justify-center w-full select-none">
+      {/* Topology Map Canvas/SVG */}
+      <div 
+        className="relative h-[95px] w-full rounded-xl border overflow-hidden flex items-center justify-center transition-all duration-300"
+        style={{
+          backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.4)",
+          borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.05)",
+          boxShadow: "var(--nm-sunken-soft)",
+        }}
+      >
+        {/* Glow backdrop */}
+        <div className="absolute inset-0 bg-radial-gradient from-accent-2/5 to-transparent pointer-events-none" />
+        
+        <svg className="w-full h-full absolute inset-0 pointer-events-none">
+          <style>{`
+            @keyframes telemetry-dash-flow {
+              to { stroke-dashoffset: -20; }
+            }
+            @keyframes telemetry-dash-pulse {
+              to { stroke-dashoffset: -100; }
+            }
+          `}</style>
+          
+          {/* Connection Lines from Center */}
+          {nodes.map((node) => (
+            <g key={node.name}>
+              <line
+                x1={center.x}
+                y1={center.y}
+                x2={node.x}
+                y2={node.y}
+                stroke="var(--accent-2)"
+                strokeWidth={pulseActive ? "2" : "1"}
+                strokeOpacity={pulseActive ? "0.4" : "0.15"}
+                className="transition-all"
+              />
+              <line
+                x1={center.x}
+                y1={center.y}
+                x2={node.x}
+                y2={node.y}
+                stroke="var(--accent-2)"
+                strokeWidth="1.5"
+                strokeOpacity={isPinging ? "0.8" : "0.3"}
+                strokeDasharray="4 16"
+                style={{
+                  strokeDashoffset: pulseActive ? -100 : undefined,
+                  animation: pulseActive
+                    ? "telemetry-dash-pulse 0.6s linear infinite"
+                    : "telemetry-dash-flow 3s linear infinite",
+                }}
+              />
+            </g>
+          ))}
+
+          {/* Central Core Hub */}
+          <circle
+            cx={center.x}
+            cy={center.y}
+            r={pulseActive ? 7 : 5}
+            fill="var(--accent-2)"
+            className="transition-all duration-300"
+            style={{
+              filter: "drop-shadow(0 0 4px var(--accent-2))",
+            }}
+          />
+          <circle
+            cx={center.x}
+            cy={center.y}
+            r={pulseActive ? 12 : 8}
+            fill="none"
+            stroke="var(--accent-2)"
+            strokeWidth="1"
+            strokeOpacity="0.4"
+            className={pulseActive ? "animate-ping" : "animate-pulse"}
+          />
+
+          {/* Regional Edge Nodes */}
+          {nodes.map((node) => (
+            <g key={node.name}>
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r="3.5"
+                fill="var(--accent-1)"
+                style={{
+                  filter: "drop-shadow(0 0 3px var(--accent-1))",
+                }}
+              />
+              {pulseActive && (
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r="8"
+                  fill="none"
+                  stroke="var(--accent-1)"
+                  strokeWidth="0.75"
+                  className="animate-ping"
+                />
+              )}
+              <text
+                x={node.x}
+                y={node.y - 7}
+                textAnchor="middle"
+                fill="var(--text-low)"
+                fontSize="6.5px"
+                fontFamily="monospace"
+                fontWeight="bold"
+                className="opacity-75"
+              >
+                {node.name}
+              </text>
+            </g>
+          ))}
+        </svg>
+
+        {/* Floating status tag */}
+        <div className="absolute top-1.5 left-2 flex items-center gap-1">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+          </span>
+          <span className="text-[7.5px] font-mono uppercase text-emerald-400 tracking-wider">Edge-Active</span>
+        </div>
+        
+        {isPinging && (
+          <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[0.5px] flex items-center justify-center rounded-xl z-20">
+            <span className="text-[8px] font-mono text-emerald-400 uppercase tracking-widest animate-pulse">Pinging...</span>
+          </div>
+        )}
+      </div>
+
+      {/* Stats Grid */}
+      <div 
+        className="grid grid-cols-3 gap-1.5 text-center border-t pt-2 transition-all duration-300"
+        style={{
+          borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.08)" : "rgba(255, 255, 255, 0.06)",
+        }}
+      >
+        <div className="space-y-0.5">
+          <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Avg Latency</p>
+          <p className="text-[11px] font-bold text-accent-2 font-mono transition-all">
+            {isPinging ? "---" : `${latency}ms`}
+          </p>
+        </div>
+        <div className="space-y-0.5">
+          <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Cpu Core Load</p>
+          <p className="text-[11px] font-bold text-accent-1 font-mono transition-all">
+            {isPinging ? "---" : `${load}%`}
+          </p>
+        </div>
+        <div className="space-y-0.5">
+          <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Bandwidth</p>
+          <p className="text-[11px] font-bold text-text-hi font-mono transition-all">
+            {isPinging ? "---" : `${speed}G`}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TechHexGrid() {
+  const { themeMode } = useTheme();
+  const [activeTechIndex, setActiveTechIndex] = useState(6); // Default to AI/ML (center node)
+
+  const TECHNOLOGIES = [
+    { name: "Next.js", icon: Sparkles, color: themeMode === "light" ? "#121420" : "#FFFFFF", desc: "Edge-rendered hybrid web framework" },
+    { name: "React", icon: Cpu, color: themeMode === "light" ? "#008EA9" : "#61DAFB", desc: "Dynamic reactive components UI engine" },
+    { name: "TypeScript", icon: Cpu, color: "#3178C6", desc: "Type-safe static structural developer safety" },
+    { name: "Node.js", icon: Bot, color: "#339933", desc: "Async high-concurrency server runtime" },
+    { name: "Python", icon: Cpu, color: "#3776AB", desc: "Robust data models & machine learning scripts" },
+    { name: "AWS Cloud", icon: Sparkles, color: themeMode === "light" ? "#D97706" : "#FF9900", desc: "Serverless global edge routing & scale" },
+    { name: "AI / ML", icon: Bot, color: themeMode === "light" ? "#D97706" : "#FF6F00", desc: "Neural networks, inference & model tools" },
+  ];
+
+  // Coordinates of hexagons forming a honeycomb
+  const hexPositions = [
+    { name: "Next.js", x: 93, y: 2 },
+    { name: "React", x: 139, y: 28 },
+    { name: "TypeScript", x: 139, y: 82 },
+    { name: "Node.js", x: 93, y: 108 },
+    { name: "Python", x: 47, y: 82 },
+    { name: "AWS Cloud", x: 47, y: 28 },
+    { name: "AI / ML", x: 93, y: 55 }, // Center node
+  ];
+
+  const orbitals = hexPositions.slice(0, 6);
+  const activeTech = TECHNOLOGIES[activeTechIndex];
+
+  return (
+    <div className="flex-1 flex flex-col justify-between w-full h-full relative p-0.5 select-none">
+      {/* Hex Honeycomb stage */}
+      <div className="relative w-full h-[166px] mt-1 overflow-visible">
+        {/* Connection paths inside SVG */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+          <style>{`
+            @keyframes hex-dash-flow {
+              to { stroke-dashoffset: -20; }
+            }
+          `}</style>
+          {orbitals.map((node) => (
+            <g key={node.name}>
+              <line
+                x1={93 + 26}
+                y1={55 + 29}
+                x2={node.x + 26}
+                y2={node.y + 29}
+                stroke="var(--accent-2)"
+                strokeWidth="1"
+                strokeOpacity="0.15"
+              />
+              <line
+                x1={93 + 26}
+                y1={55 + 29}
+                x2={node.x + 26}
+                y2={node.y + 29}
+                stroke={activeTech.name === node.name || activeTech.name === "AI / ML" ? activeTech.color : "var(--accent-2)"}
+                strokeWidth="1.5"
+                strokeOpacity={activeTech.name === node.name ? "0.7" : "0.1"}
+                strokeDasharray="4 6"
+                style={{
+                  strokeDashoffset: activeTech.name === node.name ? 0 : undefined,
+                  animation: activeTech.name === node.name ? "hex-dash-flow 1.5s linear infinite" : "none"
+                }}
+              />
+            </g>
+          ))}
+        </svg>
+
+        {/* Hex nodes */}
+        {hexPositions.map((pos, i) => {
+          const tech = TECHNOLOGIES.find(t => t.name === pos.name)!;
+          const Icon = tech.icon;
+          const isActive = activeTechIndex === i;
+          
+          return (
+            <div
+              key={pos.name}
+              onMouseEnter={() => {
+                audioSynth.playHover();
+                setActiveTechIndex(i);
+              }}
+              className="absolute cursor-pointer transition-all duration-300 flex items-center justify-center animate-pulse-slow"
+              style={{
+                left: `${pos.x}px`,
+                top: `${pos.y}px`,
+                width: "52px",
+                height: "58px",
+                zIndex: isActive ? 10 : 5,
+              }}
+            >
+              <div
+                className="w-full h-full absolute transition-all duration-300"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: isActive 
+                    ? `linear-gradient(135deg, ${tech.color}25, ${tech.color}08)` 
+                    : (themeMode === "light" ? "var(--ink-0)" : "rgba(255, 255, 255, 0.02)"),
+                  border: `1px solid ${isActive ? tech.color : (themeMode === "light" ? "rgba(0, 0, 0, 0.08)" : "rgba(255, 255, 255, 0.08)")}`,
+                  boxShadow: isActive 
+                    ? (themeMode === "light" ? `var(--nm-sunken-soft), 0 0 10px ${tech.color}33` : `0 0 10px ${tech.color}33`) 
+                    : "var(--nm-raised-soft)",
+                  transform: isActive ? "scale(1.08)" : "scale(1)",
+                }}
+              >
+                {isActive && (
+                  <div 
+                    className="absolute inset-0 filter blur-[4px] opacity-30 rounded-full" 
+                    style={{ backgroundColor: tech.color }}
+                  />
+                )}
+                <div 
+                  className="absolute inset-px rounded-md flex flex-col items-center justify-center p-0.5"
+                  style={{ 
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.95)",
+                  }}
+                >
+                  <Icon className="w-3.5 h-3.5 mb-0.5" style={{ color: tech.color }} />
+                  <span className="text-[6.5px] font-mono font-semibold tracking-tight text-text-hi leading-none text-center truncate max-w-full px-0.5">
+                    {tech.name}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Description overlay */}
+      <div 
+        className="w-full h-9 rounded-lg flex items-center justify-center px-2 py-1 select-none border transition-all duration-300"
+        style={{
+          backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.4)",
+          borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.05)",
+          boxShadow: "var(--nm-sunken-soft)",
+        }}
+      >
+        <span className="text-[8.5px] font-mono text-center text-text-low leading-tight">
+          <strong className="text-accent-2" style={{ color: activeTech.color }}>{activeTech.name}</strong>: {activeTech.desc}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function PipelineFlow() {
+  const { themeMode } = useTheme();
+  const [hoveredStage, setHoveredStage] = useState(1); // Default to Prototype
+
+  const PIPELINE_STAGES = [
+    { id: 0, label: "Discover", status: "100% DONE", detail: "Define scope & map architecture", color: "var(--accent-warm)" },
+    { id: 1, label: "Prototype", status: "85% ACTIVE", detail: "Ship testable slices & code loops", color: "var(--accent-2)" },
+    { id: 2, label: "Launch", status: "STAGING READY", detail: "Deploy to edge with logging", color: "var(--accent-1)" },
+  ];
+
+  return (
+    <div className="flex-1 flex flex-col justify-between w-full h-full select-none">
+      <div className="flex justify-between items-center w-full relative pt-4 pb-2">
+        {/* Horizontal Pipeline Background Line */}
+        <div 
+          className="absolute top-[34px] left-4 right-4 h-0.5 transition-all duration-300"
           style={{
-            background: "linear-gradient(180deg, var(--accent-2), var(--accent-1))",
-            height: "100%",
-            transformOrigin: "bottom",
-            animation: isLive 
-              ? "bar-scale 1.8s ease-in-out infinite" 
-              : "none",
-            animationDelay: `${i * 0.12}s`,
-            transform: !isLive ? "scaleY(0.2)" : undefined,
+            backgroundColor: themeMode === "light" ? "rgba(0, 0, 0, 0.08)" : "rgba(255, 255, 255, 0.08)",
           }}
         />
-      ))}
+        
+        {/* Animated Pipeline Active Line */}
+        <div 
+          className="absolute top-[34px] left-4 h-0.5 bg-gradient-to-r from-accent-warm via-accent-2 to-accent-1 transition-all duration-500"
+          style={{ 
+            width: hoveredStage === 0 ? "20%" : hoveredStage === 1 ? "50%" : "80%",
+          }}
+        />
+
+        {PIPELINE_STAGES.map((stage) => (
+          <div 
+            key={stage.id} 
+            className="flex flex-col items-center z-10 cursor-pointer"
+            onMouseEnter={() => {
+              audioSynth.playHover();
+              setHoveredStage(stage.id);
+            }}
+          >
+            <div 
+              className="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300"
+              style={{ 
+                backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.8)",
+                borderColor: hoveredStage === stage.id ? stage.color : (themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.1)"),
+                transform: hoveredStage === stage.id ? "scale(1.12)" : "scale(0.95)",
+                boxShadow: hoveredStage === stage.id 
+                  ? (themeMode === "light" ? `var(--nm-sunken-soft), 0 0 8px color-mix(in srgb, ${stage.color} 30%, transparent)` : `var(--nm-sunken-soft), 0 0 10px ${stage.color}44`)
+                  : "var(--nm-raised-soft)",
+              }}
+            >
+              <span className="text-[10px] font-mono" style={{ color: hoveredStage === stage.id ? stage.color : "var(--text-low)" }}>
+                0{stage.id + 1}
+              </span>
+            </div>
+            <span className={`text-[8.5px] font-mono mt-1.5 transition-colors duration-300 ${hoveredStage === stage.id ? "text-text-hi" : "text-text-low"}`}>
+              {stage.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Details Box */}
+      <div 
+        className="h-16 rounded-xl border p-2.5 flex flex-col justify-center select-none transition-all duration-300"
+        style={{
+          backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.4)",
+          borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.06)",
+          boxShadow: "var(--nm-sunken-soft)",
+        }}
+      >
+        <div className="flex justify-between items-center mb-0.5">
+          <span className="text-[7.5px] font-mono uppercase tracking-wider text-text-faint">Stage status</span>
+          <span className="text-[8px] font-mono font-semibold" style={{ color: PIPELINE_STAGES[hoveredStage].color }}>
+            {PIPELINE_STAGES[hoveredStage].status}
+          </span>
+        </div>
+        <p className="text-[9.5px] font-semibold text-text-hi leading-tight">
+          {PIPELINE_STAGES[hoveredStage].label}
+        </p>
+        <p className="text-[8.5px] text-text-low leading-tight mt-0.5">
+          {PIPELINE_STAGES[hoveredStage].detail}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface DiagnosticConsoleProps {
+  isPinging: boolean;
+  setIsPinging: (v: boolean) => void;
+  onPulse: () => void;
+}
+
+function DiagnosticConsole({ 
+  isPinging, 
+  setIsPinging, 
+  onPulse 
+}: DiagnosticConsoleProps) {
+  const { themeMode } = useTheme();
+  const [logs, setLogs] = useState<string[]>([
+    "SYS: boot core agents... OK",
+    "NET: edge regions online [8/8]",
+    "AGENT: monitoring localhost...",
+    "READY: telemetry link operational"
+  ]);
+  const [isDiagnosticRunning, setIsDiagnosticRunning] = useState(false);
+  const terminalContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll logs internally
+  useEffect(() => {
+    if (terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  // Periodic random background logs when idle
+  useEffect(() => {
+    if (isDiagnosticRunning || isPinging) return;
+
+    const interval = setInterval(() => {
+      const backgroundLogs = [
+        "SYS: cleared cache buffers (0.01s)",
+        "AGENT: context weight compressed 4.2x",
+        "NET: edge SFO connection optimized",
+        "COMPILER: verified 18 modules",
+        "SYS: thermal limits normal (42°C)",
+        "SEC: session tokens refreshed"
+      ];
+      const randomLog = backgroundLogs[Math.floor(Math.random() * backgroundLogs.length)];
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      
+      setLogs(prev => [...prev.slice(-8), `[${timeStr}] ${randomLog}`]);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [isDiagnosticRunning, isPinging]);
+
+  const runDiagnostics = () => {
+    if (isDiagnosticRunning) return;
+    setIsDiagnosticRunning(true);
+    audioSynth.playClick();
+    
+    // Simulate diagnostic script
+    setLogs(["[init] running full yantracore tests..."]);
+    
+    const steps = [
+      { text: "[test] CPU nodes status: OK", delay: 300 },
+      { text: "[test] edge latency: SFO:14ms SGP:48ms", delay: 700 },
+      { text: "[test] database cluster sync: OK", delay: 1100 },
+      { text: "[sys] COMPLETED ALL CHECKS.", delay: 1500 },
+      { text: "[sys] RESULT: 100% OPERATIONAL", delay: 1800 }
+    ];
+
+    steps.forEach((step) => {
+      setTimeout(() => {
+        setLogs(prev => [...prev, step.text]);
+        audioSynth.playHover();
+      }, step.delay);
+    });
+
+    setTimeout(() => {
+      setIsDiagnosticRunning(false);
+    }, 2000);
+  };
+
+  const syncNodes = () => {
+    if (isPinging) return;
+    setIsPinging(true);
+    onPulse();
+    audioSynth.playClick();
+
+    setLogs(prev => [...prev, "[sync] pulsing edge network nodes..."]);
+
+    setTimeout(() => {
+      setIsPinging(false);
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      setLogs(prev => [...prev, `[${timeStr}] [sync] success (edge latency: 24.2ms)`]);
+    }, 1200);
+  };
+
+  return (
+    <div className="flex-1 flex flex-col justify-between w-full h-full select-none font-mono">
+      {/* Terminal Display */}
+      <div 
+        ref={terminalContainerRef}
+        onClick={(e) => e.stopPropagation()}
+        className={`flex-1 rounded-xl border border-white/5 bg-black/60 p-2.5 overflow-y-auto max-h-[105px] h-[105px] text-[7.5px] leading-tight text-emerald-400 select-text scrollbar-thin scrollbar-thumb-white/10 ${
+          isDiagnosticRunning ? "animate-terminal-flicker" : ""
+        }`}
+        style={{
+          boxShadow: "inset 0 1px 4px rgba(0,0,0,0.8)",
+          textShadow: "0 0 2px rgba(52, 211, 153, 0.4)",
+        }}
+      >
+        <div className="text-text-faint text-[7px] mb-1 uppercase tracking-wider font-bold">
+          [YANTRA CORE OS v4.1]
+        </div>
+        <div className="space-y-0.5">
+          {logs.map((log, idx) => (
+            <div key={idx} className="break-all whitespace-pre-wrap">
+              {log}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Button Controls */}
+      <div className="grid grid-cols-2 gap-1.5 mt-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            runDiagnostics();
+          }}
+          disabled={isDiagnosticRunning}
+          className={`py-1 rounded-lg border text-[8px] font-mono font-bold flex items-center justify-center gap-1 active:scale-[0.97] transition-all ${
+            isDiagnosticRunning
+              ? (themeMode === "light"
+                  ? "bg-black/5 border-black/10 text-text-low cursor-not-allowed"
+                  : "bg-white/5 border-white/10 text-text-low cursor-not-allowed")
+              : (themeMode === "light"
+                  ? "bg-emerald-600/10 border-emerald-600/20 text-emerald-700 hover:bg-emerald-600/20 hover:border-emerald-600/40"
+                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40")
+          }`}
+        >
+          <Zap className="w-2.5 h-2.5" />
+          Diag OS
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            syncNodes();
+          }}
+          disabled={isPinging}
+          className={`py-1 rounded-lg border text-[8px] font-mono font-bold flex items-center justify-center gap-1 active:scale-[0.97] transition-all ${
+            isPinging
+              ? (themeMode === "light"
+                  ? "bg-black/5 border-black/10 text-text-low cursor-not-allowed"
+                  : "bg-white/5 border-white/10 text-text-low cursor-not-allowed")
+              : "bg-accent-2/10 border-accent-2/20 text-accent-2 hover:bg-accent-2/20 hover:border-accent-2/40"
+          }`}
+        >
+          <RefreshCw className={`w-2.5 h-2.5 ${isPinging ? "animate-spin" : ""}`} />
+          Pulse
+        </button>
+      </div>
+
+      <style>{`
+        @keyframes terminal-flicker {
+          0% { opacity: 0.98; filter: brightness(1); }
+          25% { opacity: 0.95; filter: brightness(0.9); }
+          50% { opacity: 0.99; filter: brightness(1.1); }
+          75% { opacity: 0.93; filter: brightness(0.85); }
+          100% { opacity: 0.98; filter: brightness(1); }
+        }
+        .animate-terminal-flicker {
+          animation: terminal-flicker 0.15s infinite;
+        }
+      `}</style>
     </div>
   );
 }
 
 function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
   const router = useRouter();
-  const [latency, setLatency] = useState(38.4);
-  const [isPinging, setIsPinging] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
+
+  const [isPinging, setIsPinging] = useState(false);
+  const [pingTrigger, setPingTrigger] = useState(0);
 
   useEffect(() => {
     if (swiperRef) {
@@ -1581,90 +2522,27 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
     }
   }, [syncTick, swiperRef]);
 
-  const handlePing = (e: React.MouseEvent) => {
+  const handlePulse = () => {
+    setPingTrigger(prev => prev + 1);
+  };
+
+  const handleHireYantracore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isPinging) return;
-    setIsPinging(true);
-    audioSynth.playClick();
-
-    setTimeout(() => {
-      const newLatency = parseFloat((Math.random() * 32 + 10).toFixed(1));
-      setLatency(newLatency);
-      setIsPinging(false);
-    }, 800);
-  };
-
-  const handleLiveStats = () => {
-    window.open("/stats", "_blank", "noopener,noreferrer");
-  };
-
-  const handleHireYantracore = () => {
-    const el = document.getElementById("signal");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    } else {
-      router.push("/#signal");
-    }
-  };
-
-  const TECHNOLOGIES = [
-    { name: "React", icon: Cpu, color: "#61DAFB" },
-    { name: "Node.js", icon: Bot, color: "#339933" },
-    { name: "Next.js", icon: Sparkles, color: "#FFFFFF" },
-    { name: "Figma", icon: Heart, color: "#F24E1E" },
-    { name: "Photoshop", icon: Sparkles, color: "#31A8FF" },
-    { name: "AI / ML", icon: Bot, color: "#FF6F00" },
-    { name: "TypeScript", icon: Cpu, color: "#3178C6" },
-    { name: "Python", icon: Cpu, color: "#3776AB" },
-    { name: "AWS Cloud", icon: Sparkles, color: "#FF9900" },
-  ];
-
-  const DELIVERY_FLOW = [
-    { label: "Discover", detail: "Map the business case", icon: Compass },
-    { label: "Prototype", detail: "Ship a testable slice", icon: Sparkles },
-    { label: "Launch", detail: "Release with observability", icon: Send },
-  ];
-
-  const CORE_SIGNALS = [
-    { label: "Product", value: "Strategy", icon: TrendingUp },
-    { label: "Systems", value: "Reliable", icon: Activity },
-    { label: "Teams", value: "Aligned", icon: Users },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.85, y: 10 },
-    visible: { 
-      opacity: 1, 
-      scale: 1, 
-      y: 0, 
-      transition: { 
-        type: "spring", 
-        stiffness: 260, 
-        damping: 18 
-      } 
-    }
+    router.push("/contact");
   };
 
   return (
     <div className="flex flex-col justify-between h-full w-full relative">
-      <ProjectCardHeader
+      <ProductCardHeader
         logoImg="/images/logo/yantracore_logo.png"
         unicodeChar="⚡"
         title="YANTRACORE"
-        description="Build amazing apps."
-        statusDotColor="bg-emerald-400"
+        description="Build Amazing Apps"
         accentColor="var(--accent-2)"
-        isLive={true}
+        showExternalLink={false}
       />
 
-      <div className="flex-1 my-2 relative overflow-visible pointer-events-auto min-h-0">
+      <div className="flex-1 my-[22px] relative overflow-visible pointer-events-auto min-h-0">
         <Swiper
           onSwiper={setSwiperRef}
           effect="cube"
@@ -1682,204 +2560,48 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           modules={[EffectCube, Autoplay]}
           className="w-full h-full"
         >
-          {/* Slide 1: Technologies Grid */}
-          <SwiperSlide className="w-full h-full flex items-center justify-center p-0.5 bg-transparent">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate={activeSlide === 0 ? "visible" : "hidden"}
-              className="grid grid-cols-3 gap-1.5 w-full"
-            >
-              {TECHNOLOGIES.map((tech) => {
-                const Icon = tech.icon;
-                return (
-                  <motion.div
-                    key={tech.name}
-                    variants={itemVariants}
-                    className="flex flex-col items-center justify-center py-2 px-1 rounded-xl border border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all group/tech cursor-default"
-                    style={{
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-                    }}
-                  >
-                    <div 
-                      className="w-6 h-6 rounded-lg flex items-center justify-center mb-1 bg-black/40 border border-white/5 group-hover/tech:scale-110 transition-transform"
-                      style={{ color: tech.color }}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-[8px] font-mono font-medium text-text-low group-hover/tech:text-text-hi transition-colors text-center truncate w-full">
-                      {tech.name}
-                    </span>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          </SwiperSlide>
-
-          {/* Slide 2: Active State & Equalizer */}
-          <SwiperSlide className="w-full h-full flex flex-col justify-center p-0.5 bg-transparent">
-            <div className="flex-1 flex flex-col gap-2.5 justify-center w-full">
-              {/* Live AI Activity Equalizer */}
-              <div 
-                className="cursor-pointer relative overflow-hidden rounded-xl border border-white/5 bg-black/45 p-2.5 flex flex-col gap-1.5 group/equalizer active:scale-[0.98] transition-transform"
-                onClick={handlePing}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-text-low flex items-center gap-1">
-                    <Activity className="w-3 h-3 text-accent-2 animate-pulse" />
-                    AI Activity
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <span className="relative flex items-center justify-center">
-                      <span className="absolute w-2 h-2 rounded-full bg-emerald-400/40 animate-ping" />
-                      <span className="relative w-1 h-1 rounded-full bg-emerald-400" />
-                    </span>
-                    <span className="text-[7.5px] font-mono uppercase tracking-wider text-emerald-300">Live</span>
-                  </div>
-                </div>
-                
-                <ActivityEqualizer isLive={!isPinging} />
-                
-                {isPinging && (
-                  <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[0.5px] flex items-center justify-center rounded-xl z-20">
-                    <span className="text-[9px] font-mono text-emerald-400 uppercase tracking-widest animate-pulse">Pinging...</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Latency & Nodes Stats */}
-              <div className="grid grid-cols-2 gap-2 text-center border-t border-white/[0.06] pt-2">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] text-text-low font-mono uppercase tracking-wider">Latency</p>
-                  <p className="text-xs font-semibold text-accent-2 font-mono">
-                    {isPinging ? "---" : `${latency}ms`}
-                  </p>
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-[9px] text-text-low font-mono uppercase tracking-wider">Nodes Active</p>
-                  <p className="text-xs font-semibold text-accent-1 font-mono">8 Regions</p>
-                </div>
-              </div>
+          {/* Slide 1: Tech Hex Matrix */}
+          <SwiperSlide className="w-full h-full flex items-center justify-center bg-transparent">
+            <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
+              <TechHexGrid />
             </div>
           </SwiperSlide>
 
-          {/* Slide 3: Delivery Flow */}
-          <SwiperSlide className="w-full h-full flex flex-col justify-center p-0.5 bg-transparent">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate={activeSlide === 2 ? "visible" : "hidden"}
-              className="flex flex-col gap-2.5 w-full"
-            >
-              <div className="rounded-xl border border-white/[0.06] bg-black/40 p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-text-low">
-                    Build loop
-                  </span>
-                  <span className="text-[7.5px] font-mono uppercase tracking-wider text-accent-2">
-                    Fast + careful
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {DELIVERY_FLOW.map((step, index) => {
-                    const Icon = step.icon;
-                    return (
-                      <motion.div
-                        key={step.label}
-                        variants={itemVariants}
-                        className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-white/[0.025] px-2.5 py-2"
-                      >
-                        <div className="w-6 h-6 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-accent-2">
-                          <Icon className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[10px] font-semibold text-text-hi leading-tight">
-                            {step.label}
-                          </p>
-                          <p className="text-[8px] text-text-low leading-tight truncate">
-                            {step.detail}
-                          </p>
-                        </div>
-                        <span className="text-[8px] font-mono text-text-faint">
-                          0{index + 1}
-                        </span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
+          {/* Slide 2: Neural Telemetry Map */}
+          <SwiperSlide className="w-full h-full flex flex-col justify-center bg-transparent">
+            <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
+              <NeuralTelemetryMap isPinging={isPinging} pingTrigger={pingTrigger} />
+            </div>
           </SwiperSlide>
 
-          {/* Slide 4: Company Signals */}
-          <SwiperSlide className="w-full h-full flex flex-col justify-center p-0.5 bg-transparent">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate={activeSlide === 3 ? "visible" : "hidden"}
-              className="flex flex-col gap-2.5 w-full"
-            >
-              <div className="grid grid-cols-3 gap-1.5">
-                {CORE_SIGNALS.map((signal) => {
-                  const Icon = signal.icon;
-                  return (
-                    <motion.div
-                      key={signal.label}
-                      variants={itemVariants}
-                      className="rounded-xl border border-white/[0.05] bg-white/[0.025] px-1.5 py-2.5 text-center"
-                    >
-                      <div className="mx-auto mb-1.5 w-7 h-7 rounded-lg bg-black/40 border border-white/5 flex items-center justify-center text-accent-1">
-                        <Icon className="w-3.5 h-3.5" />
-                      </div>
-                      <p className="text-[8px] text-text-low font-mono uppercase tracking-wider leading-tight">
-                        {signal.label}
-                      </p>
-                      <p className="text-[10px] text-text-hi font-semibold leading-tight mt-0.5">
-                        {signal.value}
-                      </p>
-                    </motion.div>
-                  );
-                })}
-              </div>
+          {/* Slide 3: Industrial Build Flow */}
+          <SwiperSlide className="w-full h-full flex flex-col justify-center bg-transparent">
+            <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
+              <PipelineFlow />
+            </div>
+          </SwiperSlide>
 
-              <div className="rounded-xl border border-white/[0.06] bg-black/40 p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg bg-accent-2/10 border border-accent-2/20 flex items-center justify-center text-accent-2">
-                    <Bot className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold text-text-hi leading-tight">
-                      Software that keeps moving
-                    </p>
-                    <p className="text-[8px] text-text-low leading-tight">
-                      AI tools, apps, infrastructure, and support in one build rhythm.
-                    </p>
-                  </div>
-                </div>
-                <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                  <div className="h-full w-4/5 rounded-full bg-gradient-to-r from-accent-2 to-accent-1 animate-pulse" />
-                </div>
-              </div>
-            </motion.div>
+          {/* Slide 4: Interactive OS Console */}
+          <SwiperSlide className="w-full h-full flex flex-col justify-center bg-transparent">
+            <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
+              <DiagnosticConsole 
+                isPinging={isPinging} 
+                setIsPinging={setIsPinging} 
+                onPulse={handlePulse} 
+              />
+            </div>
           </SwiperSlide>
         </Swiper>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 w-full pointer-events-auto">
-        <button
-          onClick={handleLiveStats}
-          className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] active:scale-95 border border-white/10 hover:border-white/20 transition-all text-text-hi"
-        >
-          Learn More
-        </button>
+      <div className="flex w-full pointer-events-auto">
         <button
           onClick={handleHireYantracore}
-          className="flex-1 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center"
+          className="w-full py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center cursor-pointer"
           style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
         >
-          Hire yantracore
+          Contact Us
         </button>
       </div>
     </div>

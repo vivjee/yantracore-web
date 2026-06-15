@@ -246,12 +246,12 @@ function RestrovisualMock() {
     <div className="w-full flex flex-col gap-3">
       <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/[0.05] border border-white/10">
         <Sparkles className="w-3.5 h-3.5 text-accent-2 shrink-0" />
-        <span className="text-xs text-text-hi font-mono">&ldquo;traditional garden ryokan in Kyoto&rdquo;</span>
+        <span className="text-xs text-text-hi font-mono">&ldquo;heritage boutique hotel in Kathmandu&rdquo;</span>
       </div>
       {[
-        { name: "Hoshinoya Ryokan", rating: "4.9", price: "$480", match: "99%" },
-        { name: "Yuzuya Ryokan", rating: "4.8", price: "$350", match: "96%" },
-        { name: "Ryokan Kurama", rating: "4.7", price: "$260", match: "93%" },
+        { name: "Dwarika's Heritage", rating: "4.9", price: "$240", match: "99%" },
+        { name: "Baber Mahal Vilas", rating: "4.8", price: "$180", match: "96%" },
+        { name: "Kantipur Temple House", rating: "4.7", price: "$120", match: "93%" },
       ].map((item) => (
         <div
           key={item.name}
@@ -280,7 +280,7 @@ function RestrovisualMock() {
 function JimboVisualMock() {
   const messages = [
     { from: "user", text: "Can I book a table for 4 at 7pm?" },
-    { from: "bot", text: "Of course! Checking availability at Hotel Aurora for tonight…" },
+    { from: "bot", text: "Of course! Checking availability at Dwarika's Resort Dhulikhel for tonight…" },
     { from: "bot", text: "✓ Table confirmed for 4 at 7:00 PM. You'll receive a WhatsApp confirmation shortly." },
     { from: "user", text: "Perfect, thank you!" },
   ];
@@ -328,9 +328,9 @@ function JimboVisualMock() {
 
 function ShramdanVisualMock() {
   const events = [
-    { title: "Lakeside Cleanup", people: 48, location: "Pokhara" },
-    { title: "Tree Planting Drive", people: 31, location: "Chitwan" },
-    { title: "Food Distribution", people: 22, location: "Kathmandu" },
+    { title: "Fewa Lake Cleanup", people: 48, location: "Pokhara", address: "Lakeside Ward 6", time: "Sat, 7:00 AM" },
+    { title: "Sauraha Reforestation", people: 31, location: "Chitwan", address: "Sauraha Buffer Zone", time: "Sun, 8:00 AM" },
+    { title: "Bagmati Cleaning Drive", people: 22, location: "Kathmandu", address: "Gaurighat", time: "Sat, 7:30 AM" },
   ];
   return (
     <div className="w-full flex flex-col gap-4">
@@ -344,10 +344,14 @@ function ShramdanVisualMock() {
             <Heart className="w-3.5 h-3.5 text-accent-warm" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-hi">{e.title}</p>
-            <div className="flex items-center gap-2">
-              <Users className="w-3 h-3 text-accent-warm" />
-              <span className="text-[10px] text-text-low">{e.people} volunteers · {e.location}</span>
+            <div className="flex justify-between items-start">
+              <p className="text-sm font-medium text-text-hi truncate">{e.title}</p>
+              <span className="text-[9px] text-text-low shrink-0">{e.time}</span>
+            </div>
+            <p className="text-[10px] text-text-low truncate">{e.address}, {e.location}</p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <Users className="w-3.5 h-3.5 text-accent-warm" />
+              <span className="text-[10px] text-text-hi font-medium">{e.people} participants</span>
             </div>
           </div>
         </div>
