@@ -485,7 +485,7 @@ export default function MusicPage() {
                 {/* Visualizer Panel Header */}
                 <div className="flex items-center justify-between z-10 w-full select-none">
                   <div className="flex items-center gap-1.5 pointer-events-none">
-                    <Activity className="w-3.5 h-3.5 text-accent-2" />
+                    <Activity className="w-5 h-5 text-accent-2" />
                     <span className="text-[9px] font-mono text-text-low uppercase tracking-wider font-semibold">
                       {isVisualizerExpanded ? "TV Mode // Ambient Space" : "Visualization"}
                     </span>
@@ -661,35 +661,35 @@ export default function MusicPage() {
                         {/* Repeat Mode Toggle */}
                         <button
                           onClick={toggleRepeatMode}
-                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                             repeatMode !== "none" ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                           }`}
                           title={`Repeat: ${repeatMode.toUpperCase()}`}
                         >
-                          <RotateCcw className={`w-3.5 h-3.5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
-                          {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[10px]">1</span>}
+                          <RotateCcw className={`w-5 h-5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
+                          {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[14px]">1</span>}
                         </button>
 
                         {/* Shuffle Toggle */}
                         <button
                           onClick={toggleShuffle}
-                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                             isShuffle ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                           }`}
                           title={`Shuffle: ${isShuffle ? "ON" : "OFF"}`}
                         >
-                          <Shuffle className="w-3.5 h-3.5" />
+                          <Shuffle className="w-5 h-5" />
                         </button>
 
                         {/* Synthesizer Mode Toggle */}
                         <button
                           onClick={handleSynthToggle}
-                          className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                          className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                             isSynthOnly ? "bg-accent-1/10 border-accent-1 text-accent-1" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                           }`}
                           title={`Synthesizer Mode: ${isSynthOnly ? "FORCE ON" : "AUTO"}`}
                         >
-                          <Sliders className="w-3.5 h-3.5" />
+                          <Sliders className="w-5 h-5" />
                         </button>
                       </div>
 
@@ -697,30 +697,30 @@ export default function MusicPage() {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={handlePrev}
-                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                          className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
                           title="Previous Track"
                         >
-                          <SkipBack className="w-4 h-4" />
+                          <SkipBack className="w-6 h-6" />
                         </button>
 
                         <button
                           onClick={togglePlay}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
                             isPlaying && currentTrack.isPlayable
                               ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
                               : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
                           }`}
                           title={isPlaying ? "Pause" : "Play"}
                         >
-                          {isPlaying && currentTrack.isPlayable ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+                          {isPlaying && currentTrack.isPlayable ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
                         </button>
 
                         <button
                           onClick={handleNext}
-                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                          className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
                           title="Next Track"
                         >
-                          <SkipForward className="w-4 h-4" />
+                          <SkipForward className="w-6 h-6" />
                         </button>
                       </div>
 
@@ -729,10 +729,10 @@ export default function MusicPage() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={toggleMute}
-                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
+                            className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
                             title={isMuted ? "Unmute" : "Mute"}
                           >
-                            {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                            {isMuted ? <VolumeX className="w-5 h-5 text-accent-3" /> : <Volume2 className="w-5 h-5" />}
                           </button>
                           <input
                             type="range"
@@ -797,20 +797,20 @@ export default function MusicPage() {
                     <div className="flex border-b border-white/5 bg-black/20 text-[9px] font-mono">
                       <button
                         onClick={() => setActiveConsoleTab("eq")}
-                        className={`flex-1 py-2 flex items-center justify-center gap-1.5 border-r border-white/5 transition-all ${
+                        className={`flex-1 py-3 text-[11px] flex items-center justify-center gap-2 border-r border-white/5 transition-all ${
                           activeConsoleTab === "eq" ? "bg-white/5 text-accent-2 font-bold" : "text-text-low hover:text-text-mid"
                         }`}
                       >
-                        <Sliders className="w-3 h-3" />
+                        <Sliders className="w-4 h-4" />
                         Equalizer
                       </button>
                       <button
                         onClick={() => setActiveConsoleTab("ambient")}
-                        className={`flex-1 py-2 flex items-center justify-center gap-1.5 transition-all ${
+                        className={`flex-1 py-3 text-[11px] flex items-center justify-center gap-2 transition-all ${
                           activeConsoleTab === "ambient" ? "bg-white/5 text-accent-2 font-bold" : "text-text-low hover:text-text-mid"
                         }`}
                       >
-                        <Sparkles className="w-3 h-3 animate-pulse" />
+                        <Sparkles className="w-4 h-4 animate-pulse" />
                         Nature
                       </button>
                     </div>
@@ -999,35 +999,35 @@ export default function MusicPage() {
                       {/* Repeat Toggle */}
                       <button
                         onClick={toggleRepeatMode}
-                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                        className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                           repeatMode !== "none" ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                         }`}
                         title={`Repeat: ${repeatMode.toUpperCase()}`}
                       >
-                        <RotateCcw className={`w-3.5 h-3.5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
-                        {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[10px]">1</span>}
+                        <RotateCcw className={`w-5 h-5 ${repeatMode === "one" ? "scale-x-[-1]" : ""}`} />
+                        {repeatMode === "one" && <span className="absolute text-[6px] font-mono font-bold mt-[14px]">1</span>}
                       </button>
 
                       {/* Shuffle Toggle */}
                       <button
                         onClick={toggleShuffle}
-                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                        className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                           isShuffle ? "bg-white/10 border-white/20 text-accent-2" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                         }`}
                         title={`Shuffle: ${isShuffle ? "ON" : "OFF"}`}
                       >
-                        <Shuffle className="w-3.5 h-3.5" />
+                        <Shuffle className="w-5 h-5" />
                       </button>
 
                       {/* Synthesizer Mode Toggle */}
                       <button
                         onClick={handleSynthToggle}
-                        className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
+                        className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                           isSynthOnly ? "bg-accent-1/10 border-accent-1 text-accent-1" : "bg-white/5 border-white/5 text-text-low hover:text-text-mid"
                         }`}
                         title={`Synthesizer Mode: ${isSynthOnly ? "FORCE ON" : "AUTO"}`}
                       >
-                        <Sliders className="w-3.5 h-3.5" />
+                        <Sliders className="w-5 h-5" />
                       </button>
                     </div>
 
@@ -1036,32 +1036,32 @@ export default function MusicPage() {
                       {/* Prev */}
                       <button
                         onClick={handlePrev}
-                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                        className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
                         title="Previous Track"
                       >
-                        <SkipBack className="w-4 h-4" />
+                        <SkipBack className="w-6 h-6" />
                       </button>
 
                       {/* Play/Pause */}
                       <button
                         onClick={togglePlay}
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
                           isPlaying && currentTrack.isPlayable
                              ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
                              : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
                         }`}
                         title={isPlaying ? "Pause" : "Play"}
                       >
-                        {isPlaying && currentTrack.isPlayable ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+                        {isPlaying && currentTrack.isPlayable ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
                       </button>
 
                       {/* Next */}
                       <button
                         onClick={handleNext}
-                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
+                        className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
                         title="Next Track"
                       >
-                        <SkipForward className="w-4 h-4" />
+                        <SkipForward className="w-6 h-6" />
                       </button>
                     </div>
 
@@ -1069,10 +1069,10 @@ export default function MusicPage() {
                     <div className="flex items-center gap-1.5 md:gap-2 flex-1 justify-end select-none">
                       <button
                         onClick={toggleMute}
-                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
+                        className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
                         title={isMuted ? "Unmute" : "Mute"}
                       >
-                        {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                        {isMuted ? <VolumeX className="w-5 h-5 text-accent-3" /> : <Volume2 className="w-5 h-5" />}
                       </button>
                       <input
                         type="range"
@@ -1157,7 +1157,7 @@ export default function MusicPage() {
                             {/* Channel number or animated indicator */}
                             <div className="w-6 h-6 rounded bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 text-[10px] font-mono text-text-low">
                               {isTrackPlaying ? (
-                                <Music className="w-3.5 h-3.5 text-accent-2 animate-bounce" />
+                                <Music className="w-5 h-5 text-accent-2 animate-bounce" />
                               ) : (
                                 String(track.id).padStart(2, "0")
                               )}

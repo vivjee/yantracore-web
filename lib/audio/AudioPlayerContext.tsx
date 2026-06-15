@@ -15,6 +15,7 @@ export interface Track {
 
 export const TRACKS: Track[] = [
   { id: 1, title: "Deep Work Lounge", duration: "Stream", isPlayable: true, src: "/music/deep-work-lounge.mp3", description: "Ambient downtempo lofi music for deep work and relaxation.", tempo: "65 BPM", key: "C Minor" },
+  { id: 2, title: "Meadow Sleepwalk", duration: "Stream", isPlayable: true, src: "/music/meadow-sleepwalk.mp3", description: "Ethereal ambient chillout soundscape with gentle downtempo grooves.", tempo: "72 BPM", key: "D Major" },
 ];
 
 export interface AudioPlayerContextType {
@@ -330,44 +331,44 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   // Update EQ filters reactively
   useEffect(() => {
     if (lowFilterRef.current && audioContextRef.current) {
-      lowFilterRef.current.gain.setValueAtTime(eqBass, audioContextRef.current.currentTime);
+      lowFilterRef.current.gain.setTargetAtTime(eqBass, audioContextRef.current.currentTime, 0.05);
     }
   }, [eqBass]);
 
   useEffect(() => {
     if (midFilterRef.current && audioContextRef.current) {
-      midFilterRef.current.gain.setValueAtTime(eqMid, audioContextRef.current.currentTime);
+      midFilterRef.current.gain.setTargetAtTime(eqMid, audioContextRef.current.currentTime, 0.05);
     }
   }, [eqMid]);
 
   useEffect(() => {
     if (highFilterRef.current && audioContextRef.current) {
-      highFilterRef.current.gain.setValueAtTime(eqTreble, audioContextRef.current.currentTime);
+      highFilterRef.current.gain.setTargetAtTime(eqTreble, audioContextRef.current.currentTime, 0.05);
     }
   }, [eqTreble]);
 
   useEffect(() => {
     if (echoGainRef.current && audioContextRef.current) {
-      echoGainRef.current.gain.setValueAtTime(echoVol, audioContextRef.current.currentTime);
+      echoGainRef.current.gain.setTargetAtTime(echoVol, audioContextRef.current.currentTime, 0.05);
     }
   }, [echoVol]);
 
   // Update Ambient layer volumes reactively
   useEffect(() => {
     if (rainGainRef.current && audioContextRef.current) {
-      rainGainRef.current.gain.setValueAtTime(rainVol, audioContextRef.current.currentTime);
+      rainGainRef.current.gain.setTargetAtTime(rainVol, audioContextRef.current.currentTime, 0.05);
     }
   }, [rainVol]);
 
   useEffect(() => {
     if (windGainRef.current && audioContextRef.current) {
-      windGainRef.current.gain.setValueAtTime(windVol, audioContextRef.current.currentTime);
+      windGainRef.current.gain.setTargetAtTime(windVol, audioContextRef.current.currentTime, 0.05);
     }
   }, [windVol]);
 
   useEffect(() => {
     if (humGainRef.current && audioContextRef.current) {
-      humGainRef.current.gain.setValueAtTime(humVol, audioContextRef.current.currentTime);
+      humGainRef.current.gain.setTargetAtTime(humVol, audioContextRef.current.currentTime, 0.05);
     }
   }, [humVol]);
 
@@ -714,7 +715,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
 
     if (synthGainRef.current && audioContextRef.current) {
-      synthGainRef.current.gain.setValueAtTime(audioVol * 0.25, audioContextRef.current.currentTime);
+      synthGainRef.current.gain.setTargetAtTime(audioVol * 0.25, audioContextRef.current.currentTime, 0.05);
     }
   }, [isMuted]);
 
@@ -728,7 +729,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
 
     if (synthGainRef.current && audioContextRef.current) {
-      synthGainRef.current.gain.setValueAtTime(targetVol * 0.25, audioContextRef.current.currentTime);
+      synthGainRef.current.gain.setTargetAtTime(targetVol * 0.25, audioContextRef.current.currentTime, 0.05);
     }
 
     addLog(newMute ? "SYS: Volume muted." : "SYS: Volume unmuted.");
@@ -964,7 +965,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         setTrackDuration,
       }}
     >
-      <audio ref={audioRef} preload="none" />
+      <audio ref={audioRef} preload="none" crossOrigin="anonymous" />
       {children}
     </AudioPlayerContext.Provider>
   );
