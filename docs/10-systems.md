@@ -77,6 +77,19 @@ Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components al
 
 ---
 
+## Off-page music controls
+
+**Files:** [`components/chrome/NowPlayingDock.tsx`](../components/chrome/NowPlayingDock.tsx), [`components/chrome/MusicMiniControls.tsx`](../components/chrome/MusicMiniControls.tsx), [`lib/hooks/useAppMode.ts`](../lib/hooks/useAppMode.ts), plus the `TvMusicDot` / `TvInlineControls` helpers in [`TvFrame.tsx`](../components/layout/TvFrame.tsx).
+
+Music plays globally (the `<audio>` element + `AudioPlayerProvider` live in the root layout), so playback persists across navigation. These surfaces let listeners see and control it without returning to `/music`, choosing the right surface per mode via `useAppMode()` (reads `body.app-mode-active`):
+
+- **App-mode pages (TV chrome):** `TvInlineControls` adds prev / play-pause / next inline in the chrome bar once a session is live (`isPlaying || currentTime > 0`); hidden below `sm`, track title from `lg+`. `TvMusicDot` badges a pulsing `.signal-dot` on the Music Lab button while playing. Both are isolated `useAudioPlayer` subscribers, so live `currentTime` ticks don't re-render the whole frame.
+- **Brochure pages:** `NowPlayingDock` — a floating bottom-right glass mini-player (status dot, track title, progress, transport, link to the console). Mounted once in the root layout; auto-hides on app-mode pages and on `/music`. Respects reduced motion; dismissible (re-arms when the track changes or the session resets).
+
+`MusicMiniControls` is the shared prev / play-pause / next transport both surfaces reuse (`variant="inline" | "dock"`).
+
+---
+
 ## Keyboard shortcuts
 
 **Files:** [`lib/shortcuts/shortcuts.ts`](../lib/shortcuts/shortcuts.ts) (registry), [`lib/shortcuts/ShortcutsProvider.tsx`](../lib/shortcuts/ShortcutsProvider.tsx) (engine), [`lib/hooks/useFullscreen.ts`](../lib/hooks/useFullscreen.ts), [`components/chrome/KeyHint.tsx`](../components/chrome/KeyHint.tsx) (on-button badges), [`components/chrome/ShortcutHelp.tsx`](../components/chrome/ShortcutHelp.tsx) (`?` cheat sheet).
@@ -93,7 +106,7 @@ Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components al
 | Key | Action | | Key | Action |
 |---|---|---|---|---|
 | `F` | Fullscreen | | `⇧H` | Home |
-| `?` | Cheat sheet (Esc closes) | | `⇧L` | Live Activity (`/entryport`) |
+| `?` | Cheat sheet (Esc closes) | | `⇧R` | Reach (`/activity`) |
 | `⇧P` | Play / Pause | | `⇧T` | Technologies |
 | `⟩` (`⇧.`) | Next track | | `⇧M` | Music Lab |
 | `⟨` (`⇧,`) | Previous track | | `⇧C` | Contact |

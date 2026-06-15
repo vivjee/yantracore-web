@@ -40,7 +40,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     runRef.current = (id: string) => {
       switch (id) {
         case "nav-home":         router.push("/"); break;
-        case "nav-entryport":    router.push("/entryport"); break;
+        case "nav-entryport":    router.push("/activity"); break;
         case "nav-technologies": router.push("/technologies"); break;
         case "nav-music":        router.push("/music"); break;
         case "nav-contact":      router.push("/contact"); break;
