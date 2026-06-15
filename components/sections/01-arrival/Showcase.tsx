@@ -71,9 +71,16 @@ import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
  */
 interface ShowcaseProps {
   inTv?: boolean;
+  /**
+   * When true, the centre logo / orbital rings / brand copy are omitted because
+   * the orbital route-group layout renders a *persistent* Sun behind this scene
+   * (so the product cards orbit the shared logo instead of a second one of their
+   * own). Used by /projects inside `app/(orbital)/`.
+   */
+  externalSun?: boolean;
 }
 
-export function Showcase({ inTv = false }: ShowcaseProps) {
+export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isLargestScreen, setIsLargestScreen] = useState(false);
@@ -152,7 +159,9 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
     >
       {/* ── MOBILE ONLY LAYOUT ── */}
       <div className="block md:hidden relative w-full h-full min-h-[100svh]">
-        {/* Center Galaxy/Logo System for Mobile */}
+        {/* Center Galaxy/Logo System for Mobile — omitted when the orbital layout
+            renders the persistent Sun behind this scene. */}
+        {!externalSun && (
         <motion.div
           className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5]"
           style={{ transformOrigin: "center center" }}
@@ -192,12 +201,14 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
             </div>
           </div>
         </motion.div>
+        )}
 
         {/* Foreground copy and mobile projects grid */}
           <div className="h-[30svh]" />
           
           <div className="flex-1 flex flex-col justify-center pointer-events-auto">
-            {/* Brand copy */}
+            {/* Brand copy — Home identity only; omitted on the orbital Projects view */}
+            {!externalSun && (
             <motion.div
               className="showcase-copy-stack flex mb-6"
               initial={{ opacity: 0, y: 20 }}
@@ -206,6 +217,7 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
             >
               <BrandCopy isMobile={true} />
             </motion.div>
+            )}
 
             {/* Mobile Projects Grid */}
             <div className="w-full max-w-[320px] mx-auto px-2 mb-6 z-20">
@@ -297,6 +309,9 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
 
         {/* Column 2: Center Column */}
         <div className="flex flex-col items-center justify-center w-full h-full relative pointer-events-none min-h-[480px] -mt-16 lg:-mt-24">
+          {/* Centre logo + copy — omitted on the orbital Projects view, where the
+              persistent Sun is rendered by the layout. */}
+          {!externalSun && (<>
           <motion.div
             className="relative w-full aspect-square flex items-center justify-center pointer-events-none"
             style={{ transformOrigin: "center center" }}
@@ -347,6 +362,7 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
           >
             <BrandCopy isMobile={false} />
           </motion.div>
+          </>)}
         </div>
 
         {/* Column 3: Right Column (Jimbo 2nd, Shramdan 4th) */}
