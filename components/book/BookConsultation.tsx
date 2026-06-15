@@ -126,8 +126,8 @@ export function BookConsultation() {
               </div>
               <h3 className="mb-3 font-mono text-2xl font-bold text-text-hi">REQUEST RECEIVED</h3>
               <p className="mx-auto max-w-md text-sm leading-relaxed text-text-mid">
-                Thanks — we've got your {typeLabel.toLowerCase()} brief at{" "}
-                <span className="text-text-hi">{bucketLabels[est.bucket]}</span>. We'll review it and
+                Thanks — we’ve got your {typeLabel.toLowerCase()} brief at{" "}
+                <span className="text-text-hi">{bucketLabels[est.bucket]}</span>. We’ll review it and
                 get back to you with a tailored plan and quote shortly.
               </p>
               <button
