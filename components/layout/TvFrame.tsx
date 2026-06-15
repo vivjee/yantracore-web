@@ -25,6 +25,14 @@ import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle
 import { useAudioPlayer } from "@/lib/audio/AudioPlayerContext";
 import { MusicMiniControls } from "@/components/chrome/MusicMiniControls";
 
+/** Seconds → "m:ss" (0:00 for non-finite input). */
+function fmtClock(secs: number): string {
+  if (!Number.isFinite(secs) || secs < 0) secs = 0;
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 /**
  * A pulsing "now playing" dot badged onto the Music Lab nav button while a
  * track is actively playing (hidden on /music — you're already there). Kept as
@@ -55,17 +63,21 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
   const {
     isPlaying,
     currentTime,
+    simulatedDuration,
     currentTrack,
     volume,
     isMuted,
     handleVolumeChange,
     toggleMute,
+    handleSeek,
   } = useAudioPlayer();
   const pathname = usePathname();
   const { themeMode } = useTheme();
   const isActive = pathname === "/music";
   const sessionActive = isPlaying || currentTime > 0;
   const showPanel = isPowered && sessionActive && !isActive;
+  const progress =
+    simulatedDuration > 0 ? Math.min(100, (currentTime / simulatedDuration) * 100) : 0;
 
   return (
     <div className="tv-music-control">
@@ -89,14 +101,16 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
       {showPanel && (
         <div className="tv-music-popover">
           <div className="tv-music-popover__card">
-            {/* Header — status dot + track title */}
-            <div className="flex items-center gap-2">
-              <span className={`shrink-0 w-2 h-2 rounded-full bg-accent-2 ${isPlaying ? "signal-dot" : ""}`} aria-hidden />
+            {/* Header — animated equalizer + status eyebrow + track title */}
+            <div className="flex items-center gap-2.5">
+              <span className="tv-music-eq" data-playing={isPlaying ? "true" : "false"} aria-hidden>
+                <i /><i /><i /><i />
+              </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[8.5px] font-mono uppercase tracking-[0.18em] text-text-low leading-none mb-1">
+                <p className={`text-[8px] font-mono uppercase tracking-[0.22em] leading-none mb-1 ${isPlaying ? "text-accent-2" : "text-text-low"}`}>
                   {isPlaying ? "Now Playing" : "Paused"}
                 </p>
-                <p className="text-[12px] font-semibold text-text-hi truncate leading-tight">
+                <p className="text-[13px] font-semibold text-text-hi truncate leading-tight">
                   {currentTrack.title}
                 </p>
               </div>
@@ -104,13 +118,40 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
 
             {/* Short description */}
             {currentTrack.description && (
-              <p className="text-[10px] text-text-low leading-relaxed line-clamp-2">
+              <p className="text-[10px] text-text-low leading-relaxed line-clamp-2 -mt-0.5">
                 {currentTrack.description}
               </p>
             )}
 
+            {/* Progress — elapsed · seekable bar · total */}
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono tabular-nums text-text-mid w-7 text-right">
+                {fmtClock(currentTime)}
+              </span>
+              <div
+                className="group/seek relative flex-1 h-1.5 rounded-full bg-white/10 cursor-pointer"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pct = (e.clientX - rect.left) / rect.width;
+                  handleSeek(Math.min(Math.max(pct, 0), 1));
+                }}
+              >
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-accent-2"
+                  style={{ width: `${progress}%` }}
+                />
+                <span
+                  className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-md opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none"
+                  style={{ left: `calc(${progress}% - 5px)` }}
+                />
+              </div>
+              <span className="text-[9px] font-mono tabular-nums text-text-mid w-7">
+                {fmtClock(simulatedDuration)}
+              </span>
+            </div>
+
             {/* Transport + compact volume */}
-            <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
+            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5">
               <MusicMiniControls variant="dock" />
               <div className="flex items-center gap-1">
                 <button
