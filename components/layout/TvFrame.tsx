@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes } from "lucide-react";
+import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Briefcase, Info } from "lucide-react";
 import {
   TvConsoleIcon,
   UserIcon,
@@ -230,6 +230,18 @@ export function TvFrame({ children }: TvFrameProps) {
                   <Boxes className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Projects</span>
                   <span className="tooltip">Projects</span>
+                </Link>
+                <Link href="/work" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/work" ? "active" : ""}`} aria-label="Work" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                  {isPowered && pathname === "/work" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
+                  <Briefcase className="w-5 h-5 relative z-10" />
+                  <span className="tv-console-label">Work</span>
+                  <span className="tooltip">Work</span>
+                </Link>
+                <Link href="/about" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/about" ? "active" : ""}`} aria-label="About" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                  {isPowered && pathname === "/about" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
+                  <Info className="w-5 h-5 relative z-10" />
+                  <span className="tv-console-label">About</span>
+                  <span className="tooltip">About</span>
                 </Link>
                 <Link href="/technologies" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/technologies" ? "active" : ""}`} aria-label="Technologies" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/technologies" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
@@ -527,6 +539,8 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
   const items = [
     { href: "/", label: "Home", Icon: Home },
     { href: "/projects", label: "Projects", Icon: Boxes },
+    { href: "/work", label: "Work", Icon: Briefcase },
+    { href: "/about", label: "About", Icon: Info },
     { href: "/technologies", label: "Tech", Icon: StellarOrbitIcon },
     { href: "/reach", label: "Reach", Icon: Globe2 },
     { href: "/contact", label: "Contact", Icon: Mail },

@@ -3,11 +3,13 @@ import { Container } from "@/components/layout/Container";
 import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 const footerLinks = [
-  { label: "Studio", href: "#studio" },
-  { label: "Capabilities", href: "#capabilities" },
+  { label: "Projects", href: "/projects" },
+  { label: "Work", href: "/work" },
+  { label: "About", href: "/about" },
+  { label: "Technologies", href: "/technologies" },
   { label: "Lab", href: "/lab" },
-  { label: "Atelier", href: "/atelier" },
-  { label: "Signal", href: "#signal" },
+  { label: "Book", href: "/book" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const legalLinks = [
