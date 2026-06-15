@@ -183,7 +183,7 @@ export function TvFrame({ children }: TvFrameProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen"
+      className="relative w-full h-[100dvh]"
     >
       <div className={`tv-frame-outer ${isCrtEnabled ? "crt-active" : ""}`}>
         {/* ── Top Chrome Control Bar ── */}
@@ -216,8 +216,9 @@ export function TvFrame({ children }: TvFrameProps) {
             {/* Right: Three button groups */}
             <div className="tv-chrome-controls">
 
-              {/* Group 1 — Navigation pages */}
-              <div className="tv-chrome-btn-group">
+              {/* Group 1 — Navigation pages (top bar on tablet/desktop; on phones
+                  these move to the bottom tab bar, so this group is CSS-hidden) */}
+              <div className="tv-chrome-btn-group tv-chrome-nav-pages">
                 <Link href="/" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/" ? "active" : ""}`} aria-label="Home" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Home className="w-5 h-5 relative z-10" />
@@ -502,11 +503,54 @@ export function TvFrame({ children }: TvFrameProps) {
             >
               {isPowered ? children : <div className="absolute inset-0 bg-[#020205]" />}
             </div>
+
+            {/* Phone-only primary nav — thumb-reachable tab bar (see TvBottomNav) */}
+            <TvBottomNav isPowered={isPowered} />
           </div>
 
 
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Mobile primary navigation — the five page destinations as a bottom tab bar.
+ * The top chrome bar can't fit ten 44px targets on a phone, so on `<md` the
+ * page-nav group is hidden up there (`.tv-chrome-nav-pages`) and these
+ * thumb-reachable tabs take over. Rendered as a flex sibling *below* the screen
+ * content (so it never overlaps pages) and hidden from `md` up via CSS.
+ */
+function TvBottomNav({ isPowered }: { isPowered: boolean }) {
+  const pathname = usePathname();
+  const items = [
+    { href: "/", label: "Home", Icon: Home },
+    { href: "/projects", label: "Projects", Icon: Boxes },
+    { href: "/technologies", label: "Tech", Icon: StellarOrbitIcon },
+    { href: "/activity", label: "Reach", Icon: Globe2 },
+    { href: "/contact", label: "Contact", Icon: Mail },
+  ] as const;
+  return (
+    <nav className="tv-bottom-nav" aria-label="Primary">
+      {items.map(({ href, label, Icon }) => {
+        const active = pathname === href;
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-label={label}
+            aria-current={active ? "page" : undefined}
+            className={`tv-bottom-nav-btn ${active ? "active" : ""}`}
+            onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }}
+            onMouseEnter={() => isPowered && audioSynth.playHover()}
+            style={!isPowered ? { opacity: 0.3, pointerEvents: "none" } : undefined}
+          >
+            <Icon className="w-[18px] h-[18px]" />
+            <span className="tv-bottom-nav-label">{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

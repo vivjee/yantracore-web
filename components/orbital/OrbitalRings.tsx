@@ -17,7 +17,7 @@
 export function OrbitalRings() {
   return (
     <div
-      className="absolute inset-0 z-[2] pointer-events-none flex items-center justify-center"
+      className="orbital-rings absolute inset-0 z-[2] pointer-events-none flex items-center justify-center"
       aria-hidden
     >
       {/* Ring 1 — fastest, innermost */}
