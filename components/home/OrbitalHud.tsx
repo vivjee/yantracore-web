@@ -25,15 +25,18 @@ import { useReducedMotion } from "framer-motion";
  * mobile (the compact layout owns that space) and on very short viewports, where
  * the height lock would otherwise clip it into the centre copy.
  */
-/** Who we build for — the left spine cycles a lit highlight across these, one at
- *  a time, like a scanning telemetry channel. The whole triad is always present
- *  (legible, not just an animation); the scan only moves the emphasis. */
+/** Both gutter spines are scanning telemetry channels: a lit highlight glides
+ *  across the words one at a time, while the whole list stays present (legible,
+ *  not just an animation). The left names who we build for, the right the stack.
+ *  They share one clock so the cadence matches; the right rides a +1 phase offset
+ *  so the two edges read as independent instruments, not a mirror. */
+const SCAN_DWELL = 3000; // ms each word stays lit
 const AUDIENCES = ["Individuals", "Companies", "Communities"] as const;
-const AUDIENCE_DWELL = 3000; // ms each audience stays lit
+const CAPABILITIES = ["Software", "AI", "Infrastructure"] as const;
 
 export function OrbitalHud() {
   const clock = useClock();
-  const lit = useAudienceScan();
+  const tick = useScanTick();
 
   return (
     <div className="orbital-hud" aria-hidden>
@@ -44,22 +47,9 @@ export function OrbitalHud() {
       <span className="orbital-hud__corner orbital-hud__corner--br" />
 
       {/* Side spines — the value prop, set in the gutters (xl only). Left names
-          who we build for as a live scan; right restates the capability stack. */}
-      <span
-        className={`orbital-hud__spine orbital-hud__spine--left${lit < 0 ? " is-static" : ""}`}
-      >
-        {AUDIENCES.map((who, i) => (
-          <Fragment key={who}>
-            {i > 0 && <span className="orbital-hud__spine-sep">·</span>}
-            <span className={`orbital-hud__audience${i === lit ? " is-active" : ""}`}>
-              {who}
-            </span>
-          </Fragment>
-        ))}
-      </span>
-      <span className="orbital-hud__spine orbital-hud__spine--right">
-        Software · AI · Infrastructure
-      </span>
+          who we build for; right restates the capability stack. Both scan. */}
+      <ScanSpine side="left" words={AUDIENCES} tick={tick} />
+      <ScanSpine side="right" words={CAPABILITIES} tick={tick} offset={1} />
 
       {/* Bottom telemetry strip */}
       <div className="orbital-hud__strip">
@@ -79,35 +69,66 @@ export function OrbitalHud() {
 }
 
 /**
- * Drives the left spine's scanning highlight: returns the index of the currently
- * lit audience, advancing every AUDIENCE_DWELL ms. Returns -1 when the user
- * prefers reduced motion (and until mount, so SSR/first paint agree) — the spine
- * then renders the full triad evenly lit and still, no scan.
+ * One gutter spine: the full word list is always rendered; a lit highlight scans
+ * across it, driven by the shared `tick`. `offset` phase-shifts which word leads
+ * (so the two spines don't blink in unison). When `tick < 0` (reduced motion or
+ * pre-mount) the spine goes static — every word evenly lit, no scan.
  */
-function useAudienceScan() {
+function ScanSpine({
+  side,
+  words,
+  tick,
+  offset = 0,
+}: {
+  side: "left" | "right";
+  words: readonly string[];
+  tick: number;
+  offset?: number;
+}) {
+  const lit = tick < 0 ? -1 : (tick + offset) % words.length;
+  return (
+    <span
+      className={`orbital-hud__spine orbital-hud__spine--${side}${lit < 0 ? " is-static" : ""}`}
+    >
+      {words.map((word, i) => (
+        <Fragment key={word}>
+          {i > 0 && <span className="orbital-hud__spine-sep">·</span>}
+          <span className={`orbital-hud__spine-word${i === lit ? " is-active" : ""}`}>
+            {word}
+          </span>
+        </Fragment>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Drives the spine scan: a monotonically increasing tick that advances every
+ * SCAN_DWELL ms (each spine maps it to a lit word via modulo). Returns -1 when
+ * the user prefers reduced motion (and until mount, so SSR/first paint agree) —
+ * the spines then render their full lists evenly lit and still, no scan.
+ */
+function useScanTick() {
   const reduced = useReducedMotion();
-  const [lit, setLit] = useState(-1);
+  const [tick, setTick] = useState(-1);
 
   useEffect(() => {
     if (reduced) {
-      // Settle to the static (evenly-lit) state on the next frame — never
-      // synchronously in the effect body — in case the scan was already running.
-      const raf = requestAnimationFrame(() => setLit(-1));
+      // Settle to the static state on the next frame — never synchronously in
+      // the effect body — in case the scan was already running.
+      const raf = requestAnimationFrame(() => setTick(-1));
       return () => cancelAnimationFrame(raf);
     }
-    // Light the first audience on the next frame, then scan on a fixed cadence.
-    const raf = requestAnimationFrame(() => setLit(0));
-    const id = setInterval(
-      () => setLit((i) => (i + 1) % AUDIENCES.length),
-      AUDIENCE_DWELL,
-    );
+    // Start the scan on the next frame, then advance on a fixed cadence.
+    const raf = requestAnimationFrame(() => setTick(0));
+    const id = setInterval(() => setTick((t) => t + 1), SCAN_DWELL);
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(id);
     };
   }, [reduced]);
 
-  return lit;
+  return tick;
 }
 
 /**

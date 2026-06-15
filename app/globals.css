@@ -1990,6 +1990,35 @@ html[data-theme="light"] .tv-music-popover__card {
     -6px -6px 16px rgba(255, 255, 255, 0.82);
 }
 
+/* Animated equalizer — the "now playing" indicator in the music quick-panel.
+   Four bars dance while playing (reusing the bar-scale keyframe at staggered
+   speeds); when paused they settle to a flat, dim baseline. Reduced motion is
+   handled globally (the loop collapses to a static frame). */
+.tv-music-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  width: 16px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.tv-music-eq > i {
+  flex: 1 1 0;
+  height: 100%;
+  border-radius: 1px;
+  transform-origin: bottom;
+  transform: scaleY(0.26);
+  background: var(--accent-2);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--accent-2) 55%, transparent);
+  transition: transform 0.3s var(--ease-out-soft);
+}
+.tv-music-eq[data-playing="true"] > i {
+  animation: bar-scale 1.05s ease-in-out infinite;
+}
+.tv-music-eq[data-playing="true"] > i:nth-child(2) { animation-duration: 0.78s; animation-delay: -0.4s; }
+.tv-music-eq[data-playing="true"] > i:nth-child(3) { animation-duration: 1.26s; animation-delay: -0.7s; }
+.tv-music-eq[data-playing="true"] > i:nth-child(4) { animation-duration: 0.92s; animation-delay: -0.2s; }
+
 /* ── Keyboard shortcut hints ─────────────────────────────────────────── */
 
 /* Small key-cap badge (⇧H, F, ?) shown in tooltips and the cheat sheet. */
@@ -3533,25 +3562,25 @@ html[data-theme="light"] .orbital-node__emblem {
   right: 24px;
   transform: translateY(-50%);
 }
-/* Left spine = the "who we build for" scan. The whole triad is always present;
-   a lit highlight glides across it, one audience at a time. Dim siblings keep
-   the gutter a whisper; the active word breaks above it with a soft accent bloom. */
+/* Both spines scan: the whole word list is always present; a lit highlight
+   glides across it, one word at a time. Dim siblings keep the gutter a whisper;
+   the active word breaks above it with a soft accent bloom. */
 .orbital-hud__spine-sep {
   opacity: 0.4;
 }
-.orbital-hud__audience {
+.orbital-hud__spine-word {
   opacity: 0.5;
   color: var(--text-low);
   transition: opacity 0.7s var(--ease-out-soft), color 0.7s var(--ease-out-soft),
     text-shadow 0.7s var(--ease-out-soft);
 }
-.orbital-hud__audience.is-active {
+.orbital-hud__spine-word.is-active {
   opacity: 1;
   color: var(--text-mid);
   text-shadow: 0 0 12px color-mix(in srgb, var(--accent-1) 55%, transparent);
 }
-/* Reduced motion / pre-mount (lit = -1): the full triad, evenly lit and still. */
-.orbital-hud__spine--left.is-static .orbital-hud__audience {
+/* Reduced motion / pre-mount (tick = -1): the full list, evenly lit and still. */
+.orbital-hud__spine.is-static .orbital-hud__spine-word {
   opacity: 0.8;
   transition: none;
   text-shadow: none;
