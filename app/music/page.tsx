@@ -258,6 +258,23 @@ export default function MusicPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isFs]);
 
+  // On the (non-fullscreen) music page, Space toggles play/pause — the natural
+  // media-player reflex. Fullscreen theater has its own Space handler above, and
+  // typing in the search box is left alone. preventDefault stops both page
+  // scroll and a focused track button from also firing its own activation.
+  useEffect(() => {
+    if (isFs) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== " " || e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      e.preventDefault();
+      togglePlay();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isFs, togglePlay]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Logical (CSS-pixel) canvas size + device pixel ratio, kept in a ref so the
   // render loop can read the current dimensions without restarting on resize.
@@ -1150,7 +1167,7 @@ export default function MusicPage() {
               {/* Scrollable Track list */}
               <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-3 flex flex-col min-h-0 glass-panel">
                 <div className="flex justify-between items-center mb-2 px-1 flex-shrink-0">
-                  <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Channel Library</span>
+                  <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Music Library</span>
                   <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
                     COUNT: {filteredTracks.length}
                   </span>
@@ -1203,17 +1220,19 @@ export default function MusicPage() {
                           </div>
 
                           <div className="min-w-0">
-                            <span className={`text-xs font-semibold font-mono block truncate leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
-                              {track.title}
-                            </span>
-                            <span className={`text-[8.5px] font-mono tracking-wider font-semibold uppercase px-1 rounded inline-block mt-0.5 ${
-                              isTrackPlaying
-                                ? "bg-accent-2/20 border border-accent-2/40 text-accent-2"
-                                : track.isPlayable
-                                ? "bg-accent-2/10 border border-accent-2/20 text-accent-2"
-                                : "bg-accent-3/10 border border-accent-3/20 text-accent-3"
-                            }`}>
-                              {isTrackPlaying ? "PLAYING" : track.isPlayable ? "LIVE" : "ARCHIVE"}
+                            <div className="flex items-center gap-1.5">
+                              <span className={`text-xs font-semibold font-mono truncate min-w-0 leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
+                                {track.title}
+                              </span>
+                              {isTrackPlaying && (
+                                <span className="flex-shrink-0 inline-flex items-center gap-1 text-[7px] font-mono tracking-wider font-bold uppercase px-1 py-px rounded bg-accent-2/20 border border-accent-2/40 text-accent-2">
+                                  <span className="w-1 h-1 rounded-full bg-accent-2 animate-pulse" />
+                                  Playing
+                                </span>
+                              )}
+                            </div>
+                            <span className="block text-[9px] font-mono text-text-low truncate leading-relaxed mt-0.5">
+                              {track.description}
                             </span>
                           </div>
                         </div>
@@ -1228,7 +1247,7 @@ export default function MusicPage() {
                   {filteredTracks.length === 0 && (
                     <div className="text-center py-8">
                       <AlertTriangle className="w-6 h-6 text-text-faint mx-auto mb-2" />
-                      <p className="text-[10px] font-mono text-text-low">No channels found matching query.</p>
+                      <p className="text-[10px] font-mono text-text-low">No music found matching query.</p>
                     </div>
                   )}
                 </div>
