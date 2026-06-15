@@ -47,6 +47,7 @@ import {
   Server,
 } from "lucide-react";
 import { Eyebrow } from "@/components/typography/Eyebrow";
+import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { LogoMark } from "../01-arrival/LogoMark";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
 
@@ -396,17 +397,16 @@ export function Showcase({ inTv = false }: ShowcaseProps) {
 function BrandCopy({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="flex w-full flex-col items-center gap-1.5 px-4 text-center md:gap-2.5">
-      <h2
-        className="yantra-electric-title font-bold"
-        style={{ fontSize: isMobile ? "2rem" : "clamp(2.25rem, 5vw, 4.25rem)" }}
-      >
-        YantraCore
-      </h2>
+      <YantraElectricTitle
+        as="h2"
+        text="YantraCore"
+        size={isMobile ? "xl" : "3xl"}
+      />
       <p
         className="max-w-[320px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] md:max-w-none md:text-xs md:tracking-[0.24em]"
         style={{ color: "var(--text-mid)" }}
       >
-        Building a Better World Through Technology
+        Technology for a Better World
       </p>
       <p
         className="max-w-[300px] text-xs leading-relaxed md:max-w-2xl md:text-sm"

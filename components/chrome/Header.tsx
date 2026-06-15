@@ -319,7 +319,7 @@ function MobileMenu({
 /* ─── Header Logo with Shiny Glass Effect ───────────────────────────── */
 export function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
   const [hovered, setHovered] = useState(false);
-  const { themeMode } = useTheme();
+  const { themeMode, logoHeartbeatEnabled } = useTheme();
 
   const isLarge = size === "large";
 
@@ -358,6 +358,9 @@ export function HeaderLogo({ size = "large" }: { size?: "large" | "small" }) {
       className={containerClass}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{
+        animation: logoHeartbeatEnabled ? "logo-heartbeat 1.5s ease-in-out infinite" : "none",
+      }}
     >
       {/* 1. Deep glow behind the logo circle */}
       <div
@@ -610,26 +613,7 @@ export function Header() {
               className="pointer-events-auto relative inline-flex items-center gap-3 group"
             >
               <HeaderLogo size="large" />
-              <span
-                style={{
-                  fontSize: "1.1rem",
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 800,
-                  letterSpacing: "0.06em",
-                  lineHeight: 1,
-                  background: "linear-gradient(110deg, #00e0cb 0%, #6e56ff 40%, #ff4fb0 70%, #00e0cb 100%)",
-                  backgroundSize: "220% 100%",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  color: "transparent",
-                  animation: "yantra-electric-flow 16s ease-in-out infinite",
-                  display: "inline-block",
-                  filter: "drop-shadow(0 0 6px rgba(110,86,255,0.4))",
-                }}
-              >
-                YantraCore
-              </span>
+              <YantraElectricTitle size="md" />
             </Link>
 
             {/* ── Pill ── */}
