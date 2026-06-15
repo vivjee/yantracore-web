@@ -13,13 +13,25 @@ export interface Track {
   key?: string;
 }
 
+// `duration` is the displayed track length (m:ss). For the bundled files these
+// are baked from the actual audio (measured once with ffprobe) so the library
+// shows real lengths and the seek bar is correct before playback — no metadata
+// fetch needed. The `loadedmetadata` handler still refines to the exact value
+// on play. When the backend owns the catalogue this field comes from the API.
 export const TRACKS: Track[] = [
-  { id: 1, title: "Deep Work Lounge", duration: "Stream", isPlayable: true, src: "/music/deep-work-lounge.mp3", description: "Ambient downtempo lofi music for deep work and relaxation.", tempo: "65 BPM", key: "C Minor" },
-  { id: 2, title: "Meadow Sleepwalk", duration: "Stream", isPlayable: true, src: "/music/meadow-sleepwalk.mp3", description: "Ethereal ambient chillout soundscape with gentle downtempo grooves.", tempo: "72 BPM", key: "D Major" },
-  { id: 3, title: "Island Drift", duration: "Stream", isPlayable: true, src: "/music/island-drift.mp3", description: "Sun-soaked lounge groove drifting on breezy, tropical textures.", tempo: "70 BPM", key: "A Major" },
-  { id: 4, title: "Mango Moon", duration: "Stream", isPlayable: true, src: "/music/mango-moon.mp3", description: "Warm nocturnal chillout with mellow, fruit-ripe synth pads.", tempo: "68 BPM", key: "F Major" },
-  { id: 5, title: "Sunlit Strings", duration: "Stream", isPlayable: true, src: "/music/sunlit-strings.mp3", description: "Golden-hour ambient piece carried by soft, sunlit strings.", tempo: "60 BPM", key: "G Major" },
+  { id: 1, title: "Deep Work Lounge", duration: "3:03", isPlayable: true, src: "/music/deep-work-lounge.mp3", description: "Ambient downtempo lofi music for deep work and relaxation.", tempo: "65 BPM", key: "C Minor" },
+  { id: 2, title: "Meadow Sleepwalk", duration: "3:06", isPlayable: true, src: "/music/meadow-sleepwalk.mp3", description: "Ethereal ambient chillout soundscape with gentle downtempo grooves.", tempo: "72 BPM", key: "D Major" },
+  { id: 3, title: "Island Drift", duration: "2:39", isPlayable: true, src: "/music/island-drift.mp3", description: "Sun-soaked lounge groove drifting on breezy, tropical textures.", tempo: "70 BPM", key: "A Major" },
+  { id: 4, title: "Mango Moon", duration: "3:19", isPlayable: true, src: "/music/mango-moon.mp3", description: "Warm nocturnal chillout with mellow, fruit-ripe synth pads.", tempo: "68 BPM", key: "F Major" },
+  { id: 5, title: "Sunlit Strings", duration: "2:40", isPlayable: true, src: "/music/sunlit-strings.mp3", description: "Golden-hour ambient piece carried by soft, sunlit strings.", tempo: "60 BPM", key: "G Major" },
 ];
+
+/** "m:ss" → seconds (300s fallback). Module-level so it can seed initial state. */
+const clockToSecs = (durStr: string): number => {
+  const parts = durStr.split(":");
+  if (parts.length === 2) return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  return 300;
+};
 
 export interface AudioPlayerContextType {
   currentTrackIndex: number;
@@ -80,7 +92,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [isSynthOnly, setIsSynthOnly] = useState(false);
   const [isFallbackActive, setIsFallbackActive] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [simulatedDuration, setSimulatedDuration] = useState(314);
+  const [simulatedDuration, setSimulatedDuration] = useState(() => clockToSecs(TRACKS[0].duration));
   const [logs, setLogs] = useState<string[]>([]);
   const [repeatMode, setRepeatMode] = useState<"none" | "one" | "all">("all");
   const [isShuffle, setIsShuffle] = useState(false);
@@ -151,11 +163,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   // Parse duration string MM:SS into seconds
   const parseDuration = useCallback((durStr: string): number => {
     if (durStr === "Stream" || durStr === "00:00") return 300;
-    const parts = durStr.split(":");
-    if (parts.length === 2) {
-      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-    }
-    return 300;
+    return clockToSecs(durStr);
   }, []);
 
   // Add custom track
