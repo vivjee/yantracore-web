@@ -87,7 +87,7 @@ interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
 `components/layout/SectionDivider.tsx` · Server · no props. A near-invisible gradient seam between sections.
 
 ### TvFrame
-`components/layout/TvFrame.tsx` · Client · `{ children }`. The CRT television app shell — power state, CRT overlays, top chrome bar, console tabs, fullscreen, synth sounds. **See [10-systems.md](./10-systems.md#tvcrt-shell) for the full system.** Most pages wrap content in it.
+`components/layout/TvFrame.tsx` · Client · `{ children }`. The CRT television app shell — power state, CRT overlays, top chrome bar, fullscreen, synth sounds. On phones (`<md`) it slims the bezel, drops the page-nav from the top bar into a thumb-reachable bottom tab bar (`TvBottomNav`), and uses `100dvh`. **See [10-systems.md](./10-systems.md#tvcrt-shell) and [#responsive--viewport](./10-systems.md#responsive--viewport) for the full system.** Most pages wrap content in it.
 
 ---
 

@@ -69,11 +69,25 @@ Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/ne
 - **Power state** — boot/shutdown animation with synth sounds (`isPowered`, `isPoweringOn`).
 - **CRT overlays** — optional scanlines / phosphor flicker / curvature / distortion filter, toggled by `isCrtEnabled` (adds `.crt-active`).
 - **Power-on static burst** — a brief CRT static overlay (`isGlitching`) flashes only as the screen re-ignites on power-on. Navigation between pages is seamless: there is **no** channel-change glitch (it was removed site-wide).
-- **Top chrome bar** (`.tv-chrome-bar`) — logo, primary nav pills (Home / Entryport / Technologies / Music / Contact), theme toggle, account button, fullscreen toggle.
-- **Console tabs** (`.tv-console-tabs-container`) — dock above the frame and act as the sticky nav on app pages.
-- **Body locks** — `body.app-mode-active` (lock scroll, hide global header) vs. `body.brochure-mode-active`.
+- **Top chrome bar** (`.tv-chrome-bar`) — logo + wordmark, the page-nav group (Home / Projects / Technologies / Reach / Contact), and utility buttons (theme, Music, Settings, account, fullscreen). On phones (`<md`) the page-nav group is hidden here (`.tv-chrome-nav-pages`) and moves to the bottom tab bar; utilities stay.
+- **Mobile bottom tab bar** (`.tv-bottom-nav`, the `TvBottomNav` helper) — on `<md`, the five page destinations render as a thumb-reachable bottom tab bar, a flex sibling **below** `.tv-screen-content` so it never overlaps page content. Hidden from `md` up.
+- **Slim adaptive frame** — below `md` the bezel padding/border thin out; the frame is `100dvh`. (The `.tv-console-*` "console tab" panel styles in `globals.css` are **legacy/unused** — the live nav is the chrome bar + bottom tab bar.)
+- **Body locks** — `body.app-mode-active` (lock scroll → `100dvh`, hide global header) vs. `body.brochure-mode-active`.
 
 Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components also render "inside the TV" via an `inTv` prop (`LoginForm`, `SignupForm`, `SettingsShell`, `Showcase`) so they adapt padding/background.
+
+---
+
+## Responsive & viewport
+
+The tablet/mobile foundation. **Prefer Tailwind breakpoints in markup; reach for the JS hooks only when a layout must branch in JavaScript.**
+
+- **Hooks** — [`lib/hooks/useMediaQuery.ts`](../lib/hooks/useMediaQuery.ts): `useMediaQuery(query)` (SSR-safe via `useSyncExternalStore`, like `useFullscreen`), `useBreakpoint()` → `{ isMobile, isTablet, isDesktop, isCompact }`, `useMinWidth`/`useMaxWidth(bp)`, and `useIsTouch()` (`(pointer: coarse)` — gate hover/parallax affordances).
+- **Breakpoints** — Tailwind defaults (`sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536`) plus custom **`xs ≈ 400`** (registered in `globals.css` via `--breakpoint-xs`; gives `xs:` and `max-xs:`). Semantic bands: mobile ≤640 · tablet 640–1023 · desktop ≥1024. Chrome CSS media queries use the `md` boundary (`767.98px`) so CSS and JS agree.
+- **Viewport height** — full-bleed shells use `dvh`/`svh`, never `vh`, so the mobile address-bar show/hide doesn't clip content. `app/layout.tsx` exports `viewport` with `viewportFit: "cover"`; `body.app-mode-active` is `100dvh`.
+- **Safe areas** — `--safe-{top,right,bottom,left}` (= `env(safe-area-inset-*)`) + `.{pt,pr,pb,pl,px,py}-safe` utilities reclaim notch / home-indicator space on fixed UI (TV bottom nav, dock).
+- **Type & touch** — `.text-fluid-{display,h1,h2,h3,lead}` are `clamp()` ramps that scale smoothly (no abrupt `text-4xl→text-6xl` jumps); `.tap-target` guarantees a ≥44px hit-area on coarse pointers **without** changing a control's visual size.
+- **Signature scenes** — phones get clean simplified layouts (Home's 2×2 node grid, Showcase's card scene). The desktop solar-system + rings scale down for the tablet/small-laptop bands (`.showcase-solar`, `.orbital-rings` mirror `.orbital-sun`) with the full spectacle returning at `xl`. The `/activity` globe and `/channels` panels **scroll within the height-locked TV screen** below their multi-column breakpoint (the screen itself never scrolls). The dashboard rail becomes an off-canvas drawer below `lg`.
 
 ---
 
