@@ -16,6 +16,9 @@ export interface Track {
 export const TRACKS: Track[] = [
   { id: 1, title: "Deep Work Lounge", duration: "Stream", isPlayable: true, src: "/music/deep-work-lounge.mp3", description: "Ambient downtempo lofi music for deep work and relaxation.", tempo: "65 BPM", key: "C Minor" },
   { id: 2, title: "Meadow Sleepwalk", duration: "Stream", isPlayable: true, src: "/music/meadow-sleepwalk.mp3", description: "Ethereal ambient chillout soundscape with gentle downtempo grooves.", tempo: "72 BPM", key: "D Major" },
+  { id: 3, title: "Island Drift", duration: "Stream", isPlayable: true, src: "/music/island-drift.mp3", description: "Sun-soaked lounge groove drifting on breezy, tropical textures.", tempo: "70 BPM", key: "A Major" },
+  { id: 4, title: "Mango Moon", duration: "Stream", isPlayable: true, src: "/music/mango-moon.mp3", description: "Warm nocturnal chillout with mellow, fruit-ripe synth pads.", tempo: "68 BPM", key: "F Major" },
+  { id: 5, title: "Sunlit Strings", duration: "Stream", isPlayable: true, src: "/music/sunlit-strings.mp3", description: "Golden-hour ambient piece carried by soft, sunlit strings.", tempo: "60 BPM", key: "G Major" },
 ];
 
 export interface AudioPlayerContextType {
@@ -240,86 +243,180 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         addLog("SYS: Audio tag linked to Analyser Node.");
       }
 
-      // Procedural Ambient Layers
-      const createNoiseBuffer = (c: AudioContext, secs = 3) => {
-        const bufferSize = c.sampleRate * secs;
+      // ── Procedural Ambient ("Remix") Layers ───────────────────────────
+      // Colored-noise generator. "pink" rolls off ~3 dB/oct (natural, the
+      // basis for rain); "brown" rolls off ~6 dB/oct (deep, airy — the basis
+      // for wind). Longer buffers make the loop seam far less perceptible
+      // than the old 3 s white-noise loop.
+      const createNoiseBuffer = (
+        c: AudioContext,
+        secs: number,
+        color: "white" | "pink" | "brown",
+      ) => {
+        const bufferSize = Math.floor(c.sampleRate * secs);
         const buffer = c.createBuffer(1, bufferSize, c.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
+
+        if (color === "pink") {
+          // Paul Kellet's economical pink-noise filter.
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const w = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + w * 0.0555179;
+            b1 = 0.99332 * b1 + w * 0.0750759;
+            b2 = 0.969 * b2 + w * 0.153852;
+            b3 = 0.8665 * b3 + w * 0.3104856;
+            b4 = 0.55 * b4 + w * 0.5329522;
+            b5 = -0.7616 * b5 - w * 0.016898;
+            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11;
+            b6 = w * 0.115926;
+          }
+        } else if (color === "brown") {
+          // Integrated white noise → deep, rumbling spectrum.
+          let last = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const w = Math.random() * 2 - 1;
+            last = (last + 0.02 * w) / 1.02;
+            data[i] = last * 3.5;
+          }
+        } else {
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
         }
         return buffer;
       };
 
-      const noiseBuf = createNoiseBuffer(ctx);
+      const pinkBuf = createNoiseBuffer(ctx, 4, "pink");
+      const brownBuf = createNoiseBuffer(ctx, 5, "brown");
 
-      // Rain Layer
+      // ── Rain ──────────────────────────────────────────────────────────
+      // Pink noise band-limited to the "sheet of rain" range. A slow LFO
+      // drifts the lowpass cutoff so the downpour breathes lighter/heavier
+      // instead of sitting as static hiss.
       const rainSource = ctx.createBufferSource();
-      rainSource.buffer = noiseBuf;
+      rainSource.buffer = pinkBuf;
       rainSource.loop = true;
-      const rainFilter = ctx.createBiquadFilter();
-      rainFilter.type = "lowpass";
-      rainFilter.frequency.setValueAtTime(600, ctx.currentTime);
+      const rainHP = ctx.createBiquadFilter();
+      rainHP.type = "highpass";
+      rainHP.frequency.setValueAtTime(700, ctx.currentTime);
+      const rainLP = ctx.createBiquadFilter();
+      rainLP.type = "lowpass";
+      rainLP.frequency.setValueAtTime(6500, ctx.currentTime);
+      const rainDriftLfo = ctx.createOscillator();
+      rainDriftLfo.type = "sine";
+      rainDriftLfo.frequency.setValueAtTime(0.08, ctx.currentTime);
+      const rainDriftDepth = ctx.createGain();
+      rainDriftDepth.gain.setValueAtTime(1400, ctx.currentTime); // ±1.4 kHz
+      rainDriftLfo.connect(rainDriftDepth);
+      rainDriftDepth.connect(rainLP.frequency);
       const rainGain = ctx.createGain();
       rainGain.gain.setValueAtTime(rainVol, ctx.currentTime);
-      rainSource.connect(rainFilter);
-      rainFilter.connect(rainGain);
+      rainSource.connect(rainHP);
+      rainHP.connect(rainLP);
+      rainLP.connect(rainGain);
       rainGain.connect(ctx.destination);
       rainSource.start(0);
+      rainDriftLfo.start(0);
       rainGainRef.current = rainGain;
 
-      // Wind Layer
+      // ── Wind ────────────────────────────────────────────────────────────
+      // Brown noise through a low-Q band, with two slow LFOs: one sweeps the
+      // cutoff (the airy rise/fall of a gust) and one swells the amplitude on
+      // a dedicated gust node — kept off the user gain so "0" is truly silent.
       const windSource = ctx.createBufferSource();
-      windSource.buffer = noiseBuf;
+      windSource.buffer = brownBuf;
       windSource.loop = true;
-      const windFilter = ctx.createBiquadFilter();
-      windFilter.type = "bandpass";
-      windFilter.frequency.setValueAtTime(350, ctx.currentTime);
-      windFilter.Q.setValueAtTime(6.0, ctx.currentTime);
-      const windLfo = ctx.createOscillator();
-      windLfo.type = "sine";
-      windLfo.frequency.setValueAtTime(0.08, ctx.currentTime);
-      const windLfoGain = ctx.createGain();
-      windLfoGain.gain.setValueAtTime(180, ctx.currentTime);
-      windLfo.connect(windLfoGain);
-      windLfoGain.connect(windFilter.frequency);
+      const windHP = ctx.createBiquadFilter();
+      windHP.type = "highpass";
+      windHP.frequency.setValueAtTime(120, ctx.currentTime);
+      const windLP = ctx.createBiquadFilter();
+      windLP.type = "lowpass";
+      windLP.frequency.setValueAtTime(700, ctx.currentTime);
+      windLP.Q.setValueAtTime(0.7, ctx.currentTime);
+      const windCutoffLfo = ctx.createOscillator();
+      windCutoffLfo.type = "sine";
+      windCutoffLfo.frequency.setValueAtTime(0.06, ctx.currentTime);
+      const windCutoffDepth = ctx.createGain();
+      windCutoffDepth.gain.setValueAtTime(380, ctx.currentTime);
+      windCutoffLfo.connect(windCutoffDepth);
+      windCutoffDepth.connect(windLP.frequency);
+      // Gust swell node: oscillates 0.4–1.0 around a 0.7 base.
+      const windGust = ctx.createGain();
+      windGust.gain.setValueAtTime(0.7, ctx.currentTime);
+      const windGustLfo = ctx.createOscillator();
+      windGustLfo.type = "sine";
+      windGustLfo.frequency.setValueAtTime(0.13, ctx.currentTime);
+      const windGustDepth = ctx.createGain();
+      windGustDepth.gain.setValueAtTime(0.3, ctx.currentTime);
+      windGustLfo.connect(windGustDepth);
+      windGustDepth.connect(windGust.gain);
       const windGain = ctx.createGain();
       windGain.gain.setValueAtTime(windVol, ctx.currentTime);
-      windSource.connect(windFilter);
-      windFilter.connect(windGain);
+      windSource.connect(windHP);
+      windHP.connect(windLP);
+      windLP.connect(windGust);
+      windGust.connect(windGain);
       windGain.connect(ctx.destination);
       windSource.start(0);
-      windLfo.start(0);
+      windCutoffLfo.start(0);
+      windGustLfo.start(0);
       windGainRef.current = windGain;
 
-      // Mains Hum Layer
-      const humOsc = ctx.createOscillator();
-      humOsc.type = "sine";
-      humOsc.frequency.setValueAtTime(60, ctx.currentTime);
-      const humHarmonic = ctx.createOscillator();
-      humHarmonic.type = "sine";
-      humHarmonic.frequency.setValueAtTime(120, ctx.currentTime);
-      const humHarmonicGain = ctx.createGain();
-      humHarmonicGain.gain.setValueAtTime(0.1, ctx.currentTime);
+      // ── Hum ───────────────────────────────────────────────────────────
+      // Mains/CPU hum: a 60 Hz fundamental + falling harmonics, each slightly
+      // detuned for a touch of beating, rounded by a lowpass and given a faint
+      // tremolo "flutter" so it breathes instead of being a sterile test tone.
       const humGain = ctx.createGain();
       humGain.gain.setValueAtTime(humVol, ctx.currentTime);
-      humOsc.connect(humGain);
-      humHarmonic.connect(humHarmonicGain);
-      humHarmonicGain.connect(humGain);
       humGain.connect(ctx.destination);
-      humOsc.start(0);
-      humHarmonic.start(0);
+
+      const humFlutterBus = ctx.createGain();
+      humFlutterBus.gain.setValueAtTime(1.0, ctx.currentTime);
+      humFlutterBus.connect(humGain);
+      const humFlutterLfo = ctx.createOscillator();
+      humFlutterLfo.type = "sine";
+      humFlutterLfo.frequency.setValueAtTime(1.7, ctx.currentTime);
+      const humFlutterDepth = ctx.createGain();
+      humFlutterDepth.gain.setValueAtTime(0.06, ctx.currentTime);
+      humFlutterLfo.connect(humFlutterDepth);
+      humFlutterDepth.connect(humFlutterBus.gain);
+
+      const humLP = ctx.createBiquadFilter();
+      humLP.type = "lowpass";
+      humLP.frequency.setValueAtTime(320, ctx.currentTime);
+      humLP.connect(humFlutterBus);
+
+      const humPartials = [
+        { f: 60, g: 1.0 },
+        { f: 120, g: 0.5 },
+        { f: 180, g: 0.18 },
+        { f: 240, g: 0.08 },
+      ];
+      const humOscs = humPartials.map(({ f, g }) => {
+        const o = ctx.createOscillator();
+        o.type = "sine";
+        o.frequency.setValueAtTime(f, ctx.currentTime);
+        o.detune.setValueAtTime(Math.random() * 6 - 3, ctx.currentTime);
+        const og = ctx.createGain();
+        og.gain.setValueAtTime(g, ctx.currentTime);
+        o.connect(og);
+        og.connect(humLP);
+        o.start(0);
+        return o;
+      });
+      humFlutterLfo.start(0);
       humGainRef.current = humGain;
 
       ambientSourcesRef.current = [
         rainSource,
+        rainDriftLfo,
         windSource,
-        windLfo,
-        humOsc,
-        humHarmonic
+        windCutoffLfo,
+        windGustLfo,
+        humFlutterLfo,
+        ...humOscs,
       ];
 
-      addLog("SYS: Procedural Ambient layers ready.");
+      addLog("SYS: Procedural Remix layers ready.");
       return ctx;
     } catch (e) {
       addLog("ERR: Failed to initialize Audio Context.");

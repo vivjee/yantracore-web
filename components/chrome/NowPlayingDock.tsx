@@ -63,7 +63,7 @@ export function NowPlayingDock() {
       {visible && (
         <motion.div
           key="now-playing-dock"
-          className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 z-[60] pointer-events-auto"
+          className="fixed right-4 bottom-[calc(1rem+var(--safe-bottom))] sm:right-6 sm:bottom-[calc(1.5rem+var(--safe-bottom))] z-[60] pointer-events-auto"
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
@@ -72,7 +72,7 @@ export function NowPlayingDock() {
           }
         >
           <AnimatedBorder variant="pulse" radius={16} paused={reduce}>
-            <GlassPanel variant="heavy" className="w-[min(80vw,320px)] px-3.5 py-3">
+            <GlassPanel variant="heavy" className="w-[min(86vw,320px)] px-3.5 py-3">
               {/* Header — status dot + track title + dismiss */}
               <div className="flex items-center gap-2.5">
                 <span

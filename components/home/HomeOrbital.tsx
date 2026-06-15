@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Boxes, Info } from "lucide-react";
 import { OrbitNode } from "./OrbitNode";
 import { OrbitalHud } from "./OrbitalHud";
+import { Rise } from "@/components/motion/Rise";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { GlassButton } from "@/components/glass/GlassButton";
 import { StellarOrbitIcon } from "@/components/chrome/NavIcons";
@@ -72,6 +73,19 @@ const DESTINATIONS = [
   },
 ] as const;
 
+/* ── Entrance choreography ────────────────────────────────────────────────
+   A calm centre-outward bloom on mount (mirrors the StarSystem's reveal): the
+   wordmark + CTAs settle first — the heart — then each column's heading and
+   nodes cascade in, gliding gently toward the Sun. All on the site's
+   --ease-out-soft curve (see Rise). Reduced-motion renders it all at rest. */
+const COPY_BASE = 0.08;  // s — eyebrow lands first
+const COPY_STEP = 0.08;  // s — per line of the centre copy
+const COL_BASE = 0.42;   // s — a column heading, just after the copy
+const COL_TRAIL = 0.05;  // s — the right column trails the left by a hair
+const NODE_BASE = 0.52;  // s — the first node under a heading
+const NODE_STEP = 0.09;  // s — per-node stagger down a column
+const COL_SLIDE = 14;    // px — nodes/headings glide in toward the centre
+
 /**
  * ColumnHeading — a quiet cap above one Home column. A mono eyebrow with an
  * accent dot and a hairline rule that fades toward the outer edge, mirroring
@@ -111,24 +125,33 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
 
   return (
     <div className="flex w-full max-w-[460px] flex-col items-center gap-3 px-4 text-center md:gap-4">
-      <p
-        className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.22em] md:text-[11px] md:tracking-[0.26em]"
-        style={{ color: "var(--text-mid)" }}
-      >
-        Technology for a Better World
-      </p>
+      <Rise delay={COPY_BASE}>
+        <p
+          className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.22em] md:text-[11px] md:tracking-[0.26em]"
+          style={{ color: "var(--text-mid)" }}
+        >
+          Technology for a Better World
+        </p>
+      </Rise>
 
-      <YantraElectricTitle as={as} text="YantraCore" size={compact ? "lg" : "xl"} />
+      <Rise delay={COPY_BASE + COPY_STEP}>
+        <YantraElectricTitle as={as} text="YantraCore" size={compact ? "lg" : "xl"} />
+      </Rise>
 
       {!compact && (
-        <p className="max-w-[52ch] text-sm leading-relaxed" style={{ color: "var(--text-low)" }}>
-          At YantraCore, we transform bold ideas into powerful digital products - apps,
-          platforms, and intelligent systems that are fast, elegant, practical, and built to
-          make life simpler, work smarter, and communities stronger.
-        </p>
+        <Rise delay={COPY_BASE + COPY_STEP * 2}>
+          <p className="max-w-[52ch] text-sm leading-relaxed" style={{ color: "var(--text-low)" }}>
+            At YantraCore, we transform bold ideas into powerful digital products - apps,
+            platforms, and intelligent systems that are fast, elegant, practical, and built to
+            make life simpler, work smarter, and communities stronger.
+          </p>
+        </Rise>
       )}
 
-      <div className="mt-1 flex flex-wrap items-center justify-center gap-2.5">
+      <Rise
+        delay={COPY_BASE + COPY_STEP * 3}
+        className="mt-1 flex flex-wrap items-center justify-center gap-2.5"
+      >
         <GlassButton
           variant="primary"
           onMouseEnter={() => audioSynth.playHover()}
@@ -143,7 +166,7 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
         >
           Explore Projects
         </GlassButton>
-      </div>
+      </Rise>
     </div>
   );
 }
@@ -155,13 +178,17 @@ export function HomeOrbital() {
       <OrbitalHud />
 
       {/* ── DESKTOP / TABLET ─────────────────────────────────────────── */}
-      <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(340px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:gap-x-10">
+      <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(240px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:grid-cols-[1fr_minmax(340px,440px)_1fr] lg:gap-x-10">
         {/* Left — wayfinding (where to go next) */}
         <div className="pointer-events-auto flex flex-col items-end justify-center gap-4">
-          <ColumnHeading label="Explore" side="left" accent="var(--accent-2)" />
+          <Rise delay={COL_BASE} x={-COL_SLIDE}>
+            <ColumnHeading label="Explore" side="left" accent="var(--accent-2)" />
+          </Rise>
           <div className="flex flex-col items-end gap-5 lg:gap-7">
-            {DESTINATIONS.map((node) => (
-              <OrbitNode key={node.name} {...node} />
+            {DESTINATIONS.map((node, i) => (
+              <Rise key={node.name} delay={NODE_BASE + i * NODE_STEP} x={-COL_SLIDE} y={12}>
+                <OrbitNode {...node} />
+              </Rise>
             ))}
           </div>
         </div>
@@ -175,10 +202,14 @@ export function HomeOrbital() {
 
         {/* Right — our projects (the YantraCore products) */}
         <div className="pointer-events-auto flex flex-col items-start justify-center gap-4">
-          <ColumnHeading label="Our Projects" side="right" accent="var(--accent-warm)" />
+          <Rise delay={COL_BASE + COL_TRAIL} x={COL_SLIDE}>
+            <ColumnHeading label="Our Projects" side="right" accent="var(--accent-warm)" />
+          </Rise>
           <div className="flex flex-col items-start gap-5 lg:gap-7">
-            {INITIATIVES.map((node) => (
-              <OrbitNode key={node.name} {...node} />
+            {INITIATIVES.map((node, i) => (
+              <Rise key={node.name} delay={NODE_BASE + COL_TRAIL + i * NODE_STEP} x={COL_SLIDE} y={12}>
+                <OrbitNode {...node} />
+              </Rise>
             ))}
           </div>
         </div>
@@ -192,8 +223,10 @@ export function HomeOrbital() {
           <CenterCopy compact as="p" />
         </div>
         <div className="pointer-events-auto grid w-full max-w-[360px] grid-cols-2 gap-2.5">
-          {[...INITIATIVES, ...DESTINATIONS].map((node) => (
-            <OrbitNode key={node.name} {...node} className="orbital-node--compact" />
+          {[...INITIATIVES, ...DESTINATIONS].map((node, i) => (
+            <Rise key={node.name} delay={NODE_BASE + i * (NODE_STEP * 0.6)} y={14} className="w-full">
+              <OrbitNode {...node} className="orbital-node--compact" />
+            </Rise>
           ))}
         </div>
       </div>

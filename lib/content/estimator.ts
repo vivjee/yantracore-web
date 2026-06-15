@@ -63,6 +63,21 @@ export const addOns: AddOnOption[] = [
   { id: "support", label: "3-month support", addLow: 3000, addHigh: 9000 },
 ];
 
+export type TimelineId = "asap" | "1-3mo" | "3-6mo" | "flexible";
+
+export interface TimelineOption {
+  id: TimelineId;
+  label: string;
+  blurb: string;
+}
+
+export const timelines: TimelineOption[] = [
+  { id: "asap", label: "ASAP", blurb: "Ready now" },
+  { id: "1-3mo", label: "1–3 months", blurb: "Planning ahead" },
+  { id: "3-6mo", label: "3–6 months", blurb: "On the roadmap" },
+  { id: "flexible", label: "Flexible", blurb: "No fixed date" },
+];
+
 export type BudgetBucket = "under-10k" | "10k-25k" | "25k-50k" | "50k-plus" | "discuss";
 
 export const bucketLabels: Record<BudgetBucket, string> = {

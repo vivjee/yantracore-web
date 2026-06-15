@@ -15,15 +15,12 @@ import {
   Music,
   Radio,
   Sliders,
-  Terminal,
   Activity,
   AlertTriangle,
   RotateCcw,
   Shuffle,
   Maximize2,
   Minimize2,
-  Upload,
-  Link as LinkIcon,
   Wind,
   CloudRain,
   Cpu,
@@ -31,7 +28,7 @@ import {
   ChevronDown,
   Wand2,
 } from "lucide-react";
-import { useAudioPlayer, Track } from "@/lib/audio/AudioPlayerContext";
+import { useAudioPlayer } from "@/lib/audio/AudioPlayerContext";
 import { audioSynth } from "@/lib/audio";
 import { useElementFullscreen } from "@/lib/hooks/useElementFullscreen";
 import {
@@ -57,7 +54,6 @@ export default function MusicPage() {
     isFallbackActive,
     currentTime,
     simulatedDuration,
-    logs,
     repeatMode,
     isShuffle,
     tracks,
@@ -89,13 +85,10 @@ export default function MusicPage() {
     setWindVol,
     humVol,
     setHumVol,
-    // Custom Track Loaders
-    addCustomTrack,
   } = useAudioPlayer();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeConsoleTab, setActiveConsoleTab] = useState<"eq" | "ambient">("ambient");
-  const [customUrl, setCustomUrl] = useState("");
   const [visualizerStyle, setVisualizerStyle] = useState<string>("mixed");
   const [visualizerColor, setVisualizerColor] = useState<ColorKey>("teal");
   const [isVizMenuOpen, setIsVizMenuOpen] = useState(false);
@@ -265,6 +258,23 @@ export default function MusicPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isFs]);
 
+  // On the (non-fullscreen) music page, Space toggles play/pause — the natural
+  // media-player reflex. Fullscreen theater has its own Space handler above, and
+  // typing in the search box is left alone. preventDefault stops both page
+  // scroll and a focused track button from also firing its own activation.
+  useEffect(() => {
+    if (isFs) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== " " || e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      e.preventDefault();
+      togglePlay();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isFs, togglePlay]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Logical (CSS-pixel) canvas size + device pixel ratio, kept in a ref so the
   // render loop can read the current dimensions without restarting on resize.
@@ -273,7 +283,6 @@ export default function MusicPage() {
   const analysisRef = useRef<Analysis | null>(null);
   // Per-visualizer scratch space (particles, ring lists, spectrogram buffers…).
   const vizStateRef = useRef<Record<string, unknown>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Audio Visualizer render loop.
   //
@@ -413,50 +422,6 @@ export default function MusicPage() {
     };
   }, [isFs]);
 
-  // Handle local file upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const objectURL = URL.createObjectURL(file);
-    const newTrack: Track = {
-      id: tracks.length + 1,
-      title: file.name.replace(/\.[^/.]+$/, ""),
-      duration: "00:00", // will load metadata
-      isPlayable: true,
-      src: objectURL,
-      description: "User uploaded local ambient core file.",
-      tempo: "Local",
-      key: "Custom"
-    };
-
-    addCustomTrack(newTrack);
-    setTimeout(() => {
-      handleTrackSelect(tracks.length, { autoplay: true });
-    }, 100);
-  };
-
-  // Handle URL stream loading
-  const handleUrlLoad = () => {
-    if (!customUrl) return;
-    const newTrack: Track = {
-      id: tracks.length + 1,
-      title: "Custom Stream " + (tracks.length - 19),
-      duration: "Stream",
-      isPlayable: true,
-      src: customUrl,
-      description: `External streaming network feed: ${customUrl}`,
-      tempo: "Network",
-      key: "Remote"
-    };
-
-    addCustomTrack(newTrack);
-    setCustomUrl("");
-    setTimeout(() => {
-      handleTrackSelect(tracks.length, { autoplay: true });
-    }, 100);
-  };
-
   const filteredTracks = tracks.filter((t) =>
     t.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -586,8 +551,9 @@ export default function MusicPage() {
             </div>
           </div>
 
-          {/* Main workspace */}
-          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-hidden relative">
+          {/* Main workspace — scrolls on phones (the TV screen is height-locked),
+              side-by-side and clipped on md+. */}
+          <div className="flex-1 w-full flex flex-col md:flex-row gap-5 min-h-0 overflow-y-auto md:overflow-hidden no-scrollbar relative">
 
             {/* Left Column: Player Console */}
             <div className="flex-1 flex flex-col gap-4 min-h-0 relative">
@@ -600,7 +566,7 @@ export default function MusicPage() {
                   relative flex flex-col overflow-hidden transition-[border-color,box-shadow] duration-300
                   ${isFs
                     ? "bg-black w-screen h-screen p-0 gap-0"
-                    : "bg-black/60 border border-white/5 rounded-xl p-3 gap-2 flex-1 min-h-[220px] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"
+                    : "bg-black/60 border border-white/5 rounded-xl p-3 gap-2 flex-1 min-h-[150px] sm:min-h-[220px] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)]"
                   }
                   ${isFs && !controlsVisible ? "cursor-none" : ""}
                 `}
@@ -847,7 +813,7 @@ export default function MusicPage() {
                 )}
               </div>
 
-              {/* Deck Console — track details + EQ/Nature suite + transport (compact) */}
+              {/* Deck Console — track details + EQ/Remix suite + transport (compact) */}
               <div className="flex-shrink-0 bg-black/30 border border-white/5 rounded-xl p-3.5 flex flex-col gap-3 relative glass-panel">
                 <div className="absolute inset-0 bg-gradient-to-b from-accent-1/2 to-transparent opacity-10 pointer-events-none" />
 
@@ -880,7 +846,7 @@ export default function MusicPage() {
                   </div>
                 </div>
 
-                {/* Tabbed Suite: Equalizer + Nature Soundscapes */}
+                {/* Tabbed Suite: Equalizer + Remix (ambient texture) layers */}
                 <div className="border border-white/5 rounded-xl bg-black/40 overflow-hidden flex flex-col flex-shrink-0">
                   {/* Tab Headers */}
                   <div className="flex border-b border-white/5 bg-black/20 text-[9px] font-mono">
@@ -900,7 +866,7 @@ export default function MusicPage() {
                       }`}
                     >
                       <Sparkles className="w-4 h-4 animate-pulse" />
-                      Nature
+                      Remix
                     </button>
                   </div>
 
@@ -1082,7 +1048,7 @@ export default function MusicPage() {
                 </div>
 
                 {/* Bezel Controls */}
-                <div className="flex items-center justify-between w-full gap-4 flex-shrink-0">
+                <div className="flex items-center justify-between w-full gap-2 sm:gap-4 flex-shrink-0">
                   {/* Left: Toggles (Repeat, Shuffle, Synth Mode) */}
                   <div className="flex items-center gap-1.5 md:gap-2 flex-1 justify-start select-none">
                     <button
@@ -1164,7 +1130,9 @@ export default function MusicPage() {
                       step="0.01"
                       value={volume}
                       onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                      className="w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                      aria-label="Volume"
+                      // Hidden on phones (device volume rules there); mute stays.
+                      className="hidden sm:block w-16 md:w-20 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
                     />
                   </div>
                 </div>
@@ -1173,10 +1141,10 @@ export default function MusicPage() {
             </div>
 
             {/* Right Column: Track Search and Playlist Library */}
-            <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-0 select-none">
+            <div className="w-full md:w-[340px] lg:w-[380px] xl:w-[420px] flex flex-col gap-3 min-h-[45vh] md:min-h-0 select-none">
 
-              {/* Search Box + add-source row */}
-              <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0 flex flex-col gap-2.5">
+              {/* Search Box */}
+              <div className="bg-black/40 border border-white/5 rounded-xl p-3 flex-shrink-0">
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-2.5 text-text-low pointer-events-none" />
                   <input
@@ -1195,49 +1163,12 @@ export default function MusicPage() {
                     </button>
                   )}
                 </div>
-
-                {/* Load your own: local file or stream URL */}
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="audio/*"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload a local audio file"
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-mono text-text-mid hover:text-text-hi hover:border-accent-2/40 transition-colors flex-shrink-0 uppercase tracking-wider"
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    Upload
-                  </button>
-                  <div className="relative flex-1 min-w-0">
-                    <LinkIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-text-low pointer-events-none" />
-                    <input
-                      type="text"
-                      value={customUrl}
-                      onChange={(e) => setCustomUrl(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter") handleUrlLoad(); }}
-                      placeholder="Stream URL…"
-                      className="w-full bg-black/40 border border-white/5 focus:border-accent-2/50 rounded-lg py-1.5 pl-8 pr-14 text-[10px] font-mono text-text-hi placeholder-text-faint outline-none transition-all"
-                    />
-                    <button
-                      onClick={handleUrlLoad}
-                      disabled={!customUrl}
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded bg-accent-2/15 border border-accent-2/30 text-accent-2 text-[8px] font-mono uppercase tracking-wider disabled:opacity-30 disabled:cursor-not-allowed hover:bg-accent-2/25 transition-colors"
-                    >
-                      Load
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {/* Scrollable Track list */}
               <div className="flex-1 bg-black/30 border border-white/5 rounded-xl p-3 flex flex-col min-h-0 glass-panel">
                 <div className="flex justify-between items-center mb-2 px-1 flex-shrink-0">
-                  <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Channel Library</span>
+                  <span className="text-[9px] font-mono text-text-low tracking-wider uppercase font-semibold">Music Library</span>
                   <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-text-mid">
                     COUNT: {filteredTracks.length}
                   </span>
@@ -1253,11 +1184,18 @@ export default function MusicPage() {
                       <button
                         key={track.id}
                         onClick={() => {
+                          // Clicking the current track toggles play/pause (so
+                          // clicking the live track pauses it); any other track
+                          // gets selected and auto-played.
+                          if (isSelected) {
+                            togglePlay();
+                            return;
+                          }
                           const idx = tracks.findIndex((t) => t.id === track.id);
                           handleTrackSelect(idx, { autoplay: true });
                         }}
                         aria-current={isTrackPlaying ? "true" : undefined}
-                        className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden ${
+                        className={`w-full text-left p-2 rounded-lg border transition-all duration-300 flex items-center justify-between gap-3 group relative overflow-hidden cursor-pointer ${
                           isTrackPlaying
                             ? "bg-accent-2/10 border-accent-2/60 shadow-[0_0_18px_rgba(0,224,203,0.12),inset_0_1px_8px_rgba(0,224,203,0.08)]"
                             : isSelected
@@ -1274,24 +1212,28 @@ export default function MusicPage() {
                           {/* Channel number or animated indicator */}
                           <div className="w-6 h-6 rounded bg-black/40 border border-white/5 flex items-center justify-center flex-shrink-0 text-[10px] font-mono text-text-low">
                             {isTrackPlaying ? (
-                              <Music className="w-5 h-5 text-accent-2 animate-bounce" />
+                              <span className="inline-flex animate-[track-icon-spin-in_0.6s_ease-out]">
+                                <Music className="w-3.5 h-3.5 text-accent-2 animate-[track-icon-zoom_1.4s_ease-in-out_infinite]" />
+                              </span>
                             ) : (
                               String(track.id).padStart(2, "0")
                             )}
                           </div>
 
                           <div className="min-w-0">
-                            <span className={`text-xs font-semibold font-mono block truncate leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
-                              {track.title}
-                            </span>
-                            <span className={`text-[8.5px] font-mono tracking-wider font-semibold uppercase px-1 rounded inline-block mt-0.5 ${
-                              isTrackPlaying
-                                ? "bg-accent-2/20 border border-accent-2/40 text-accent-2"
-                                : track.isPlayable
-                                ? "bg-accent-2/10 border border-accent-2/20 text-accent-2"
-                                : "bg-accent-3/10 border border-accent-3/20 text-accent-3"
-                            }`}>
-                              {isTrackPlaying ? "PLAYING" : track.isPlayable ? "LIVE" : "ARCHIVE"}
+                            <div className="flex items-center gap-1.5">
+                              <span className={`text-xs font-semibold font-mono truncate min-w-0 leading-snug group-hover:text-text-hi transition-colors ${isTrackPlaying ? "text-accent-2" : "text-text-hi"}`}>
+                                {track.title}
+                              </span>
+                              {isTrackPlaying && (
+                                <span className="flex-shrink-0 inline-flex items-center gap-1 text-[7px] font-mono tracking-wider font-bold uppercase px-1 py-px rounded bg-accent-2/20 border border-accent-2/40 text-accent-2">
+                                  <span className="w-1 h-1 rounded-full bg-accent-2 animate-pulse" />
+                                  Playing
+                                </span>
+                              )}
+                            </div>
+                            <span className="block text-[9px] font-mono text-text-low truncate leading-relaxed mt-0.5">
+                              {track.description}
                             </span>
                           </div>
                         </div>
@@ -1306,22 +1248,9 @@ export default function MusicPage() {
                   {filteredTracks.length === 0 && (
                     <div className="text-center py-8">
                       <AlertTriangle className="w-6 h-6 text-text-faint mx-auto mb-2" />
-                      <p className="text-[10px] font-mono text-text-low">No channels found matching query.</p>
+                      <p className="text-[10px] font-mono text-text-low">No music found matching query.</p>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Console log footer (retro style log) */}
-              <div className="h-[100px] bg-black/75 border border-white/5 rounded-xl p-2.5 font-mono text-[8.5px] text-accent-2 overflow-y-auto flex flex-col-reverse gap-0.5 shadow-[inset_0_2px_6px_rgba(0,0,0,0.7)] flex-shrink-0">
-                {logs.length > 0 ? (
-                  logs.map((log, i) => <div key={i} className="truncate select-none leading-relaxed">{log}</div>)
-                ) : (
-                  <div className="text-text-faint select-none animate-pulse">TERMINAL LOG ACTIVE (IDLE)</div>
-                )}
-                <div className="text-text-low border-b border-white/5 pb-1 mb-1 select-none flex items-center gap-1">
-                  <Terminal className="w-3 h-3 text-text-low" />
-                  <span>DECODER LOG SUMMARY</span>
                 </div>
               </div>
 

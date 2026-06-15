@@ -40,13 +40,11 @@ import {
   Waves,
   Wifi,
   Terminal,
-  Zap,
-  RefreshCw,
   Play,
   CheckCircle,
   Server,
 } from "lucide-react";
-import { Eyebrow } from "@/components/typography/Eyebrow";
+import { Rise } from "@/components/motion/Rise";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { LogoMark } from "../01-arrival/LogoMark";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
@@ -158,7 +156,10 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
       style={{ minHeight: inTv ? "100%" : "100svh" }}
     >
       {/* ── MOBILE ONLY LAYOUT ── */}
-      <div className="block md:hidden relative w-full h-full min-h-[100svh]">
+      {/* Bottom-anchored flex column (like HomeOrbital): the logo/rings sit
+          behind as an absolute layer, copy + grid hug the base. No min-h/spacer
+          so it can't overflow the height-locked, bottom-nav-shortened screen. */}
+      <div className="flex flex-col justify-end md:hidden relative w-full h-full pb-4">
         {/* Center Galaxy/Logo System for Mobile — omitted when the orbital layout
             renders the persistent Sun behind this scene. */}
         {!externalSun && (
@@ -203,10 +204,9 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
         </motion.div>
         )}
 
-        {/* Foreground copy and mobile projects grid */}
-          <div className="h-[30svh]" />
-          
-          <div className="flex-1 flex flex-col justify-center pointer-events-auto">
+        {/* Foreground copy and mobile projects grid — bottom-anchored by the
+            parent's justify-end; the absolute logo/rings layer sits behind. */}
+          <div className="flex flex-col justify-center pointer-events-auto">
             {/* Brand copy — Home identity only; omitted on the orbital Projects view */}
             {!externalSun && (
             <motion.div
@@ -217,6 +217,14 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
             >
               <BrandCopy isMobile={true} />
             </motion.div>
+            )}
+
+            {/* Projects intro — replaces the brand copy on the orbital /projects
+                view, sitting just above the product grid. */}
+            {externalSun && (
+              <div className="mb-5 flex justify-center px-2">
+                <ProjectsIntro mobile />
+              </div>
             )}
 
             {/* Mobile Projects Grid */}
@@ -267,11 +275,11 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
         </div>
 
       <div 
-        className="hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-12 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
+        className="showcase-solar hidden md:grid grid-cols-[1fr_minmax(350px,420px)_1fr] lg:grid-cols-[1fr_minmax(400px,500px)_1fr] xl:grid-cols-[1fr_minmax(460px,580px)_1fr] gap-x-6 lg:gap-x-16 gap-y-8 items-center justify-center max-w-[1200px] lg:max-w-[1350px] xl:max-w-[1500px] mx-auto px-6 min-h-screen relative z-20 py-16 pointer-events-none"
         style={{ perspective: 1200 }}
       >
         {/* Column 1: Left Column (Yantracore 1st, Restroverse 3rd) */}
-        <div className="flex flex-col gap-12 lg:gap-16 items-end justify-center w-full h-full pointer-events-auto">
+        <div className="flex flex-col gap-8 lg:gap-11 items-end justify-center w-full h-full pointer-events-auto">
           {/* Card 1: Yantracore (index 0) */}
           <FloatingCard
             key={0}
@@ -363,10 +371,21 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
             <BrandCopy isMobile={false} />
           </motion.div>
           </>)}
+
+          {/* Projects intro — shown on the orbital /projects view in place of the
+              brand copy. Anchored low in the centre column (a top-% so it survives
+              the height-locked TV's bottom clip and the showcase-solar centre-origin
+              scaling) so it reads below the persistent Sun, nested in the gap between
+              the two lower product cards. */}
+          {externalSun && (
+            <div className="pointer-events-auto absolute inset-x-0 top-[61%] flex justify-center px-4">
+              <ProjectsIntro />
+            </div>
+          )}
         </div>
 
         {/* Column 3: Right Column (Jimbo 2nd, Shramdan 4th) */}
-        <div className="flex flex-col gap-12 lg:gap-16 items-start justify-center w-full h-full pointer-events-auto">
+        <div className="flex flex-col gap-8 lg:gap-11 items-start justify-center w-full h-full pointer-events-auto">
           {/* Card 2: Jimbo (index 1) */}
           <FloatingCard
             key={1}
@@ -433,6 +452,62 @@ function BrandCopy({ isMobile }: { isMobile: boolean }) {
         <br />
         Technology with purpose. Built for impact.
       </p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   ProjectsIntro — the orienting copy for the /projects orbital view.
+   Where Home shows the brand wordmark, the Projects page omits its own
+   centre logo (the persistent Sun fills that role) and instead explains
+   what the orbiting cards are: YantraCore's growing ecosystem of work.
+   Staggers in on the site's shared Rise curve; `mobile` tightens the
+   scale for the phone layout above the product grid.
+   ───────────────────────────────────────────────────────────────── */
+function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <div
+      className={`flex w-full flex-col items-center text-center ${
+        mobile ? "max-w-[340px] gap-2" : "max-w-[520px] gap-3"
+      }`}
+    >
+      <Rise delay={0.08} y={mobile ? 10 : 18}>
+        {/* The page's main heading — the orbital /projects view had none until
+            now. Styled as a quiet mono eyebrow so it labels without competing
+            with the Sun. */}
+        <h1
+          className={`font-mono uppercase text-text-mid ${
+            mobile ? "text-[10px] tracking-[0.24em]" : "text-[11px] tracking-[0.28em]"
+          }`}
+        >
+          Our Projects
+        </h1>
+      </Rise>
+
+      <Rise delay={0.16} y={mobile ? 10 : 18}>
+        <p
+          className={`text-balance leading-relaxed ${
+            mobile ? "text-[12px]" : "text-[15px] md:text-base"
+          }`}
+          style={{ color: "var(--text-mid)" }}
+        >
+          A growing ecosystem of apps, AI agents, platforms, and social-impact
+          tools — built by YantraCore to serve people, businesses, and
+          communities.
+        </p>
+      </Rise>
+
+      <Rise delay={0.24} y={mobile ? 10 : 18}>
+        <p
+          className={`inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.18em] ${
+            mobile ? "text-[9px]" : "text-[11px]"
+          }`}
+          style={{ color: "var(--accent-2)" }}
+        >
+          <Sparkles className={mobile ? "h-3 w-3" : "h-3.5 w-3.5"} aria-hidden />
+          Explore what we&rsquo;re building
+        </p>
+      </Rise>
     </div>
   );
 }
@@ -1473,7 +1548,7 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
         </div>
 
         {/* Swiper Coverflow Carousel */}
-        <div className="w-full relative overflow-hidden select-none mt-auto h-[120px]">
+        <div className="w-full relative overflow-hidden select-none h-[144px]">
           <Swiper
             onSwiper={setSwiperRef}
             effect="coverflow"
@@ -1497,14 +1572,13 @@ function CardRestroverse({ syncTick = 0 }: { syncTick?: number }) {
             className="w-full h-full"
           >
             {hotelSlides.map((hotel, index) => (
-              <SwiperSlide key={index} className="w-full flex justify-center">
-                <div 
+              <SwiperSlide key={index} className="w-full flex justify-center pt-2.5 pb-4">
+                <div
                   className="flex gap-2.5 p-2 rounded-xl w-full h-full text-left relative group/slide overflow-hidden"
                   style={{
                     background: "var(--ink-1)",
                     border: "1px solid var(--nm-line-soft)",
                     boxShadow: "var(--nm-raised-soft)",
-                    marginBottom: "15px",
                   }}
                 >
                   {/* Decorative digital grid background overlay */}
@@ -1669,6 +1743,10 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
   const [isInteractive, setIsInteractive] = useState(false);
   const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
 
+  // Neumorphic surface recipes — raised tactile chips + a carved sunken groove
+  const nmChip = "3px 3px 7px #050608, -3px -3px 7px #131829";
+  const nmGroove = "inset 2px 2px 5px #010203, inset -1px -1px 3px #171c30";
+
   // Auto-simulation flow synced centrally
   useEffect(() => {
     if (isInteractive) return;
@@ -1765,15 +1843,19 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
           {SHRAMDAN_PROJECTS.map((project, index) => (
             <SwiperSlide key={project.id} className="w-full h-full">
               <div
-                className="flex flex-col gap-2 w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm"
+                className="flex flex-col gap-2 w-full h-full rounded-2xl border border-white/[0.04] p-2 backdrop-blur-sm"
+                style={{ background: "var(--ink-1)", boxShadow: "var(--nm-sunken-soft)" }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsInteractive(true);
                   swiperRef?.slideToLoop(index, 1000);
                 }}
               >
-                {/* 30% reduced image height: min-h-[118px] -> fixed h-[82px] */}
-                <div className="relative rounded-xl overflow-hidden border border-white/10 h-[82px] flex-shrink-0 bg-black/30 w-full">
+                {/* Project visual — raised neumorphic photo frame */}
+                <div
+                  className="relative rounded-xl overflow-hidden h-[104px] flex-shrink-0 w-full"
+                  style={{ background: "var(--ink-0)", boxShadow: "var(--nm-raised-soft)", border: "1px solid var(--nm-line-soft)" }}
+                >
                   <Image
                     src={project.image}
                     alt={`${project.name} before and after`}
@@ -1781,101 +1863,110 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
                     sizes="(max-width: 768px) 240px, 300px"
                     className="object-cover"
                   />
-                  {/* Category Tag overlay on top-left of image */}
-                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[7px] font-mono text-accent-warm leading-none">
+                  {/* Legibility gradient for the overlaid chrome */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-black/25 pointer-events-none" />
+
+                  {/* Category tag — top-left */}
+                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/55 border border-white/10 backdrop-blur-md text-[7px] font-mono uppercase tracking-wider text-accent-warm leading-none">
                     {project.tag}
                   </div>
 
-                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
-                    <MapPin className="w-2 h-2 text-text-hi" />
-                    <span className="text-[7.5px] text-text-hi leading-none">{project.location}</span>
-                  </div>
-                  
-                  {/* Pagination dots overlay */}
-                  <div className="absolute bottom-1.5 right-1.5 flex gap-1 z-30 pointer-events-auto">
+                  {/* Pagination — top-right (active pill grows) */}
+                  <div className="absolute top-1.5 right-1.5 flex items-center gap-1 z-30 pointer-events-auto">
                     {SHRAMDAN_PROJECTS.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={(e) => handleDotClick(idx, e)}
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          activeIdx === idx 
-                            ? "bg-accent-warm scale-125 shadow-[0_0_6px_var(--accent-warm)]" 
-                            : "bg-white/30 hover:bg-white/50"
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeIdx === idx
+                            ? "w-4 bg-accent-warm shadow-[0_0_6px_var(--accent-warm)]"
+                            : "w-1.5 bg-white/35 hover:bg-white/60"
                         }`}
                         aria-label={`Go to slide ${idx + 1}`}
                       />
                     ))}
                   </div>
+
+                  {/* Location — bottom-left */}
+                  <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15">
+                    <MapPin className="w-2 h-2 text-accent-warm" />
+                    <span className="text-[7.5px] text-text-hi leading-none font-medium">{project.location}</span>
+                  </div>
+
+                  {/* Social proof — bottom-right avatar stack */}
+                  <div className="absolute bottom-1.5 right-1.5 flex -space-x-1.5 items-center">
+                    {project.avatars.slice(0, 3).map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="w-4 h-4 rounded-full border border-black/60 flex items-center justify-center text-[6.5px] font-bold text-white"
+                        style={{
+                          backgroundColor: color,
+                          backgroundImage: "radial-gradient(circle at top, rgba(255,255,255,0.25) 0%, transparent 75%)",
+                        }}
+                      >
+                        {["A", "S", "R", "N"][idx]}
+                      </div>
+                    ))}
+                    <div className="w-4 h-4 rounded-full bg-black/55 border border-white/20 backdrop-blur-md flex items-center justify-center text-[6px] text-text-hi font-bold">
+                      +{Math.max(project.volunteers - 3, 0)}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Details Section utilizing the extra space */}
-                <div className="flex-1 flex flex-col justify-between py-0.5 min-h-0">
-                  {/* Row 1: Title, Address and Likes */}
-                  <div className="flex justify-between items-start gap-1">
+                {/* Details */}
+                <div className="flex-1 flex flex-col justify-between min-h-0">
+                  {/* Title + Like */}
+                  <div className="flex items-start justify-between gap-1.5">
                     <div className="min-w-0">
-                      <p className="text-[11.5px] font-bold text-text-hi leading-tight truncate">{project.name}</p>
+                      <p className="text-[12px] font-bold text-text-hi leading-tight truncate">{project.name}</p>
                       <p className="text-[8px] text-text-low font-mono leading-none mt-0.5 truncate">{project.address}</p>
                     </div>
-                    <button 
-                      className="flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform pointer-events-auto flex-shrink-0 px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/5" 
+                    <button
                       onClick={handleLike}
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-shrink-0 active:scale-95 transition-transform pointer-events-auto"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
                     >
                       <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" />
-                      <span className="text-[9.5px] text-text-hi font-medium leading-none">{likes[index]}</span>
+                      <span className="text-[9px] text-text-hi font-semibold leading-none">{likes[index]}</span>
                     </button>
                   </div>
 
-                  {/* Row 2: Impact Stats & Progress Bar */}
-                  <div className="space-y-1">
+                  {/* Impact + carved progress groove */}
+                  <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-[8.5px] font-mono leading-none">
-                      <span className="text-text-low flex items-center gap-1">
+                      <span className="text-text-mid flex items-center gap-1">
                         <TrendingUp className="w-2.5 h-2.5 text-accent-warm" />
                         {project.impact}
                       </span>
-                      <span className="text-accent-warm font-semibold">{project.progress}%</span>
+                      <span className="text-accent-warm font-bold">{project.progress}%</span>
                     </div>
-                    <div className="w-full h-1 bg-white/[0.06] rounded-full overflow-hidden border border-white/5 relative">
-                      <div 
-                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-amber-500 to-orange-400"
-                        style={{ 
-                          width: `${project.progress}%`,
-                          boxShadow: "0 0 6px rgba(255,180,84,0.4)" 
-                        }}
+                    <div
+                      className="w-full h-2 rounded-full overflow-hidden relative"
+                      style={{ background: "var(--ink-0)", boxShadow: nmGroove }}
+                    >
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-amber-500 via-orange-400 to-amber-300"
+                        style={{ width: `${project.progress}%`, boxShadow: "0 0 8px rgba(255,180,84,0.55)" }}
                       />
                     </div>
                   </div>
 
-                  {/* Row 3: Volunteers (Participants), Time, and Avatar Stack */}
-                  <div className="flex items-center justify-between border-t border-white/[0.05] pt-1.5 mt-0.5">
-                    <div className="flex flex-col gap-0.5 text-[8px] min-w-0">
-                      <div className="flex items-center gap-1">
-                        <Users className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
-                        <span className="text-text-hi font-semibold leading-none">{project.volunteers}</span>
-                        <span className="text-text-low text-[7.5px] leading-none">participants</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
-                        <span className="text-text-hi font-medium leading-none truncate max-w-[80px]">{project.time}</span>
-                      </div>
+                  {/* Footer — raised neumorphic stat chips */}
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-1 min-w-0"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
+                    >
+                      <Users className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                      <span className="text-[9px] text-text-hi font-bold leading-none">{project.volunteers}</span>
+                      <span className="text-[7px] text-text-low leading-none">joined</span>
                     </div>
-
-                    {/* Avatar Stack */}
-                    <div className="flex -space-x-1.5 overflow-hidden items-center flex-shrink-0">
-                      {project.avatars.map((color, idx) => (
-                        <div 
-                          key={idx}
-                          className="w-3.5 h-3.5 rounded-full border border-black/50 flex items-center justify-center text-[6.5px] font-bold text-white shadow-sm flex-shrink-0"
-                          style={{ 
-                            backgroundColor: color,
-                            backgroundImage: `radial-gradient(circle at top, rgba(255,255,255,0.2) 0%, transparent 80%)`
-                          }}
-                        >
-                          {["A", "S", "R", "N"][idx]}
-                        </div>
-                      ))}
-                      <div className="w-3.5 h-3.5 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-center text-[5.5px] text-text-low font-bold flex-shrink-0 z-10">
-                        +8
-                      </div>
+                    <div
+                      className="flex items-center gap-1 px-1.5 py-1 rounded-lg flex-[1.4] min-w-0"
+                      style={{ background: "var(--ink-1)", boxShadow: nmChip, border: "1px solid var(--nm-line-soft)" }}
+                    >
+                      <Clock className="w-2.5 h-2.5 text-accent-warm flex-shrink-0" />
+                      <span className="text-[7.5px] text-text-hi font-medium leading-none truncate">{project.time}</span>
                     </div>
                   </div>
                 </div>
@@ -1909,7 +2000,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
    CardCoreStatus Components & Main Dashboard Card
    ============================================================ */
 
-function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pingTrigger: number }) {
+function NeuralTelemetryMap() {
   const { themeMode } = useTheme();
   const [latency, setLatency] = useState(24.2);
   const [load, setLoad] = useState(41.8);
@@ -1935,13 +2026,18 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
     return () => clearInterval(interval);
   }, []);
 
+  // Self-driven telemetry pulse so the map stays alive on its own
   useEffect(() => {
-    if (pingTrigger > 0) {
+    let pulseTimer: ReturnType<typeof setTimeout>;
+    const interval = setInterval(() => {
       setPulseActive(true);
-      const timer = setTimeout(() => setPulseActive(false), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [pingTrigger]);
+      pulseTimer = setTimeout(() => setPulseActive(false), 1100);
+    }, 4200);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(pulseTimer);
+    };
+  }, []);
 
   const nodes = [
     { name: "SFO", x: 35, y: 25 },
@@ -1953,10 +2049,10 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
   const center = { x: 120, y: 52 };
 
   return (
-    <div className="flex-1 flex flex-col gap-2.5 justify-center w-full select-none">
+    <div className="flex-1 flex flex-col gap-2.5 w-full h-full min-h-0 select-none">
       {/* Topology Map Canvas/SVG */}
-      <div 
-        className="relative h-[95px] w-full rounded-xl border overflow-hidden flex items-center justify-center transition-all duration-300"
+      <div
+        className="relative flex-1 min-h-0 w-full rounded-xl border overflow-hidden flex items-center justify-center transition-all duration-300"
         style={{
           backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.4)",
           borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.05)",
@@ -1966,7 +2062,7 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
         {/* Glow backdrop */}
         <div className="absolute inset-0 bg-radial-gradient from-accent-2/5 to-transparent pointer-events-none" />
         
-        <svg className="w-full h-full absolute inset-0 pointer-events-none">
+        <svg viewBox="0 0 240 100" preserveAspectRatio="xMidYMid meet" className="w-full h-full absolute inset-0 pointer-events-none">
           <style>{`
             @keyframes telemetry-dash-flow {
               to { stroke-dashoffset: -20; }
@@ -1996,7 +2092,7 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
                 y2={node.y}
                 stroke="var(--accent-2)"
                 strokeWidth="1.5"
-                strokeOpacity={isPinging ? "0.8" : "0.3"}
+                strokeOpacity={pulseActive ? "0.8" : "0.3"}
                 strokeDasharray="4 16"
                 style={{
                   strokeDashoffset: pulseActive ? -100 : undefined,
@@ -2077,12 +2173,6 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
           </span>
           <span className="text-[7.5px] font-mono uppercase text-emerald-400 tracking-wider">Edge-Active</span>
         </div>
-        
-        {isPinging && (
-          <div className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[0.5px] flex items-center justify-center rounded-xl z-20">
-            <span className="text-[8px] font-mono text-emerald-400 uppercase tracking-widest animate-pulse">Pinging...</span>
-          </div>
-        )}
       </div>
 
       {/* Stats Grid */}
@@ -2095,19 +2185,19 @@ function NeuralTelemetryMap({ isPinging, pingTrigger }: { isPinging: boolean; pi
         <div className="space-y-0.5">
           <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Avg Latency</p>
           <p className="text-[11px] font-bold text-accent-2 font-mono transition-all">
-            {isPinging ? "---" : `${latency}ms`}
+            {`${latency}ms`}
           </p>
         </div>
         <div className="space-y-0.5">
           <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Cpu Core Load</p>
           <p className="text-[11px] font-bold text-accent-1 font-mono transition-all">
-            {isPinging ? "---" : `${load}%`}
+            {`${load}%`}
           </p>
         </div>
         <div className="space-y-0.5">
           <p className="text-[7.5px] text-text-low font-mono uppercase tracking-wider">Bandwidth</p>
           <p className="text-[11px] font-bold text-text-hi font-mono transition-all">
-            {isPinging ? "---" : `${speed}G`}
+            {`${speed}G`}
           </p>
         </div>
       </div>
@@ -2321,8 +2411,8 @@ function PipelineFlow() {
       </div>
 
       {/* Details Box */}
-      <div 
-        className="h-16 rounded-xl border p-2.5 flex flex-col justify-center select-none transition-all duration-300"
+      <div
+        className="flex-1 min-h-0 rounded-xl border p-2.5 flex flex-col justify-center select-none transition-all duration-300"
         style={{
           backgroundColor: themeMode === "light" ? "var(--ink-0)" : "rgba(10, 12, 22, 0.4)",
           borderColor: themeMode === "light" ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.06)",
@@ -2346,25 +2436,17 @@ function PipelineFlow() {
   );
 }
 
-interface DiagnosticConsoleProps {
-  isPinging: boolean;
-  setIsPinging: (v: boolean) => void;
-  onPulse: () => void;
-}
-
-function DiagnosticConsole({ 
-  isPinging, 
-  setIsPinging, 
-  onPulse 
-}: DiagnosticConsoleProps) {
-  const { themeMode } = useTheme();
+function DiagnosticConsole() {
   const [logs, setLogs] = useState<string[]>([
     "SYS: boot core agents... OK",
     "NET: edge regions online [8/8]",
+    "DB: cluster sync OK [3/3]",
+    "SEC: identity vault unlocked",
     "AGENT: monitoring localhost...",
+    "COMPILER: verified 18 modules",
+    "SYS: thermal limits normal (42°C)",
     "READY: telemetry link operational"
   ]);
-  const [isDiagnosticRunning, setIsDiagnosticRunning] = useState(false);
   const terminalContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll logs internally
@@ -2374,82 +2456,37 @@ function DiagnosticConsole({
     }
   }, [logs]);
 
-  // Periodic random background logs when idle
+  // Continuously stream background telemetry so the console stays alive
   useEffect(() => {
-    if (isDiagnosticRunning || isPinging) return;
+    const backgroundLogs = [
+      "SYS: cleared cache buffers (0.01s)",
+      "AGENT: context weight compressed 4.2x",
+      "NET: edge SFO connection optimized",
+      "COMPILER: verified 18 modules",
+      "SYS: thermal limits normal (42°C)",
+      "SEC: session tokens refreshed",
+      "DB: cluster sync OK [3/3]",
+      "EDGE: latency SFO:14ms SGP:48ms"
+    ];
 
     const interval = setInterval(() => {
-      const backgroundLogs = [
-        "SYS: cleared cache buffers (0.01s)",
-        "AGENT: context weight compressed 4.2x",
-        "NET: edge SFO connection optimized",
-        "COMPILER: verified 18 modules",
-        "SYS: thermal limits normal (42°C)",
-        "SEC: session tokens refreshed"
-      ];
       const randomLog = backgroundLogs[Math.floor(Math.random() * backgroundLogs.length)];
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-      
-      setLogs(prev => [...prev.slice(-8), `[${timeStr}] ${randomLog}`]);
-    }, 4500);
+
+      setLogs(prev => [...prev.slice(-13), `[${timeStr}] ${randomLog}`]);
+    }, 2200);
 
     return () => clearInterval(interval);
-  }, [isDiagnosticRunning, isPinging]);
-
-  const runDiagnostics = () => {
-    if (isDiagnosticRunning) return;
-    setIsDiagnosticRunning(true);
-    audioSynth.playClick();
-    
-    // Simulate diagnostic script
-    setLogs(["[init] running full yantracore tests..."]);
-    
-    const steps = [
-      { text: "[test] CPU nodes status: OK", delay: 300 },
-      { text: "[test] edge latency: SFO:14ms SGP:48ms", delay: 700 },
-      { text: "[test] database cluster sync: OK", delay: 1100 },
-      { text: "[sys] COMPLETED ALL CHECKS.", delay: 1500 },
-      { text: "[sys] RESULT: 100% OPERATIONAL", delay: 1800 }
-    ];
-
-    steps.forEach((step) => {
-      setTimeout(() => {
-        setLogs(prev => [...prev, step.text]);
-        audioSynth.playHover();
-      }, step.delay);
-    });
-
-    setTimeout(() => {
-      setIsDiagnosticRunning(false);
-    }, 2000);
-  };
-
-  const syncNodes = () => {
-    if (isPinging) return;
-    setIsPinging(true);
-    onPulse();
-    audioSynth.playClick();
-
-    setLogs(prev => [...prev, "[sync] pulsing edge network nodes..."]);
-
-    setTimeout(() => {
-      setIsPinging(false);
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-      setLogs(prev => [...prev, `[${timeStr}] [sync] success (edge latency: 24.2ms)`]);
-    }, 1200);
-  };
+  }, []);
 
   return (
-    <div className="flex-1 flex flex-col justify-between w-full h-full select-none font-mono">
-      {/* Terminal Display */}
-      <div 
+    <div className="flex-1 flex flex-col w-full h-full select-none font-mono">
+      {/* Terminal Display — fills the panel top to bottom */}
+      <div
         ref={terminalContainerRef}
         onClick={(e) => e.stopPropagation()}
-        className={`flex-1 rounded-xl border border-white/5 bg-black/60 p-2.5 overflow-y-auto max-h-[105px] h-[105px] text-[7.5px] leading-tight text-emerald-400 select-text scrollbar-thin scrollbar-thumb-white/10 ${
-          isDiagnosticRunning ? "animate-terminal-flicker" : ""
-        }`}
+        className="flex-1 min-h-0 rounded-xl border border-white/5 bg-black/60 p-2.5 overflow-y-auto text-[7.5px] leading-tight text-emerald-400 select-text scrollbar-thin scrollbar-thumb-white/10"
         style={{
           boxShadow: "inset 0 1px 4px rgba(0,0,0,0.8)",
           textShadow: "0 0 2px rgba(52, 211, 153, 0.4)",
@@ -2464,62 +2501,13 @@ function DiagnosticConsole({
               {log}
             </div>
           ))}
+          {/* Live prompt cursor */}
+          <div className="flex items-center gap-1 text-emerald-400/90 pt-0.5">
+            <span>{">"}</span>
+            <span className="inline-block w-1 h-2.5 bg-emerald-400/80 animate-[pulse_1s_infinite]" />
+          </div>
         </div>
       </div>
-
-      {/* Button Controls */}
-      <div className="grid grid-cols-2 gap-1.5 mt-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            runDiagnostics();
-          }}
-          disabled={isDiagnosticRunning}
-          className={`py-1 rounded-lg border text-[8px] font-mono font-bold flex items-center justify-center gap-1 active:scale-[0.97] transition-all ${
-            isDiagnosticRunning
-              ? (themeMode === "light"
-                  ? "bg-black/5 border-black/10 text-text-low cursor-not-allowed"
-                  : "bg-white/5 border-white/10 text-text-low cursor-not-allowed")
-              : (themeMode === "light"
-                  ? "bg-emerald-600/10 border-emerald-600/20 text-emerald-700 hover:bg-emerald-600/20 hover:border-emerald-600/40"
-                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40")
-          }`}
-        >
-          <Zap className="w-2.5 h-2.5" />
-          Diag OS
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            syncNodes();
-          }}
-          disabled={isPinging}
-          className={`py-1 rounded-lg border text-[8px] font-mono font-bold flex items-center justify-center gap-1 active:scale-[0.97] transition-all ${
-            isPinging
-              ? (themeMode === "light"
-                  ? "bg-black/5 border-black/10 text-text-low cursor-not-allowed"
-                  : "bg-white/5 border-white/10 text-text-low cursor-not-allowed")
-              : "bg-accent-2/10 border-accent-2/20 text-accent-2 hover:bg-accent-2/20 hover:border-accent-2/40"
-          }`}
-        >
-          <RefreshCw className={`w-2.5 h-2.5 ${isPinging ? "animate-spin" : ""}`} />
-          Pulse
-        </button>
-      </div>
-
-      <style>{`
-        @keyframes terminal-flicker {
-          0% { opacity: 0.98; filter: brightness(1); }
-          25% { opacity: 0.95; filter: brightness(0.9); }
-          50% { opacity: 0.99; filter: brightness(1.1); }
-          75% { opacity: 0.93; filter: brightness(0.85); }
-          100% { opacity: 0.98; filter: brightness(1); }
-        }
-        .animate-terminal-flicker {
-          animation: terminal-flicker 0.15s infinite;
-        }
-      `}</style>
     </div>
   );
 }
@@ -2529,18 +2517,11 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [swiperRef, setSwiperRef] = useState<SwiperInstance | null>(null);
 
-  const [isPinging, setIsPinging] = useState(false);
-  const [pingTrigger, setPingTrigger] = useState(0);
-
   useEffect(() => {
     if (swiperRef) {
       swiperRef.slideNext(1500);
     }
   }, [syncTick, swiperRef]);
-
-  const handlePulse = () => {
-    setPingTrigger(prev => prev + 1);
-  };
 
   const handleHireYantracore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -2586,7 +2567,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           {/* Slide 2: Neural Telemetry Map */}
           <SwiperSlide className="w-full h-full flex flex-col justify-center bg-transparent">
             <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
-              <NeuralTelemetryMap isPinging={isPinging} pingTrigger={pingTrigger} />
+              <NeuralTelemetryMap />
             </div>
           </SwiperSlide>
 
@@ -2600,11 +2581,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           {/* Slide 4: Interactive OS Console */}
           <SwiperSlide className="w-full h-full flex flex-col justify-center bg-transparent">
             <div className="w-full h-full rounded-xl border border-white/5 shadow-[var(--nm-sunken-soft)] p-1.5 bg-white/[0.02] backdrop-blur-sm flex flex-col justify-center">
-              <DiagnosticConsole 
-                isPinging={isPinging} 
-                setIsPinging={setIsPinging} 
-                onPulse={handlePulse} 
-              />
+              <DiagnosticConsole />
             </div>
           </SwiperSlide>
         </Swiper>

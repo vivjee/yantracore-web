@@ -54,9 +54,9 @@ A procedural Web-Audio synthesizer (`class AudioSynth`, exported as the singleto
 Used by `TvFrame`, `Header`, `Showcase`, `SettingsShell` for tactile UI feedback. The `AudioContext` is created lazily on first interaction (autoplay-policy safe).
 
 ### 2. Music player — `lib/audio/AudioPlayerContext.tsx`
-A full ambient-music engine behind the `/music` page, exposed via `useAudioPlayer()`. Mounted in the root layout so playback persists across navigation. It wraps a hidden `<audio>` element plus a Web-Audio graph (AnalyserNode for the visualizer, 3-band BiquadFilter EQ, a delay node for echo, oscillator drones, and noise generators for rain/wind/hum ambience).
+A full ambient-music engine behind the `/music` page, exposed via `useAudioPlayer()`. Mounted in the root layout so playback persists across navigation. It wraps a hidden `<audio>` element plus a Web-Audio graph (AnalyserNode for the visualizer, 3-band BiquadFilter EQ, a delay node for echo, oscillator drones, and procedural texture layers for rain/wind/hum). These texture layers are surfaced in the **Remix** tab (formerly "Nature") of the deck console: rain is band-limited **pink** noise with a slow cutoff drift, wind is **brown** noise through a low-Q band with gust LFOs on cutoff and amplitude, and hum is a detuned 60 Hz harmonic stack with a faint tremolo. Each layer's volume is user-controlled (`rainVol/windVol/humVol`); modulation is kept off those user gains so a slider at 0 is truly silent.
 
-Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/next/prev, seek, volume/mute, repeat (`none`/`one`/`all`), shuffle, a synth-only fallback when streaming fails, 3-band EQ (`eqBass/Mid/Treble`), ambient layer volumes (`echoVol/rainVol/windVol/humVol`), custom-track loading (`addCustomTrack`), and a `logs` array for the on-screen console.
+Capabilities: playlist (5 bundled lofi/ambient tracks in `public/music/`; the canonical list is the `TRACKS` array in `AudioPlayerContext.tsx`), play/pause/next/prev, seek, volume/mute, repeat (`none`/`one`/`all`), shuffle, a synth-only fallback when streaming fails, 3-band EQ (`eqBass/Mid/Treble`), ambient layer volumes (`echoVol/rainVol/windVol/humVol`), custom-track loading (`addCustomTrack`), and a `logs` activity array. `addCustomTrack` and `logs` remain in the context but are no longer surfaced in the `/music` page — the upload / stream-URL inputs and the decoder-log console were removed; the right column now holds only the search box and the (expanded) music library.
 
 ---
 
@@ -68,12 +68,26 @@ Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/ne
 
 - **Power state** — boot/shutdown animation with synth sounds (`isPowered`, `isPoweringOn`).
 - **CRT overlays** — optional scanlines / phosphor flicker / curvature / distortion filter, toggled by `isCrtEnabled` (adds `.crt-active`).
-- **Glitch on navigate** — brief distortion + sound when the route changes (works with `template.tsx` re-mounting).
-- **Top chrome bar** (`.tv-chrome-bar`) — logo, primary nav pills (Home / Entryport / Technologies / Music / Contact), theme toggle, account button, fullscreen toggle.
-- **Console tabs** (`.tv-console-tabs-container`) — dock above the frame and act as the sticky nav on app pages.
-- **Body locks** — `body.app-mode-active` (lock scroll, hide global header) vs. `body.brochure-mode-active`.
+- **Power-on static burst** — a brief CRT static overlay (`isGlitching`) flashes only as the screen re-ignites on power-on. Navigation between pages is seamless: there is **no** channel-change glitch (it was removed site-wide).
+- **Top chrome bar** (`.tv-chrome-bar`) — logo + wordmark, the page-nav group (Home / Projects / Technologies / Reach / Contact), and utility buttons (theme, Music, Settings, account, fullscreen). On phones (`<md`) the page-nav group is hidden here (`.tv-chrome-nav-pages`) and moves to the bottom tab bar; utilities stay.
+- **Mobile bottom tab bar** (`.tv-bottom-nav`, the `TvBottomNav` helper) — on `<md`, the five page destinations render as a thumb-reachable bottom tab bar, a flex sibling **below** `.tv-screen-content` so it never overlaps page content. Hidden from `md` up.
+- **Slim adaptive frame** — below `md` the bezel padding/border thin out; the frame is `100dvh`. (The `.tv-console-*` "console tab" panel styles in `globals.css` are **legacy/unused** — the live nav is the chrome bar + bottom tab bar.)
+- **Body locks** — `body.app-mode-active` (lock scroll → `100dvh`, hide global header) vs. `body.brochure-mode-active`.
 
 Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components also render "inside the TV" via an `inTv` prop (`LoginForm`, `SignupForm`, `SettingsShell`, `Showcase`) so they adapt padding/background.
+
+---
+
+## Responsive & viewport
+
+The tablet/mobile foundation. **Prefer Tailwind breakpoints in markup; reach for the JS hooks only when a layout must branch in JavaScript.**
+
+- **Hooks** — [`lib/hooks/useMediaQuery.ts`](../lib/hooks/useMediaQuery.ts): `useMediaQuery(query)` (SSR-safe via `useSyncExternalStore`, like `useFullscreen`), `useBreakpoint()` → `{ isMobile, isTablet, isDesktop, isCompact }`, `useMinWidth`/`useMaxWidth(bp)`, and `useIsTouch()` (`(pointer: coarse)` — gate hover/parallax affordances).
+- **Breakpoints** — Tailwind defaults (`sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536`) plus custom **`xs ≈ 400`** (registered in `globals.css` via `--breakpoint-xs`; gives `xs:` and `max-xs:`). Semantic bands: mobile ≤640 · tablet 640–1023 · desktop ≥1024. Chrome CSS media queries use the `md` boundary (`767.98px`) so CSS and JS agree.
+- **Viewport height** — full-bleed shells use `dvh`/`svh`, never `vh`, so the mobile address-bar show/hide doesn't clip content. `app/layout.tsx` exports `viewport` with `viewportFit: "cover"`; `body.app-mode-active` is `100dvh`.
+- **Safe areas** — `--safe-{top,right,bottom,left}` (= `env(safe-area-inset-*)`) + `.{pt,pr,pb,pl,px,py}-safe` utilities reclaim notch / home-indicator space on fixed UI (TV bottom nav, dock).
+- **Type & touch** — `.text-fluid-{display,h1,h2,h3,lead}` are `clamp()` ramps that scale smoothly (no abrupt `text-4xl→text-6xl` jumps); `.tap-target` guarantees a ≥44px hit-area on coarse pointers **without** changing a control's visual size.
+- **Signature scenes** — phones get clean simplified layouts (Home's 2×2 node grid, Showcase's card scene). The desktop solar-system + rings scale down for the tablet/small-laptop bands (`.showcase-solar`, `.orbital-rings` mirror `.orbital-sun`) with the full spectacle returning at `xl`. The `/activity` globe and `/channels` panels **scroll within the height-locked TV screen** below their multi-column breakpoint (the screen itself never scrolls). The dashboard rail becomes an off-canvas drawer below `lg`.
 
 ---
 
@@ -151,6 +165,6 @@ Three sources of animation, used deliberately:
 2. **Framer Motion** — component-level: entrance/stagger (`AnimationWrappers`), the `StarSystem` orbits, `Header`/`Showcase`/`TvFrame` transitions, mobile menus.
 3. **GSAP + split-type** — installed for scroll-tied/text-split scenes (per VISION). Verify current usage before assuming a given scene uses it.
 
-**Reusable primitives:** `Reveal` (scroll-into-view fade/translate — the most-used), `MarqueeRow` (infinite scroll), `CountUp` (number animation), `JellyRotateWrapper` (click spin), `StaggerContainer`/`StaggerItem`/`ScaleFadeItem` (Framer entrances). See [11-ui-components.md](./11-ui-components.md).
+**Reusable primitives:** `Reveal` (scroll-into-view fade/translate — the most-used), `Rise` (mount-time fade/translate — the on-load sibling of `Reveal`; give a screenful of items increasing `delay`s for a staggered entrance, as Home / Reach / Contact do), `MarqueeRow` (infinite scroll), `CountUp` (number animation), `JellyRotateWrapper` (click spin), `StaggerContainer`/`StaggerItem`/`ScaleFadeItem` (Framer entrances). See [11-ui-components.md](./11-ui-components.md).
 
 **Always respect reduced motion.** New looping or large-movement animation must be disabled under `prefers-reduced-motion` — the global CSS handles most cases, but JS-driven motion (rAF loops) must check `window.matchMedia("(prefers-reduced-motion: reduce)")` or `useTheme().reducedMotionEnabled` itself, the way `Reveal`, `CountUp`, and `Cursor` do.

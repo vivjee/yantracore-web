@@ -41,7 +41,7 @@ export function ShortcutHelp({ open, onClose }: { open: boolean; onClose: () => 
 
           {/* Panel */}
           <motion.div
-            className="kbd-help-panel relative w-full max-w-2xl rounded-2xl overflow-hidden"
+            className="kbd-help-panel relative w-full max-w-2xl rounded-2xl overflow-x-hidden overflow-y-auto max-h-[calc(100dvh-2rem)]"
             initial={{ opacity: 0, scale: 0.96, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 8 }}

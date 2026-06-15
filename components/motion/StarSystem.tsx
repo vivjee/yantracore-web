@@ -123,7 +123,7 @@ export function StarSystem({ onCenterClick }: { onCenterClick: () => void }) {
       >
 
       {/* The System */}
-      <div className="relative w-full h-full flex items-center justify-center scale-[0.2] sm:scale-[0.3] md:scale-[0.42] xl:scale-[0.5] origin-center">
+      <div className="relative w-full h-full flex items-center justify-center scale-[0.26] sm:scale-[0.34] md:scale-[0.42] xl:scale-[0.5] origin-center">
 
         {/* Draw Orbit Rings for Planets */}
         {techPlanets.map((planet, i) => (

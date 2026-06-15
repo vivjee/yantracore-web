@@ -39,7 +39,6 @@ export function ProjectCard({
         style={{
           height: "100%",
           borderRadius: 24,
-          padding: 24,
           background:
             "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
           backdropFilter: "blur(20px)",
@@ -52,7 +51,7 @@ export function ProjectCard({
           position: "relative",
           overflow: "hidden",
         }}
-        className="group-hover:[border-color:color-mix(in_srgb,var(--accent-1)_35%,rgba(255,255,255,0.08))] group-hover:-translate-y-1"
+        className="p-5 sm:p-6 group-hover:[border-color:color-mix(in_srgb,var(--accent-1)_35%,rgba(255,255,255,0.08))] group-hover:-translate-y-1"
       >
         {/* Top accent gradient line */}
         <div

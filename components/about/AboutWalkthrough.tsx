@@ -31,7 +31,7 @@ export function AboutWalkthrough() {
           </Reveal>
           <Reveal delay={100}>
             <h1
-              className="mt-4 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-text-hi md:text-6xl"
+              className="mt-4 max-w-4xl text-fluid-h1 font-bold text-text-hi"
               style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.01em" }}
             >
               YantraCore reveals the{" "}

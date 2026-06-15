@@ -9,8 +9,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // /entryport was renamed to /activity in the orbital makeover.
-      { source: "/entryport", destination: "/activity", permanent: true },
+      // The reach globe was /entryport → /activity → /reach. Preserve both old URLs.
+      { source: "/entryport", destination: "/reach", permanent: true },
+      { source: "/activity", destination: "/reach", permanent: true },
     ];
   },
 };

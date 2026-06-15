@@ -58,6 +58,14 @@
   --r-md: 16px;
   --r-lg: 24px;
   --r-xl: 32px;
+
+  /* Safe-area insets (notch / rounded corners / home indicator).
+     Resolve to 0px on devices without insets; consumed via the `.*-safe`
+     utilities below or directly in calc() for fixed UI. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 /* Alternate palettes — uncomment one to swap entire site
@@ -80,6 +88,10 @@
    ============================================================ */
 
 @theme inline {
+  /* Extra small-phone breakpoint (≈400px). Tailwind keeps its sm/md/lg/xl/2xl
+     defaults; this only adds `xs:` (≥400) and `max-xs:` (<400) variants. */
+  --breakpoint-xs: 25rem;
+
   --color-ink-0: var(--ink-0);
   --color-ink-1: var(--ink-1);
   --color-ink-edge: var(--ink-edge);
@@ -182,6 +194,47 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--accent-1) 35%, transparent);
   color: var(--text-hi);
+}
+
+/* ============================================================
+   Responsive foundation utilities (responsive sweep)
+   ============================================================ */
+
+/* Safe-area padding — adds the device inset on top of the box's own padding.
+   Use the directional variants on edges that meet a notch / home indicator. */
+.pt-safe { padding-top: var(--safe-top); }
+.pr-safe { padding-right: var(--safe-right); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.pl-safe { padding-left: var(--safe-left); }
+.px-safe { padding-left: var(--safe-left); padding-right: var(--safe-right); }
+.py-safe { padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+
+/* Fluid type scale — smooth clamp() ramps so display/heading type never jumps
+   abruptly between breakpoints. Use standalone (not alongside text-* sizes). */
+.text-fluid-display { font-size: clamp(2.5rem, 1.6rem + 4.2vw, 5rem);    line-height: 1.02; letter-spacing: -0.02em; }
+.text-fluid-h1      { font-size: clamp(2rem, 1.4rem + 3vw, 3.75rem);     line-height: 1.05; letter-spacing: -0.015em; }
+.text-fluid-h2      { font-size: clamp(1.5rem, 1.15rem + 1.8vw, 2.5rem); line-height: 1.12; letter-spacing: -0.01em; }
+.text-fluid-h3      { font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); line-height: 1.18; }
+.text-fluid-lead    { font-size: clamp(1rem, 0.93rem + 0.4vw, 1.25rem);  line-height: 1.5; }
+
+/* Touch hit-area helper — guarantees a ≥44px tap target on coarse pointers
+   WITHOUT changing the control's visual size. Apply to small icon buttons/links
+   that don't already use their own ::after; the element gets position:relative. */
+@media (pointer: coarse) {
+  .tap-target { position: relative; }
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
+  /* Force-reveal a hover-gated control on touch (no hover to trigger it).
+     Unlayered, so it wins over Tailwind's `opacity-0` on coarse pointers. */
+  .touch-reveal { opacity: 1 !important; }
 }
 
 /* ============================================================
@@ -849,6 +902,21 @@ html.prefers-reduced-motion *::after {
   80%      { transform: scaleY(0.30); }
 }
 
+/* Music list — playing-track indicator.
+   `track-icon-zoom` loops the icon in/out; `track-icon-spin-in` fires once
+   (on mount) for a single rotation when a track first starts playing. They
+   live on separate nested elements so the rotate and scale transforms don't
+   clobber each other. */
+@keyframes track-icon-zoom {
+  0%, 100% { transform: scale(0.82); }
+  50%      { transform: scale(1.12); }
+}
+
+@keyframes track-icon-spin-in {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ============================================================
    Marquee — infinite left/right scroll for MarqueeRow
    ============================================================ */
@@ -1194,7 +1262,7 @@ body:has([data-layout="auth"]) > header {
   border-left: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .tv-chrome-bar {
     padding: 0 10px 0 8px;
     height: 44px;
@@ -1205,6 +1273,86 @@ body:has([data-layout="auth"]) > header {
   .tv-chrome-btn-group + .tv-chrome-btn-group {
     padding-left: 12px;
   }
+
+  /* Slim adaptive frame on phones — thinner bezel reclaims content space. */
+  .tv-frame-outer {
+    padding: 3px;
+    padding-top: 0;
+  }
+  .tv-frame-bezel {
+    border-width: 2px;
+    border-radius: 10px;
+  }
+
+  /* The five page destinations live in the bottom tab bar on phones, so hide
+     the top-bar page-nav group (the utility groups stay up top). */
+  .tv-chrome-nav-pages {
+    display: none;
+  }
+}
+
+/* ── Mobile bottom tab bar — primary page nav within the TV screen ── */
+.tv-bottom-nav {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 12; /* above the CRT overlays (z 9–11) */
+  background: linear-gradient(180deg, #0d0f1a 0%, #090b13 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Tablet/desktop keep the top chrome nav — drop the bottom bar entirely. */
+@media (min-width: 768px) {
+  .tv-bottom-nav {
+    display: none;
+  }
+}
+
+.tv-bottom-nav-btn {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 7px 2px 6px;
+  color: var(--text-low);
+  position: relative;
+  transition: color 0.25s var(--ease-out-soft);
+}
+
+.tv-bottom-nav-btn:active {
+  color: var(--text-hi);
+}
+
+.tv-bottom-nav-btn.active {
+  color: var(--accent-2);
+}
+
+/* Active tab indicator — a short underglow bar at the top edge. */
+.tv-bottom-nav-btn.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-2);
+}
+
+.tv-bottom-nav-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
 /* Hide scrollbars for overflow scrollable areas */
@@ -1355,7 +1503,7 @@ body:has([data-layout="auth"]) > header {
 /* App-mode and Brochure-mode body locks */
 body.app-mode-active {
   overflow: hidden !important;
-  height: 100vh !important;
+  height: 100dvh !important; /* dynamic vh — survives the mobile address-bar show/hide */
 }
 
 body.app-mode-active header {
@@ -1665,7 +1813,7 @@ body.brochure-mode-active header {
   transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .tv-console-tabs-container {
     left: 12px;
     gap: 6px;
@@ -1844,7 +1992,7 @@ html[data-theme="light"] .kbd-hint--solid {
   background: rgba(0, 0, 0, 0.06);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .tv-console-btn {
     width: 30px;
     height: 30px;
@@ -1860,6 +2008,39 @@ html[data-theme="light"] .kbd-hint--solid {
   }
   .tv-console-btn--labeled .tooltip {
     display: block;
+  }
+}
+
+/* Tablet / small-laptop (768–1279): the five labeled page-nav buttons plus the
+   utility groups exceed the bar width once labels render, pushing Account /
+   Fullscreen off the clipped (overflow:hidden) right edge. Keep the page-nav
+   icon-only through this band; the word labels return at xl where the row fits. */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .tv-chrome-btn-group .tv-console-btn--labeled {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  .tv-console-label {
+    display: none;
+  }
+  .tv-console-btn--labeled .tooltip {
+    display: block;
+  }
+}
+
+/* Touch: expand the chrome icon buttons (30px on phones, 40px elsewhere) to a
+   ≥44px hit area without changing their visual size. `.tv-console-btn` is
+   already position:relative and uses no ::after of its own. */
+@media (pointer: coarse) {
+  .tv-console-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -2064,6 +2245,17 @@ select:focus {
   outline: none !important;
   border-color: var(--accent-2) !important;
   box-shadow: var(--nm-sunken-medium), 0 0 12px rgba(0, 224, 203, 0.35) !important;
+}
+
+/* iOS Safari zooms the viewport when a focused field renders below 16px — and
+   the height-locked TV screen can't recover gracefully. Force a 16px minimum on
+   phones (visual only; desktop keeps each control's designed size). */
+@media (max-width: 767.98px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* 4. Divider replacements */
@@ -2713,6 +2905,44 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
 }
 @media (max-height: 680px) {
   .orbital-sun { transform: scale(0.56) !important; }
+}
+
+/* Ring system scales (and shares the Sun's origin) so the constellation stays
+   proportional and aligned with the central Sun on every screen size. The fixed
+   480/660/860px SVG rings would otherwise overflow a phone and dwarf the
+   scaled-down Sun. Mirrors the .orbital-sun ramp above. */
+.orbital-rings {
+  transform: scale(0.5);
+  transform-origin: 50% 44%;
+  transition: transform 0.6s var(--ease-out-soft);
+}
+@media (min-width: 640px) {
+  .orbital-rings { transform: scale(0.62); }
+}
+@media (min-width: 768px) {
+  .orbital-rings { transform: scale(0.82); }
+}
+@media (min-width: 1280px) {
+  .orbital-rings { transform: scale(1); }
+}
+@media (max-height: 820px) {
+  .orbital-rings { transform: scale(0.72) !important; }
+}
+@media (max-height: 680px) {
+  .orbital-rings { transform: scale(0.56) !important; }
+}
+
+/* Showcase solar-system (the /projects + Home desktop scene). It's engineered
+   for wide (xl+) viewports — its 270px floating cards plus outward offsets
+   overflow the narrow side columns on tablet/small-laptop widths. Scale the
+   whole constellation (cards, connectors, rings, logo) uniformly so the
+   spectacle fits, without disturbing the intricate per-card internals. The
+   scene only renders from md up (`hidden md:grid`), so phones are unaffected. */
+@media (max-width: 1279.98px) {
+  .showcase-solar { transform: scale(0.84); transform-origin: center center; }
+}
+@media (max-width: 1023.98px) {
+  .showcase-solar { transform: scale(0.66); transform-origin: center center; }
 }
 
 /* The satellite layer (each orbital page's content) — a gentle CSS-only fade on
