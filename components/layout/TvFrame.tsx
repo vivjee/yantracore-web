@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes } from "lucide-react";
+import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Briefcase, Info, Volume2, VolumeX } from "lucide-react";
 import {
   TvConsoleIcon,
   UserIcon,
@@ -25,6 +25,14 @@ import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle
 import { useAudioPlayer } from "@/lib/audio/AudioPlayerContext";
 import { MusicMiniControls } from "@/components/chrome/MusicMiniControls";
 
+/** Seconds → "m:ss" (0:00 for non-finite input). */
+function fmtClock(secs: number): string {
+  if (!Number.isFinite(secs) || secs < 0) secs = 0;
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 /**
  * A pulsing "now playing" dot badged onto the Music Lab nav button while a
  * track is actively playing (hidden on /music — you're already there). Kept as
@@ -43,22 +51,132 @@ function TvMusicDot({ isPowered }: { isPowered: boolean }) {
 }
 
 /**
- * Inline transport for the TV chrome bar — appears next to the nav once a
- * listening session is live, so music is controllable from any app-mode page.
- * Isolated subscriber (see TvMusicDot). Hidden below `sm` (chrome is cramped on
- * phones — the Music Lab dot still signals playback there); title shows on `lg+`.
+ * The Music Lab nav button, plus a hover/focus "now playing" quick-panel that
+ * unfurls beneath it once a listening session is live — so playback is
+ * controllable from any app-mode page without crowding the nav row. The panel
+ * is gated to hover-capable pointers (see `.tv-music-popover` in globals.css):
+ * on touch/phones it never appears — the pulsing dot signals playback and a tap
+ * opens the full `/music` console. Isolated subscriber so live `currentTime`
+ * ticks (the popover header) don't re-render the whole frame.
  */
-function TvInlineControls({ isPowered }: { isPowered: boolean }) {
-  const { isPlaying, currentTime, currentTrack } = useAudioPlayer();
+function TvMusicControl({ isPowered }: { isPowered: boolean }) {
+  const {
+    isPlaying,
+    currentTime,
+    simulatedDuration,
+    currentTrack,
+    volume,
+    isMuted,
+    handleVolumeChange,
+    toggleMute,
+    handleSeek,
+  } = useAudioPlayer();
   const pathname = usePathname();
+  const { themeMode } = useTheme();
+  const isActive = pathname === "/music";
   const sessionActive = isPlaying || currentTime > 0;
-  if (!isPowered || !sessionActive || pathname === "/music") return null;
+  const showPanel = isPowered && sessionActive && !isActive;
+  const progress =
+    simulatedDuration > 0 ? Math.min(100, (currentTime / simulatedDuration) * 100) : 0;
+
   return (
-    <div className="hidden sm:flex items-center gap-1 pl-2 ml-0.5 border-l border-white/10">
-      <span className="hidden lg:block max-w-[160px] truncate text-[11px] font-mono text-text-mid">
-        {currentTrack.title}
-      </span>
-      <MusicMiniControls variant="inline" />
+    <div className="tv-music-control">
+      <Link
+        href="/music"
+        className={`tv-console-btn ${isActive ? "active" : ""}`}
+        aria-label="Music Lab"
+        onMouseEnter={() => isPowered && audioSynth.playHover()}
+        onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }}
+        style={!isPowered ? { opacity: 0.3, cursor: "not-allowed" } : undefined}
+      >
+        {isPowered && isActive && (
+          <motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />
+        )}
+        <TvMusicDot isPowered={isPowered} />
+        <Headphones className="w-5 h-5 relative z-10" />
+        {/* When the quick-panel is live it replaces the tooltip on hover. */}
+        {!showPanel && <span className="tooltip">Music Lab <KeyHint id="nav-music" /></span>}
+      </Link>
+
+      {showPanel && (
+        <div className="tv-music-popover">
+          <div className="tv-music-popover__card">
+            {/* Header — animated equalizer + status eyebrow + track title */}
+            <div className="flex items-center gap-2.5">
+              <span className="tv-music-eq" data-playing={isPlaying ? "true" : "false"} aria-hidden>
+                <i /><i /><i /><i />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className={`text-[8px] font-mono uppercase tracking-[0.22em] leading-none mb-1 ${isPlaying ? "text-accent-2" : "text-text-low"}`}>
+                  {isPlaying ? "Now Playing" : "Paused"}
+                </p>
+                <p className="text-[13px] font-semibold text-text-hi truncate leading-tight">
+                  {currentTrack.title}
+                </p>
+              </div>
+            </div>
+
+            {/* Short description */}
+            {currentTrack.description && (
+              <p className="text-[10px] text-text-low leading-relaxed line-clamp-2 -mt-0.5">
+                {currentTrack.description}
+              </p>
+            )}
+
+            {/* Progress — elapsed · seekable bar · total */}
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono tabular-nums text-text-mid w-7 text-right">
+                {fmtClock(currentTime)}
+              </span>
+              <div
+                className="group/seek relative flex-1 h-1.5 rounded-full bg-white/10 cursor-pointer"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const pct = (e.clientX - rect.left) / rect.width;
+                  handleSeek(Math.min(Math.max(pct, 0), 1));
+                }}
+              >
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-accent-2"
+                  style={{ width: `${progress}%` }}
+                />
+                <span
+                  className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-md opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none"
+                  style={{ left: `calc(${progress}% - 5px)` }}
+                />
+              </div>
+              <span className="text-[9px] font-mono tabular-nums text-text-mid w-7">
+                {fmtClock(simulatedDuration)}
+              </span>
+            </div>
+
+            {/* Transport + compact volume */}
+            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5">
+              <MusicMiniControls variant="dock" />
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => { audioSynth.playClick(); toggleMute(); }}
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-text-mid hover:text-text-hi hover:bg-white/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60"
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4 text-accent-3" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                  aria-label="Volume"
+                  className="w-16 accent-accent-2 cursor-pointer bg-white/10 h-1 rounded-full appearance-none outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -243,6 +361,18 @@ export function TvFrame({ children }: TvFrameProps) {
                   <span className="tv-console-label">Reach</span>
                   <span className="tooltip">Reach <KeyHint id="nav-entryport" /></span>
                 </Link>
+                <Link href="/work" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/work" ? "active" : ""}`} aria-label="Work" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                  {isPowered && pathname === "/work" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
+                  <Briefcase className="w-5 h-5 relative z-10" />
+                  <span className="tv-console-label">Work</span>
+                  <span className="tooltip">Work</span>
+                </Link>
+                <Link href="/about" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/about" ? "active" : ""}`} aria-label="About" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                  {isPowered && pathname === "/about" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
+                  <Info className="w-5 h-5 relative z-10" />
+                  <span className="tv-console-label">About</span>
+                  <span className="tooltip">About</span>
+                </Link>
                 <Link href="/contact" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/contact" ? "active" : ""}`} aria-label="Contact" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/contact" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Mail className="w-5 h-5 relative z-10" />
@@ -251,21 +381,13 @@ export function TvFrame({ children }: TvFrameProps) {
                 </Link>
               </div>
 
-              {/* Inline music transport — visible while a session is live */}
-              <TvInlineControls isPowered={isPowered} />
-
               {/* Group 2 — Theme and Settings */}
               <div className="tv-chrome-btn-group">
                 <button className="tv-console-btn relative z-10" onClick={() => { if (isPowered) { audioSynth.playClick(); setThemeMode(themeMode === "dark" ? "light" : "dark"); } }} onMouseEnter={() => isPowered && audioSynth.playHover()} aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} theme`} disabled={!isPowered} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {themeMode === "dark" ? <SunCoreIcon className="w-5 h-5 relative z-10" /> : <MoonCrescentIcon className="w-5 h-5 relative z-10" />}
                   <span className="tooltip">{themeMode === "dark" ? "Light Theme" : "Dark Theme"} <KeyHint id="view-theme" /></span>
                 </button>
-                <Link href="/music" className={`tv-console-btn ${pathname === "/music" ? "active" : ""}`} aria-label="Music Lab" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
-                  {isPowered && pathname === "/music" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <TvMusicDot isPowered={isPowered} />
-                  <Headphones className="w-5 h-5 relative z-10" />
-                  <span className="tooltip">Music Lab <KeyHint id="nav-music" /></span>
-                </Link>
+                <TvMusicControl isPowered={isPowered} />
                 <Link href="/settings" className={`tv-console-btn ${pathname === "/settings" ? "active" : ""}`} aria-label="System Settings" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/settings" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <ChipSettingsIcon className="w-5 h-5 settings-icon relative z-10" />
@@ -529,6 +651,8 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
     { href: "/projects", label: "Projects", Icon: Boxes },
     { href: "/technologies", label: "Tech", Icon: StellarOrbitIcon },
     { href: "/reach", label: "Reach", Icon: Globe2 },
+    { href: "/work", label: "Work", Icon: Briefcase },
+    { href: "/about", label: "About", Icon: Info },
     { href: "/contact", label: "Contact", Icon: Mail },
   ] as const;
   return (

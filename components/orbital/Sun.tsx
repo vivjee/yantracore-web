@@ -23,6 +23,10 @@ function SunBase() {
   return (
     <div className="orbital-sun" aria-hidden>
       <OrbitalRings />
+      {/* Soft radial bloom behind the logo — invisible at rest. It rises (and the
+          rings brighten) when the Home sense disc over the logo is hovered,
+          driven purely by CSS :has, so the persistent Sun stays JS-free here. */}
+      <span className="orbital-sun__bloom" aria-hidden />
       {/* parallax disabled: the Sun is pointer-events:none and never unmounts,
           so the cursor-tilt rAF would run forever doing nothing. */}
       <LogoMark centerY="44%" parallax={false} />

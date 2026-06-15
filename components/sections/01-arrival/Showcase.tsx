@@ -48,6 +48,7 @@ import { Rise } from "@/components/motion/Rise";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { LogoMark } from "../01-arrival/LogoMark";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
+import { GlassButton } from "@/components/glass/GlassButton";
 
 
 /**
@@ -97,7 +98,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
     {
       name: "YANTRACORE",
       logoImg: "/images/logo/yantracore_logo.png",
-      desc: "Build amazing apps.",
+      desc: "Technology for a Better World",
       accent: "var(--accent-2)",
       url: "/channels/yantracore"
     },
@@ -118,7 +119,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
     {
       name: "SHRAMDAN",
       logoImg: "/images/logo/shramdaan_logo.png",
-      desc: "Come together and solve social problems.",
+      desc: "Solve social problems, together.",
       accent: "var(--accent-warm)",
       url: "/channels/shramdan"
     }
@@ -378,7 +379,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
               scaling) so it reads below the persistent Sun, nested in the gap between
               the two lower product cards. */}
           {externalSun && (
-            <div className="pointer-events-auto absolute inset-x-0 top-[61%] flex justify-center px-4">
+            <div className="pointer-events-auto absolute inset-x-0 top-[68%] flex justify-center px-4">
               <ProjectsIntro />
             </div>
           )}
@@ -465,10 +466,17 @@ function BrandCopy({ isMobile }: { isMobile: boolean }) {
    scale for the phone layout above the product grid.
    ───────────────────────────────────────────────────────────────── */
 function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
+  const router = useRouter();
+
+  const startProject = () => {
+    audioSynth.playClick();
+    router.push("/book");
+  };
+
   return (
     <div
       className={`flex w-full flex-col items-center text-center ${
-        mobile ? "max-w-[340px] gap-2" : "max-w-[520px] gap-3"
+        mobile ? "max-w-[330px] gap-2.5" : "max-w-[500px] gap-3.5"
       }`}
     >
       <Rise delay={0.08} y={mobile ? 10 : 18}>
@@ -497,16 +505,18 @@ function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
         </p>
       </Rise>
 
-      <Rise delay={0.24} y={mobile ? 10 : 18}>
-        <p
-          className={`inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.18em] ${
-            mobile ? "text-[9px]" : "text-[11px]"
-          }`}
-          style={{ color: "var(--accent-2)" }}
+      {/* Real CTA — turns the explainer into an invitation. Routes to the
+          consultation booking flow, matching Home's primary "Book a
+          Consultation" action. */}
+      <Rise delay={0.24} y={mobile ? 10 : 18} className={mobile ? "mt-0.5" : "mt-1.5"}>
+        <GlassButton
+          variant="primary"
+          onMouseEnter={() => audioSynth.playHover()}
+          onClick={startProject}
+          className={mobile ? "px-5 py-2.5 text-[0.82rem]" : undefined}
         >
-          <Sparkles className={mobile ? "h-3 w-3" : "h-3.5 w-3.5"} aria-hidden />
-          Explore what we&rsquo;re building
-        </p>
+          Build your project with us
+        </GlassButton>
       </Rise>
     </div>
   );
@@ -1809,7 +1819,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
         logoImg="/images/logo/shramdaan_logo.png"
         unicodeChar="🌱"
         title="SHRAMDAN"
-        description="Come together and solve social problems."
+        description="Solve social problems, together."
         accentColor="var(--accent-warm)"
         url="https://shramdan.org"
       />
@@ -2534,7 +2544,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
         logoImg="/images/logo/yantracore_logo.png"
         unicodeChar="⚡"
         title="YANTRACORE"
-        description="Build Amazing Apps"
+        description="Technology for a Better World"
         accentColor="var(--accent-2)"
         showExternalLink={false}
       />

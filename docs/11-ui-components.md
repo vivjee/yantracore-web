@@ -146,7 +146,7 @@ interface RiseProps {        // extends HTMLMotionProps<"div">
   duration?: number;  // s, default 0.7
 }
 ```
-Mount-time fade + translate (Framer Motion) — the on-load sibling of `Reveal` (which waits for scroll). Use it for a screenful of items that are all visible at once: give each an increasing `delay` and they bloom in sequence. Opacity + transform only (no CLS); respects reduced motion (renders at rest). Powers the staggered entrances on Home (`HomeOrbital`), Reach (`EntryportGlobe`), and Contact.
+Mount-time fade + translate (Framer Motion) — the on-load sibling of `Reveal` (which waits for scroll). Use it for a screenful of items that are all visible at once: give each an increasing `delay` and they bloom in sequence. Opacity + transform only (no CLS); respects reduced motion (renders at rest). Powers the staggered entrances on Home (`HomeOrbital`), Reach (`ReachGlobe`), and Contact.
 
 ### MarqueeRow — `components/motion/MarqueeRow.tsx` · Client.
 ```ts
@@ -269,8 +269,8 @@ Auth surfaces. `LoginForm`: role tabs (client/staff/admin), Google SSO button, e
 ### ChannelPage — `components/channels/ChannelPage.tsx` · Client · `{ slug: ChannelSlug }`.
 The `/channels/[slug]` dashboard: 3-column live-signal viewer (feed terminal, hero + controls, stats/search/pulse). Reads config from `lib/content/channels.ts`; simulated live updates. Slugs: `jimbo` · `restroverse` · `shramdan` · `yantracore`.
 
-### EntryportGlobe — `components/entryport/EntryportGlobe.tsx` · Client.
-The `/entryport` interactive 3D globe (Three.js + OrbitControls): activity arcs from a Nepal hub (Pokhara) to 12 cities, color-coded by kind, with status/metrics panels and drag/zoom controls.
+### ReachGlobe — `components/reach/ReachGlobe.tsx` · Client.
+The `/reach` interactive 3D globe (Three.js + OrbitControls): activity arcs from a Nepal hub (Pokhara) to 12 cities, color-coded by kind, with status/metrics panels and drag/zoom controls. (Formerly `EntryportGlobe` at `components/entryport/`.)
 
 ### FloatingAssistant — `components/assistant/FloatingAssistant.tsx` · Client · no props.
 Fixed bottom-right chat bubble with a Lottie bot avatar and a toggle panel. Currently a UI demo with a simulated response delay (not wired to YantraMate).

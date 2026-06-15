@@ -51,7 +51,7 @@ yantra-web/
 │   ├── dashboard/              # Console (DashboardShell); /dashboard/settings sub-route
 │   ├── settings/               # Public settings (SettingsShell)
 │   ├── music/                  # Ambient music player page
-│   ├── entryport/              # EntryportGlobe (Three.js globe)
+│   ├── reach/                  # ReachGlobe (Three.js globe; was /entryport→/activity)
 │   ├── technologies/           # StarSystem tech visualization
 │   ├── contact/                # Contact form page
 │   ├── channels/[slug]/        # Per-channel dashboard (generateStaticParams)
@@ -63,7 +63,7 @@ yantra-web/
 ├── components/                 # See docs/11-ui-components.md for the full inventory
 │   ├── glass/ motion/ backgrounds/ chrome/ layout/ typography/
 │   ├── sections/01-arrival … 09-signal/
-│   ├── dashboard/ auth/ channels/ entryport/ assistant/ brand/
+│   ├── dashboard/ auth/ channels/ reach/ assistant/ brand/
 ├── lib/
 │   ├── api/                    # yantramate.ts (live SDK) + contact/project/notify/posts (stubs)
 │   ├── content/                # capabilities, channels, client-work, team, testimonials (typed TS)
@@ -71,7 +71,7 @@ yantra-web/
 │   ├── audio/AudioPlayerContext.tsx  + audio.ts (UI sound synth)
 │   ├── hooks/useCanvasControls.ts
 │   └── utils/cn.ts
-├── public/                     # images, logos (SVG + GLB), music (mp3), lottie (json), entryport textures
+├── public/                     # images, logos (SVG + GLB), music (mp3), lottie (json), globe textures
 ├── docs/                       # this doc set
 ├── AGENTS.md  README.md
 ├── next.config.ts  tsconfig.json  postcss.config.mjs  eslint.config.mjs

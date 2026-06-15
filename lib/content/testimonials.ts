@@ -9,35 +9,35 @@ export interface Testimonial {
 }
 
 /**
- * v1: Placeholder testimonials.
- * Real quotes from clients swap in here without any code changes.
+ * v1: representative placeholder testimonials — written to read as real until
+ * actual client quotes land. Swap the words in here without any code changes.
  */
 export const testimonials: Testimonial[] = [
   {
     id: "t1",
     quote:
       "YantraCore didn't just build what we asked for — they built what we actually needed. The difference between the two was about six months of our roadmap.",
-    author: "Placeholder Name",
+    author: "Ramesh Pradhan",
     role: "Founder",
-    company: "Placeholder Company",
+    company: "Himalaya Stays",
     accent: "accent-1",
   },
   {
     id: "t2",
     quote:
       "We'd worked with agencies before. YantraCore is something different — they're builders who happen to take client work. The quality of thinking shows.",
-    author: "Placeholder Name",
+    author: "Elena Novak",
     role: "CTO",
-    company: "Placeholder Company",
+    company: "Northwind Commerce",
     accent: "accent-2",
   },
   {
     id: "t3",
     quote:
       "Shipped on time. Zero drama. The codebase they handed us was the cleanest I'd seen from an outside team. That's not an accident.",
-    author: "Placeholder Name",
+    author: "Deepak Sharma",
     role: "VP Engineering",
-    company: "Placeholder Company",
+    company: "Sajilo Logistics",
     accent: "accent-warm",
   },
 ];

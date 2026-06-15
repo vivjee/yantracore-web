@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Boxes, Info } from "lucide-react";
+import { Boxes, Globe2, Info, Mail } from "lucide-react";
 import { OrbitNode } from "./OrbitNode";
 import { OrbitalHud } from "./OrbitalHud";
 import { Rise } from "@/components/motion/Rise";
@@ -14,105 +14,68 @@ import { audioSynth } from "@/lib/audio";
  * HomeOrbital — the new Home: a calm, one-screen navigation hub.
  *
  * The persistent Sun (the animated logo) is rendered by the orbital layout and
- * sits behind this layer. Here we arrange the satellites around it:
- *   - Inner ring  (proof)      — the YantraCore initiatives: Jimbo, Restroverse,
- *                                Shramdan. Calm portals; the live simulations
- *                                they used to run now live on the Projects page.
- *   - Outer ring  (wayfinding) — where to go next: Projects, Technologies, About.
- *   - Centre copy + CTAs       — who we are, in one short breath.
+ * sits behind this layer. On large screens the satellites are arranged on a
+ * single elliptical ORBIT around it, like planets holding station: one uniform
+ * ring of the site's primary destinations — Projects, Technologies, Reach,
+ * About, Contact — with the wordmark + CTAs nested in the open base of the ring.
+ * (The product showcases — Jimbo, Restroverse, Shramdan — now live solely on the
+ * Projects page; Home is pure wayfinding.)
  *
- * Everything is positioned around the fixed Sun so the centre never shifts when
- * navigating between orbital pages.
+ * Each satellite is placed by its angle on the ring (polar `left/top` built from
+ * the shared --orbit-rx / --orbit-ry radii) and drifts on a slow, independent
+ * bob. The geometry is centred on the fixed Sun, so the heart never shifts when
+ * navigating between orbital pages. Phones keep the compact grid below.
  */
 
-const INITIATIVES = [
-  {
-    name: "Jimbo",
-    tagline: "24/7 AI business assistant",
-    href: "/channels/jimbo",
-    accent: "var(--accent-1)",
-    logoImg: "/images/logo/jimbo_logo.png",
-  },
-  {
-    name: "Restroverse",
-    tagline: "Discover your perfect stay",
-    href: "/channels/restroverse",
-    accent: "var(--accent-2)",
-    logoImg: "/images/logo/restroverse_logo.png",
-  },
-  {
-    name: "Shramdan",
-    tagline: "Community work, made visible",
-    href: "/channels/shramdan",
-    accent: "var(--accent-warm)",
-    logoImg: "/images/logo/shramdaan_logo.png",
-  },
-] as const;
-
-const DESTINATIONS = [
-  {
-    name: "Projects",
-    tagline: "What we've built",
-    href: "/projects",
-    accent: "var(--accent-2)",
-    Icon: Boxes,
-  },
-  {
-    name: "Technologies",
-    tagline: "The stack we wield",
-    href: "/technologies",
-    accent: "var(--accent-1)",
-    Icon: StellarOrbitIcon,
-  },
-  {
-    name: "About",
-    tagline: "Who we are",
-    href: "/about",
-    accent: "var(--accent-3)",
-    Icon: Info,
-  },
+/* The five destinations, in render order (also the mobile grid order). `angle`
+   places each on the ring — measured from the 3-o'clock axis, CCW positive — and
+   `side` chooses which edge anchors on the orbit (top = centred). The set is
+   symmetric about the vertical axis: a crown node at 90°, then a mirrored pair
+   on each side, leaving the whole lower wedge open for the centre copy. `bob`
+   gives each its own drift so they never move in unison. */
+const SATELLITES = [
+  { name: "Projects",     tagline: "What we've built",     href: "/projects",     accent: "var(--accent-2)",    Icon: Boxes,            side: "top",   angle: 90,  bob: { dur: "9.5s", delay: "-2s",   x: "0px",  y: "-9px"  } },
+  { name: "Technologies", tagline: "The stack we wield",   href: "/technologies", accent: "var(--accent-1)",    Icon: StellarOrbitIcon, side: "left",  angle: 140, bob: { dur: "8.5s", delay: "-4s",   x: "-5px", y: "-10px" } },
+  { name: "Reach",        tagline: "Where our work lands", href: "/reach",        accent: "var(--accent-warm)", Icon: Globe2,           side: "left",  angle: 190, bob: { dur: "10s",  delay: "-2.5s", x: "-4px", y: "-7px"  } },
+  { name: "About",        tagline: "Who we are",           href: "/about",        accent: "var(--accent-3)",    Icon: Info,             side: "right", angle: 40,  bob: { dur: "9s",   delay: "-3s",   x: "5px",  y: "-8px"  } },
+  { name: "Contact",      tagline: "Start a conversation", href: "/contact",      accent: "var(--accent-2)",    Icon: Mail,             side: "right", angle: -10, bob: { dur: "11s",  delay: "-1s",   x: "6px",  y: "-6px"  } },
 ] as const;
 
 /* ── Entrance choreography ────────────────────────────────────────────────
    A calm centre-outward bloom on mount (mirrors the StarSystem's reveal): the
-   wordmark + CTAs settle first — the heart — then each column's heading and
-   nodes cascade in, gliding gently toward the Sun. All on the site's
+   wordmark + CTAs settle first — the heart — then the satellites cascade in,
+   each gliding outward from the Sun into its slot on the ring. All on the site's
    --ease-out-soft curve (see Rise). Reduced-motion renders it all at rest. */
 const COPY_BASE = 0.08;  // s — eyebrow lands first
 const COPY_STEP = 0.08;  // s — per line of the centre copy
-const COL_BASE = 0.42;   // s — a column heading, just after the copy
-const COL_TRAIL = 0.05;  // s — the right column trails the left by a hair
-const NODE_BASE = 0.52;  // s — the first node under a heading
-const NODE_STEP = 0.09;  // s — per-node stagger down a column
-const COL_SLIDE = 14;    // px — nodes/headings glide in toward the centre
+const NODE_BASE = 0.5;   // s — the first satellite settles, just after the copy
+const NODE_STEP = 0.09;  // s — per-satellite stagger around the ring
+const COL_SLIDE = 16;    // px — each satellite glides outward from the Sun
 
-/**
- * ColumnHeading — a quiet cap above one Home column. A mono eyebrow with an
- * accent dot and a hairline rule that fades toward the outer edge, mirroring
- * the column it labels (left columns hug their right/inner edge, and vice
- * versa). Purely decorative: pointer-events stay with the nodes below.
- */
-function ColumnHeading({
-  label,
-  side,
-  accent,
-}: {
-  label: string;
-  side: "left" | "right";
-  accent: string;
-}) {
-  return (
-    <div
-      className={`orbital-col-heading orbital-col-heading--${side}`}
-      style={{ "--col-accent": accent } as React.CSSProperties}
-    >
-      <span className="orbital-col-heading__label">
-        <span className="orbital-col-heading__dot" aria-hidden />
-        {label}
-      </span>
-      <span className="orbital-col-heading__rule" aria-hidden />
-    </div>
-  );
+/* ── Orbit geometry ───────────────────────────────────────────────────────
+   Satellites are positioned by angle on a shared ellipse centred on the Sun.
+   Angles are measured from the 3-o'clock axis, counter-clockwise positive. The
+   set is symmetric about the vertical axis, with the whole lower wedge left open
+   for the centre copy. Radii live in CSS (--orbit-rx / --orbit-ry) so they stay
+   responsive; here we only feed in the per-node cos/sin. */
+const DEG = Math.PI / 180;
+
+/** Polar `left/top` for a satellite (anchored by its inner edge — or centred,
+ *  for the top node — via the side modifier) plus the inward offset it enters
+ *  from. */
+function ringSlot(angleDeg: number, accent: string) {
+  const a = angleDeg * DEG;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return {
+    style: {
+      left: `calc(50% + (var(--orbit-rx) * ${cos.toFixed(4)}))`,
+      top: `calc(var(--orbit-cy) - (var(--orbit-ry) * ${sin.toFixed(4)}))`,
+      "--node-accent": accent,
+    } as React.CSSProperties,
+    inX: -cos * COL_SLIDE, // start nudged toward the Sun, settle outward
+    inY: sin * COL_SLIDE,
+  };
 }
 
 function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h1" | "p" }) {
@@ -159,13 +122,6 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
         >
           Book a Consultation
         </GlassButton>
-        <GlassButton
-          variant="secondary"
-          onMouseEnter={() => audioSynth.playHover()}
-          onClick={() => go("/projects")}
-        >
-          Explore Projects
-        </GlassButton>
       </Rise>
     </div>
   );
@@ -177,42 +133,43 @@ export function HomeOrbital() {
       {/* Ambient mission-control HUD framing the empty space (desktop only) */}
       <OrbitalHud />
 
-      {/* ── DESKTOP / TABLET ─────────────────────────────────────────── */}
-      <div className="pointer-events-none hidden h-full w-full grid-cols-[1fr_minmax(240px,440px)_1fr] items-center gap-x-6 px-8 md:grid lg:grid-cols-[1fr_minmax(340px,440px)_1fr] lg:gap-x-10">
-        {/* Left — wayfinding (where to go next) */}
-        <div className="pointer-events-auto flex flex-col items-end justify-center gap-4">
-          <Rise delay={COL_BASE} x={-COL_SLIDE}>
-            <ColumnHeading label="Explore" side="left" accent="var(--accent-2)" />
-          </Rise>
-          <div className="flex flex-col items-end gap-5 lg:gap-7">
-            {DESTINATIONS.map((node, i) => (
-              <Rise key={node.name} delay={NODE_BASE + i * NODE_STEP} x={-COL_SLIDE} y={12}>
-                <OrbitNode {...node} />
-              </Rise>
-            ))}
-          </div>
-        </div>
+      {/* ── DESKTOP / TABLET — the orbit ring (md+) ───────────────────── */}
+      <nav className="home-orbit" aria-label="Explore YantraCore">
+        {/* The orbit path the satellites ride (decorative). */}
+        <span className="home-orbit__path" aria-hidden />
 
-        {/* Centre — sun shows through from the layout; copy sits at the base */}
-        <div className="pointer-events-none relative flex h-full flex-col items-center justify-end pb-[7vh]">
-          <div className="pointer-events-auto">
-            <CenterCopy />
-          </div>
-        </div>
+        {/* Sun hover sensor — a centred disc over the logo. The persistent Sun is
+            pointer-events:none and sits beneath this layer, so it can't feel the
+            cursor itself; hovering this disc 'wakes' it (the rings brighten and a
+            soft bloom rises behind the logo) via CSS :has on .orbital-stage.
+            Purely decorative — the logo isn't a link. */}
+        <span className="home-orbit__sun-sense" aria-hidden />
 
-        {/* Right — our projects (the YantraCore products) */}
-        <div className="pointer-events-auto flex flex-col items-start justify-center gap-4">
-          <Rise delay={COL_BASE + COL_TRAIL} x={COL_SLIDE}>
-            <ColumnHeading label="Our Projects" side="right" accent="var(--accent-warm)" />
-          </Rise>
-          <div className="flex flex-col items-start gap-5 lg:gap-7">
-            {INITIATIVES.map((node, i) => (
-              <Rise key={node.name} delay={NODE_BASE + COL_TRAIL + i * NODE_STEP} x={COL_SLIDE} y={12}>
-                <OrbitNode {...node} />
-              </Rise>
-            ))}
-          </div>
-        </div>
+        {/* The satellites, placed by angle on the ring. */}
+        <ul className="home-orbit__ring">
+          {SATELLITES.map((planet, i) => {
+            const { side, angle, bob, ...node } = planet;
+            const { style, inX, inY } = ringSlot(angle, node.accent);
+            return (
+              <li key={node.name} className={`home-orbit__planet home-orbit__planet--${side}`} style={style}>
+                <div
+                  className="home-orbit__float"
+                  style={{ "--bob-dur": bob.dur, "--bob-delay": bob.delay, "--bob-x": bob.x, "--bob-y": bob.y } as React.CSSProperties}
+                >
+                  <Rise delay={NODE_BASE + i * NODE_STEP} x={inX} y={inY}>
+                    <OrbitNode {...node} />
+                  </Rise>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* Centre copy — the Sun shows through behind it; nested in the open base
+          of the orbit ring (md+). */}
+      <div className="home-orbit-copy">
+        <CenterCopy />
       </div>
 
       {/* ── MOBILE ───────────────────────────────────────────────────── */}
@@ -222,9 +179,16 @@ export function HomeOrbital() {
         <div className="pointer-events-auto mb-5">
           <CenterCopy compact as="p" />
         </div>
-        <div className="pointer-events-auto grid w-full max-w-[360px] grid-cols-2 gap-2.5">
-          {[...INITIATIVES, ...DESTINATIONS].map((node, i) => (
-            <Rise key={node.name} delay={NODE_BASE + i * (NODE_STEP * 0.6)} y={14} className="w-full">
+        {/* Flex-wrap (not a grid) so the odd fifth tile centres on its own row
+            instead of stranding in a column. */}
+        <div className="pointer-events-auto flex w-full max-w-[360px] flex-wrap justify-center gap-2.5">
+          {SATELLITES.map((node, i) => (
+            <Rise
+              key={node.name}
+              delay={NODE_BASE + i * (NODE_STEP * 0.6)}
+              y={14}
+              className="w-[calc(50%-5px)]"
+            >
               <OrbitNode {...node} className="orbital-node--compact" />
             </Rise>
           ))}

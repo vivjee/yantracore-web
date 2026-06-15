@@ -104,12 +104,26 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-ink-0 text-text-hi antialiased">
+        {/* Skip link — first tab stop; lets keyboard users jump past the chrome. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:border focus:border-accent-2/50 focus:bg-ink-1 focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-wider focus:text-text-hi focus:no-underline focus:outline-none"
+        >
+          Skip to content
+        </a>
         <ThemeProvider>
           <AudioPlayerProvider>
             <ShortcutsProvider>
               <Cursor />
               <NowPlayingDock />
-              <SmoothScrollProvider>{children}</SmoothScrollProvider>
+              <SmoothScrollProvider>
+                {/* `display:contents` focus target — no box, so it can't disturb
+                    the 100dvh / app-mode layout, but keyboard focus still lands
+                    here and Tab continues into the page content. */}
+                <div id="main-content" tabIndex={-1} className="contents">
+                  {children}
+                </div>
+              </SmoothScrollProvider>
             </ShortcutsProvider>
           </AudioPlayerProvider>
         </ThemeProvider>

@@ -6,14 +6,14 @@
 
 | Route | Surface | What it is |
 |---|---|---|
-| `/` | Brochure | Homepage — calm **orbital navigation hub** (`HomeOrbital`). Lives in the `app/(orbital)/` route group; the animated logo (`Sun`) is a *persistent* centre. Satellites: 3 initiative portals (Jimbo/Restroverse/Shramdan) + 3 wayfinding nodes (Projects/Technologies/About) + identity copy & two CTAs (Book a Consultation → `/book`, Explore Projects → `/projects`) |
+| `/` | Brochure | Homepage — calm **orbital navigation hub** (`HomeOrbital`). Lives in the `app/(orbital)/` route group; the animated logo (`Sun`) is a *persistent* centre. Pure wayfinding: 5 page satellites (Projects, Technologies, Reach, About, Contact) + identity copy & two CTAs (Book a Consultation → `/book`, Explore Projects → `/projects`). On **md+** the satellites ride a single elliptical **orbit ring** around the Sun — symmetric about the vertical axis (a crown node at the top, a mirrored pair each side), each drifting on its own slow bob, with the copy nested in the ring's open base. The product showcases (Jimbo/Restroverse/Shramdan) live solely on `/projects` now. Phones keep a compact centred grid |
 | `/projects` | Brochure (orbital) | The live product "solar system" (`Showcase`) — **now in the `(orbital)` group, sharing the persistent `Sun`** (seamless from Home). YC's *own* products; client work + testimonials live on `/work` |
 | `/work` | Brochure | Client-work grid (+ modal) + testimonials + CTA. Reuses the VISION `Work` / `Voices` sections (`WorkWalkthrough`) |
 | `/about` | Brochure | Studio identity walkthrough — thesis hero + `Manifesto` / `Capabilities` / `Forge` + CTA (channel page, internal scroll) |
 | `/book` | Brochure | **Book a Consultation** — budget estimator → project-intake form (`BookConsultation`, `submitProject` stub) |
 | `/contact` | Brochure | Contact form (client-validated) |
 | `/music` | Brochure | Ambient music player (Web-Audio engine) |
-| `/activity` | Brochure | Interactive 3D globe (`EntryportGlobe`). **Renamed from `/entryport`** (308 redirect); channel page — the globe is its own centerpiece, not a logo-at-centre orbital view |
+| `/reach` | Brochure | Interactive 3D globe (`ReachGlobe`) framed on Nepal — YantraCore's live reach across the world. **Renamed `/entryport` → `/activity` → `/reach`** (both old paths 308-redirect here, see `next.config.ts`); channel page — the globe is its own centerpiece, not a logo-at-centre orbital view |
 | `/technologies` | Brochure (orbital) | `StarSystem` tech-stack star-map — **folded into the `(orbital)` group** (seamless nav; its opaque scene + own centre star sit over the persistent Sun) |
 | `/channels/[slug]` | Brochure/App | Per-channel live dashboard (`jimbo`/`restroverse`/`shramdan`/`yantracore`) |
 | `/lab/components` | Internal | UI component library — categorized, navigable source of truth (buttons, badges, tags, cards, icons, tech-stack, motion, brand) |
@@ -25,16 +25,22 @@
 
 **Top nav today** lives in the `TvFrame` chrome bar (Home / Entryport / Technologies / Music / Contact) plus the `Header` pill on brochure pages — **not** the Studio/Capabilities/Atelier/Lab/Signal structure described in the vision below.
 
-**Not built yet** (described in the vision but no route exists): `/work/{restroverse,jimbo,shramdan}` product teasers, `/capabilities`, `/atelier`, `/lab` blog index, `/lab/[slug]`, `/signal`. *Staffing is deferred.* (`/work`, `/about`, `/book`, `/activity` are now built — see the table above.)
+**IA decisions (locked 2026-06-15 — the "lean set"):** keep a tight page surface; nothing redundant.
+
+- **To build:** `/lab` (blog index) + `/lab/[slug]` (post) — the content/SEO engine, rendering `lib/api/posts.ts`. This is the only new marketing route still planned.
+- **Folded in, not separate routes:** the **team** lives inside `/about` (no standalone `/atelier`); **client services** live inside `/about`'s `Capabilities` section (no standalone `/capabilities`).
+- **Cut from the vision:** `/work/{restroverse,jimbo,shramdan}` product teasers (`/projects` + `/channels/*` already cover the products) and the standalone `/signal` (`/contact` + `/book` cover conversion).
+
+(`/work`, `/about`, `/book`, `/reach` are built — see the table above. *Staffing is deferred.*)
 
 ### The orbital makeover (in progress — Phase 0+1 shipped 2026-06-15)
 
 The site is being reorganized around one idea: **YantraCore is the sun; every page is a constellation orbiting the same sun.** Routes split into two classes:
 
 - **Orbital pages** (`/`, `/projects`, `/technologies`) — *same channel, different view*. They share the `app/(orbital)/` route-group layout (a **persistent, memoized `Sun`** + `TvFrame`) that mounts once and never re-mounts across soft navigations, so transitions are **seamless** (no CRT glitch; only the satellites swap). Still **distinct, server-rendered routes** with their own metadata — SEO preserved. (Technologies' star-map is opaque, so it covers the Sun rather than orbiting it — it's "in the group" for seamless nav, not a literal shared-Sun view.)
-- **Channel pages** (`/about`, `/work`, `/activity`, `/contact`, `/book`, `/music`, console) — *change the channel*: a full re-mount under their own `TvFrame`. `/activity` (the globe) is a channel because its centerpiece isn't the logo. *(The CRT channel-change glitch that used to fire on these navigations was removed site-wide — all navigation is now seamless.)*
+- **Channel pages** (`/about`, `/work`, `/reach`, `/contact`, `/book`, `/music`, console) — *change the channel*: a full re-mount under their own `TvFrame`. `/reach` (the globe) is a channel because its centerpiece isn't the logo. *(The CRT channel-change glitch that used to fire on these navigations was removed site-wide — all navigation is now seamless; `TvFrame` no longer needs the old `seamless` prop.)*
 
-**Phase status:** **0+1 ✅** orbital foundation (persistent `Sun`, `TvFrame seamless` prop, removed root `template.tsx`) + new calm Home · **2 ✅** `/projects` folded into the `(orbital)` group (shares the `Sun` — first real seamless navigation); client work + testimonials split out to **`/work` ✅** · **3 ✅ (mostly)** `/technologies` folded into the group (seamless nav); `/entryport`→`/activity` (308 redirect, channel page). Remaining: perfect the exit→enter cross-morph (frozen-router `AnimatePresence`) · **4 ✅** About (`/about`) · **5 ✅** Book a Consultation (`/book`) · **6 (in progress)** nav/IA — Home done (About node → `/about`, Book CTA → `/book`); **chrome-bar buttons for `/projects`·`/about`·`/work` + the `/activity` relabel are still to wire** (deferred while `TvFrame` is under edit) + Contact refresh ✅ + docs.
+**Phase status:** **0+1 ✅** orbital foundation (persistent `Sun`, removed root `template.tsx`; the channel-change glitch was later dropped site-wide, so the old `TvFrame seamless` prop is gone) + new calm Home · **2 ✅** `/projects` folded into the `(orbital)` group (shares the `Sun` — first real seamless navigation); client work + testimonials split out to **`/work` ✅** · **3 ✅ (mostly)** `/technologies` folded into the group (seamless nav); `/entryport`→`/activity`→`/reach` (308 redirects, channel page). Remaining: perfect the exit→enter cross-morph (frozen-router `AnimatePresence`) · **4 ✅** About (`/about`) · **5 ✅** Book a Consultation (`/book`) · **6 (in progress)** nav/IA — Home ✅ (About node → `/about`, Book CTA → `/book`); chrome bar ✅ for Home/Projects/Technologies/Reach/Contact; **remaining: add About + Work to the global nav and rewire the stale `Footer` links to the real IA** + Contact refresh ✅ + docs.
 
 The mechanism: in Next.js App Router a shared layout is preserved across navigations between its children, so the `(orbital)` layout's `Sun` + `TvFrame` persist while only `{children}` (the satellites) swap through `SatelliteTransition`. The root `template.tsx` (a remount boundary) was removed because it would have re-mounted the group on every navigation.
 
@@ -276,4 +282,4 @@ Most contact happens in homepage chapter 09. A standalone `/signal` page exists 
 
 Future-domain note: the three products will live on their own external domains. The `/work/*` pages on yantracore.com are teaser/story pages that link out once the real product sites exist. Placeholder external URLs are used until then.
 
-Multi-lingual note: routes are scaffolded to support locale prefixes (`/en/...`, `/hi/...`, etc.) but only `en` ships in v1. See [05-tech-architecture.md](./05-tech-architecture.md) for the i18n approach.
+Multi-lingual note: `next-intl` is installed and i18n is on the near-term roadmap. **Nepali (`ne`) is the planned next language** (YantraCore is Nepal-based — the `/reach` globe is framed on Nepal), with English (`en`) as the default. Routes will gain locale prefixes (`/en/…`, `/ne/…`) when i18n is wired; only `en` ships today. See [05-tech-architecture.md](./05-tech-architecture.md) for the i18n approach.

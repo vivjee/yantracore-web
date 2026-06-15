@@ -296,6 +296,11 @@ export default function MusicPage() {
     const ctx2d = canvas.getContext("2d");
     if (!ctx2d) return;
 
+    // Honor reduced motion: paint a single static frame, never start the loop.
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     // Allocate analyser buffers once per (re)subscription instead of every frame.
     const bufferLength = analyser ? analyser.frequencyBinCount : 128;
     const freqData = new Uint8Array(bufferLength);
@@ -305,11 +310,9 @@ export default function MusicPage() {
       analysisRef.current = makeAnalysis(bufferLength);
     }
 
-    let localFrameId: number;
+    let localFrameId = 0;
 
-    const draw = () => {
-      localFrameId = requestAnimationFrame(draw);
-
+    const renderFrame = () => {
       // Draw in logical pixels; the backing store is scaled by dpr for crispness.
       const { w: width, h: height, dpr } = sizeRef.current;
       if (width <= 0 || height <= 0) return;
@@ -350,10 +353,32 @@ export default function MusicPage() {
       ctx2d.globalAlpha = 1;
     };
 
-    draw();
+    if (reduced) {
+      renderFrame();
+      return;
+    }
+
+    const loop = () => {
+      renderFrame();
+      localFrameId = requestAnimationFrame(loop);
+    };
+
+    // Pause when the tab is hidden so the canvas loop isn't burning GPU/CPU
+    // in the background.
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(localFrameId);
+        localFrameId = 0;
+      } else if (!localFrameId) {
+        localFrameId = requestAnimationFrame(loop);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    if (!document.hidden) localFrameId = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(localFrameId);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [isPlaying, analyser, visualizerStyle, visualizerColor, isFs]);
 

@@ -230,7 +230,7 @@ export function Forge() {
                   Ready to see this process in action?
                 </p>
                 <Link
-                  href="#signal"
+                  href="/book"
                   className="inline-flex items-center gap-2 text-sm font-medium text-text-hi glass-primary px-5 py-2.5 rounded-xl transition-all duration-300 hover:shadow-[0_16px_40px_-8px_rgba(110,86,255,0.5)] group"
                 >
                   Start a project

@@ -26,7 +26,7 @@ Scripts: `pnpm dev` · `pnpm build` · `pnpm start` · `pnpm lint`. Package mana
 
 ## What's inside
 
-- **Brochure:** `/` (homepage), `/contact`, `/music`, `/entryport` (3D globe), `/technologies`, `/channels/[slug]`.
+- **Brochure:** `/` (homepage), `/contact`, `/music`, `/reach` (3D globe), `/technologies`, `/channels/[slug]`.
 - **Console:** `/login`, `/signup`, `/dashboard` (Ask AI · Email · Drive · Projects), `/settings`.
 - **Design system:** all tokens, glass surfaces, palettes, and animations live in `app/globals.css`; theming is runtime via `lib/theme/`.
 

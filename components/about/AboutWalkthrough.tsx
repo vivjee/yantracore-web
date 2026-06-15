@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Manifesto } from "@/components/sections/02-manifesto/Manifesto";
 import { Capabilities } from "@/components/sections/04-capabilities/Capabilities";
 import { Forge } from "@/components/sections/05-forge/Forge";
+import { team } from "@/lib/content/team";
 
 /**
  * AboutWalkthrough — the /about identity story.
@@ -13,8 +14,8 @@ import { Forge } from "@/components/sections/05-forge/Forge";
  * A scrollable narrative that reuses the VISION-era section components (built
  * but never assembled into a live page): a custom hero states the thesis, then
  * Manifesto (what we believe) → Capabilities (what we build) → Forge (how we
- * work) → a closing CTA. Client-work proof + testimonials deliberately live on
- * /projects instead, so About stays the "who we are" page.
+ * work) → Team (who builds it) → a closing CTA. Client-work proof +
+ * testimonials live on /work instead, so About stays the "who we are" page.
  *
  * Server Component: the hero/CTA/Manifesto render to static HTML (SEO); only
  * Capabilities + Forge ship client JS. Scrolls internally within the TV screen,
@@ -61,6 +62,59 @@ export function AboutWalkthrough() {
       <Manifesto />
       <Capabilities />
       <Forge />
+
+      {/* ── Team ── */}
+      <section className="relative px-6 py-24 md:py-32">
+        <Container width="default">
+          <Reveal>
+            <Eyebrow tone="accent">The Team</Eyebrow>
+          </Reveal>
+          <Reveal delay={100}>
+            <h2
+              className="mt-4 max-w-3xl text-3xl font-bold tracking-tight text-text-hi md:text-4xl"
+              style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.01em" }}
+            >
+              The people who build it
+            </h2>
+          </Reveal>
+          <Reveal delay={180}>
+            <p className="mt-4 max-w-2xl leading-relaxed text-text-mid">
+              A small, senior team — engineers and designers who ship. Three in
+              management, five building day to day.
+            </p>
+          </Reveal>
+
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {team.map((member, i) => (
+              <Reveal key={member.id} delay={240 + i * 60}>
+                <div className="glass-light flex h-full flex-col gap-3 rounded-2xl p-5">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-mono text-sm font-semibold ${
+                        member.isManagement
+                          ? "border-accent-2/30 bg-accent-2/15 text-accent-2"
+                          : "border-accent-1/30 bg-accent-1/15 text-accent-1"
+                      }`}
+                      aria-hidden
+                    >
+                      {member.initials}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-text-hi">{member.name}</p>
+                      <p className="font-mono text-[11px] uppercase tracking-wider text-text-low">
+                        {member.role}
+                      </p>
+                    </div>
+                  </div>
+                  {member.bio && (
+                    <p className="text-sm leading-relaxed text-text-mid">{member.bio}</p>
+                  )}
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
 
       {/* ── Closing CTA ── */}
       <section className="relative px-6 py-24 md:py-36">

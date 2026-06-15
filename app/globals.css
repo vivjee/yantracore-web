@@ -1929,6 +1929,96 @@ body.brochure-mode-active header {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ── Music quick-panel popover (anchored to the Music Lab nav button) ──────
+   Unfurls beneath the Music button while a listening session is live. Reveal
+   is gated to hover-capable pointers so it never fires on a phone tap; the
+   `padding-top` is a transparent bridge so the cursor never crosses a dead gap
+   between the button and the card. */
+.tv-music-control {
+  position: relative;
+}
+
+.tv-music-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 8px;
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s var(--ease-out-soft), transform 0.18s var(--ease-out-soft),
+    visibility 0.18s;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tv-music-control:hover .tv-music-popover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Keyboard users: reveal while focus rests on the button or anything in the card. */
+.tv-music-control:focus-within .tv-music-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tv-music-popover__card {
+  width: 264px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 12, 20, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="light"] .tv-music-popover__card {
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(246, 248, 251, 0.97);
+  box-shadow:
+    6px 6px 16px rgba(163, 177, 198, 0.28),
+    -6px -6px 16px rgba(255, 255, 255, 0.82);
+}
+
+/* Animated equalizer — the "now playing" indicator in the music quick-panel.
+   Four bars dance while playing (reusing the bar-scale keyframe at staggered
+   speeds); when paused they settle to a flat, dim baseline. Reduced motion is
+   handled globally (the loop collapses to a static frame). */
+.tv-music-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  width: 16px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.tv-music-eq > i {
+  flex: 1 1 0;
+  height: 100%;
+  border-radius: 1px;
+  transform-origin: bottom;
+  transform: scaleY(0.26);
+  background: var(--accent-2);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--accent-2) 55%, transparent);
+  transition: transform 0.3s var(--ease-out-soft);
+}
+.tv-music-eq[data-playing="true"] > i {
+  animation: bar-scale 1.05s ease-in-out infinite;
+}
+.tv-music-eq[data-playing="true"] > i:nth-child(2) { animation-duration: 0.78s; animation-delay: -0.4s; }
+.tv-music-eq[data-playing="true"] > i:nth-child(3) { animation-duration: 1.26s; animation-delay: -0.7s; }
+.tv-music-eq[data-playing="true"] > i:nth-child(4) { animation-duration: 0.92s; animation-delay: -0.2s; }
+
 /* ── Keyboard shortcut hints ─────────────────────────────────────────── */
 
 /* Small key-cap badge (⇧H, F, ?) shown in tooltips and the cheat sheet. */
@@ -2914,7 +3004,7 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
 .orbital-rings {
   transform: scale(0.5);
   transform-origin: 50% 44%;
-  transition: transform 0.6s var(--ease-out-soft);
+  transition: transform 0.6s var(--ease-out-soft), filter 0.5s var(--ease-out-soft);
 }
 @media (min-width: 640px) {
   .orbital-rings { transform: scale(0.62); }
@@ -2930,6 +3020,44 @@ html[data-theme="light"] .tv-frame-controls .tv-console-btn.tv-off:not([disabled
 }
 @media (max-height: 680px) {
   .orbital-rings { transform: scale(0.56) !important; }
+}
+
+/* Hover-to-wake — a soft radial bloom behind the logo, invisible at rest. Lives
+   in the persistent Sun (so it never re-mounts), centred on the logo (50% / 44%)
+   and scaled with it via the parent's transform. It rises only when the Home
+   sense disc over the logo is hovered (see the :has rule below); the violet→cyan
+   tint and `screen` blend read as the Sun quietly catching light. */
+.orbital-sun__bloom {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 360px;
+  height: 360px;
+  transform: translate(-50%, -50%) scale(0.85);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent-1) 26%, transparent) 0%,
+    color-mix(in srgb, var(--accent-2) 13%, transparent) 42%,
+    transparent 70%
+  );
+  opacity: 0;
+  z-index: 4; /* between the rings (z2) and the logo (z5) — glows behind the mark */
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.55s var(--ease-out-soft), transform 0.6s var(--ease-out-soft);
+}
+
+/* The wake itself. The sense disc lives in the Home satellite layer (the only
+   layer that can feel the cursor — the Sun beneath is pointer-events:none), so
+   we reach across the shared .orbital-stage with :has to light up the Sun: the
+   bloom rises and the whole ring system brightens a touch. Pure CSS, no JS. */
+.orbital-stage:has(.home-orbit__sun-sense:hover) .orbital-sun__bloom {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.orbital-stage:has(.home-orbit__sun-sense:hover) .orbital-rings {
+  filter: brightness(1.16) saturate(1.08);
 }
 
 /* Showcase solar-system (the /projects + Home desktop scene). It's engineered
@@ -3176,6 +3304,130 @@ html[data-theme="light"] .orbital-node__emblem {
   );
 }
 
+/* ── Home orbit — desktop constellation (md+) ─────────────────────────
+   The large-screen Home arranges its six satellites on an elliptical orbit
+   around the persistent Sun instead of two flat columns: the three "Explore"
+   destinations ride the left arc, the three "Our Projects" initiatives ride
+   the right arc, and the wordmark + CTAs nest in the open base of the ring.
+   Each satellite is anchored by its INNER edge on the orbit (so the ring
+   threads through the row of nodes) and drifts on a slow, independent bob —
+   planets holding station. Positions are polar: HomeOrbital writes each
+   node's `left/top` from its angle, multiplying the shared --orbit-rx /
+   --orbit-ry radii (which scale with the viewport) by a pre-computed
+   cos/sin. Purely a md+ enhancement; phones keep the 2-col grid below. */
+.home-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: none;
+  /* Orbit geometry — centre matches the Sun (50% / 44%); radii scale fluidly
+     and pull in on tighter viewports so the nodes clear the screen edges. */
+  --orbit-cy: 44%;
+  --orbit-rx: clamp(200px, 26vw, 372px);
+  --orbit-ry: clamp(150px, 22vh, 250px);
+}
+@media (min-width: 768px) {
+  .home-orbit { display: block; }
+}
+@media (max-width: 1023.98px) {
+  .home-orbit {
+    --orbit-rx: clamp(178px, 30vw, 300px);
+    --orbit-ry: clamp(140px, 23vh, 212px);
+  }
+}
+@media (max-height: 760px) {
+  .home-orbit { --orbit-ry: clamp(120px, 18vh, 182px); }
+}
+@media (max-height: 640px) {
+  .home-orbit { --orbit-ry: clamp(104px, 15vh, 150px); }
+}
+
+/* The faint path the satellites ride. Sized to the orbit diameter, centred on
+   the Sun; the lower arc is masked away so it never crosses the centre copy. */
+.home-orbit__path {
+  position: absolute;
+  left: 50%;
+  top: var(--orbit-cy);
+  width: calc(var(--orbit-rx) * 2);
+  height: calc(var(--orbit-ry) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--accent-1) 24%, transparent);
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 84%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 84%);
+  animation: home-orbit-in 1s var(--ease-out-soft) 0.35s both;
+}
+
+/* The Sun hover sensor — a centred, invisible disc over the logo. The orbit
+   layer is pointer-events:none, so this re-enables events just for itself; it's
+   the cursor target that wakes the Sun (see the .orbital-stage:has rule). Kept
+   well inside the node ring (radius < the closest satellite) so it never steals
+   hover from the satellites or the centre CTAs. md+ only (it rides .home-orbit,
+   which is hidden on phones — a hover affordance touch can't use anyway). */
+.home-orbit__sun-sense {
+  position: absolute;
+  left: 50%;
+  top: var(--orbit-cy);
+  width: clamp(200px, 19vw, 290px);
+  height: clamp(200px, 19vw, 290px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+/* Satellite list + slot. Each slot is anchored on the orbit and vertically
+   centred; the side modifier picks which edge meets the ring (the top crown
+   node is centred horizontally instead). */
+.home-orbit__ring {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-orbit__planet {
+  position: absolute;
+  pointer-events: auto;
+  width: max-content;
+}
+.home-orbit__planet--left  { transform: translate(-100%, -50%); }
+.home-orbit__planet--right { transform: translate(0, -50%); }
+/* The crown node rests its BOTTOM edge on the orbit (centred horizontally), so
+   the whole tile sits above the ring like the side nodes sit outside it —
+   rather than straddling the line and dipping toward the logo. */
+.home-orbit__planet--top   { transform: translate(-50%, -100%); }
+
+/* Slow, independent drift — the satellites hold station and breathe. The
+   per-slot amplitude / tempo / phase arrive as inline custom properties. */
+.home-orbit__float {
+  animation: orbit-bob var(--bob-dur, 9s) ease-in-out var(--bob-delay, 0s) infinite;
+  will-change: transform;
+}
+@keyframes orbit-bob {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(var(--bob-x, 0px), var(--bob-y, -8px)); }
+}
+
+@keyframes home-orbit-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Desktop centre copy — nested in the open base of the orbit ring. */
+.home-orbit-copy {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(18px, 6vh, 60px);
+  transform: translateX(-50%);
+  z-index: 5;
+  display: none;
+  justify-content: center;
+  width: min(92vw, 520px);
+}
+@media (min-width: 768px) {
+  .home-orbit-copy { display: flex; }
+}
+
 /* ── Orbital HUD — ambient mission-control instrumentation ─────────────
    Frames the Home hub's negative space: viewfinder corners, a bottom
    telemetry strip, and side spines. All purely decorative; the root is
@@ -3309,6 +3561,29 @@ html[data-theme="light"] .orbital-node__emblem {
 .orbital-hud__spine--right {
   right: 24px;
   transform: translateY(-50%);
+}
+/* Both spines scan: the whole word list is always present; a lit highlight
+   glides across it, one word at a time. Dim siblings keep the gutter a whisper;
+   the active word breaks above it with a soft accent bloom. */
+.orbital-hud__spine-sep {
+  opacity: 0.4;
+}
+.orbital-hud__spine-word {
+  opacity: 0.5;
+  color: var(--text-low);
+  transition: opacity 0.7s var(--ease-out-soft), color 0.7s var(--ease-out-soft),
+    text-shadow 0.7s var(--ease-out-soft);
+}
+.orbital-hud__spine-word.is-active {
+  opacity: 1;
+  color: var(--text-mid);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent-1) 55%, transparent);
+}
+/* Reduced motion / pre-mount (tick = -1): the full list, evenly lit and still. */
+.orbital-hud__spine.is-static .orbital-hud__spine-word {
+  opacity: 0.8;
+  transition: none;
+  text-shadow: none;
 }
 @media (min-width: 1280px) {
   .orbital-hud__spine {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 
 /**
  * OrbitalHud — the ambient "mission-control" instrumentation that frames the
@@ -13,16 +14,29 @@ import { useEffect, useState } from "react";
  *   • A bottom telemetry strip   — a live status pulse with a `YantraCore / Home`
  *                                  brand readout on the left, and the visitor's
  *                                  local timezone + a running clock on the right.
- *   • Vertical edge spines        — micro-type restating the value prop in the
- *                                  wide side gutters (xl screens only).
+ *   • Vertical edge spines        — micro-type in the wide side gutters (xl only):
+ *                                  the left spine names who we build for as a
+ *                                  live telemetry channel — Individuals ·
+ *                                  Companies · Communities, scanning one lit at a
+ *                                  time; the right restates the capability stack.
  *
  * Entirely decorative: the root is aria-hidden and pointer-events-none, so it
  * never steals focus or clicks from the satellites layered above it. Hidden on
  * mobile (the compact layout owns that space) and on very short viewports, where
  * the height lock would otherwise clip it into the centre copy.
  */
+/** Both gutter spines are scanning telemetry channels: a lit highlight glides
+ *  across the words one at a time, while the whole list stays present (legible,
+ *  not just an animation). The left names who we build for, the right the stack.
+ *  They share one clock so the cadence matches; the right rides a +1 phase offset
+ *  so the two edges read as independent instruments, not a mirror. */
+const SCAN_DWELL = 3000; // ms each word stays lit
+const AUDIENCES = ["Individuals", "Companies", "Communities"] as const;
+const CAPABILITIES = ["Software", "AI", "Infrastructure"] as const;
+
 export function OrbitalHud() {
   const clock = useClock();
+  const tick = useScanTick();
 
   return (
     <div className="orbital-hud" aria-hidden>
@@ -32,13 +46,10 @@ export function OrbitalHud() {
       <span className="orbital-hud__corner orbital-hud__corner--bl" />
       <span className="orbital-hud__corner orbital-hud__corner--br" />
 
-      {/* Side spines — the value prop, set in the gutters (xl only) */}
-      <span className="orbital-hud__spine orbital-hud__spine--left">
-        Building for companies &amp; communities
-      </span>
-      <span className="orbital-hud__spine orbital-hud__spine--right">
-        Software · AI · Infrastructure
-      </span>
+      {/* Side spines — the value prop, set in the gutters (xl only). Left names
+          who we build for; right restates the capability stack. Both scan. */}
+      <ScanSpine side="left" words={AUDIENCES} tick={tick} />
+      <ScanSpine side="right" words={CAPABILITIES} tick={tick} offset={1} />
 
       {/* Bottom telemetry strip */}
       <div className="orbital-hud__strip">
@@ -55,6 +66,69 @@ export function OrbitalHud() {
       </div>
     </div>
   );
+}
+
+/**
+ * One gutter spine: the full word list is always rendered; a lit highlight scans
+ * across it, driven by the shared `tick`. `offset` phase-shifts which word leads
+ * (so the two spines don't blink in unison). When `tick < 0` (reduced motion or
+ * pre-mount) the spine goes static — every word evenly lit, no scan.
+ */
+function ScanSpine({
+  side,
+  words,
+  tick,
+  offset = 0,
+}: {
+  side: "left" | "right";
+  words: readonly string[];
+  tick: number;
+  offset?: number;
+}) {
+  const lit = tick < 0 ? -1 : (tick + offset) % words.length;
+  return (
+    <span
+      className={`orbital-hud__spine orbital-hud__spine--${side}${lit < 0 ? " is-static" : ""}`}
+    >
+      {words.map((word, i) => (
+        <Fragment key={word}>
+          {i > 0 && <span className="orbital-hud__spine-sep">·</span>}
+          <span className={`orbital-hud__spine-word${i === lit ? " is-active" : ""}`}>
+            {word}
+          </span>
+        </Fragment>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Drives the spine scan: a monotonically increasing tick that advances every
+ * SCAN_DWELL ms (each spine maps it to a lit word via modulo). Returns -1 when
+ * the user prefers reduced motion (and until mount, so SSR/first paint agree) —
+ * the spines then render their full lists evenly lit and still, no scan.
+ */
+function useScanTick() {
+  const reduced = useReducedMotion();
+  const [tick, setTick] = useState(-1);
+
+  useEffect(() => {
+    if (reduced) {
+      // Settle to the static state on the next frame — never synchronously in
+      // the effect body — in case the scan was already running.
+      const raf = requestAnimationFrame(() => setTick(-1));
+      return () => cancelAnimationFrame(raf);
+    }
+    // Start the scan on the next frame, then advance on a fixed cadence.
+    const raf = requestAnimationFrame(() => setTick(0));
+    const id = setInterval(() => setTick((t) => t + 1), SCAN_DWELL);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
+  }, [reduced]);
+
+  return tick;
 }
 
 /**
