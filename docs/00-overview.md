@@ -80,7 +80,10 @@ app/                 # Next.js App Router: pages, layouts, and /api proxy routes
   (orbital)/         # Orbital route group — shared layout = persistent Sun + TvFrame (seamless)
     layout.tsx       #   mounts the Sun + frame ONCE; satellites swap beneath it
     page.tsx         #   / — calm orbital navigation hub (HomeOrbital)
-  projects/          # Live product "solar system" (Showcase), relocated from the old homepage
+    projects/        #   /projects — Showcase product constellation (externalSun → shares the Sun)
+  about/             # /about — studio identity walkthrough (channel page; reuses VISION sections)
+  work/              # /work — client work grid + testimonials (Work + Voices)
+  book/              # /book — Book a Consultation (budget estimator + intake form)
   dashboard/         # The console (DashboardShell)
   login/ signup/     # Auth surfaces (currently localStorage/demo)
   music/ entryport/  # Brochure feature pages
@@ -96,7 +99,8 @@ components/
   typography/        # Eyebrow, YantraElectricTitle
   orbital/           # Sun (persistent logo), OrbitalRings, SatelliteTransition — the orbital shell
   home/              # HomeOrbital hub + OrbitNode (calm satellite) — the new homepage
-  sections/          # 01-arrival … 09-signal homepage chapters (VISION-era; Showcase now lives at /projects)
+  about/ work/ book/ # Channel pages: identity walkthrough, client work, consultation (estimator+form)
+  sections/          # 01-arrival … 09-signal chapters (VISION-era; now assembled into /about & /work)
   dashboard/         # DashboardShell, SettingsShell
   auth/ channels/ entryport/ assistant/ brand/   # feature components
 lib/
