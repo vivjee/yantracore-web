@@ -313,11 +313,11 @@ function ReachGlobeViewport({
         if (tween.t >= 1) tween.active = false;
       }
       controls.update();
-      clouds.rotation.y += delta * 0.012; // subtle ambient drift (earth stays put)
+      if (!reduced) clouds.rotation.y += delta * 0.012; // ambient drift (earth stays put)
 
       const live = isLiveRef.current;
       const active = activeRef.current;
-      const haloPulse = 0.1 + (0.5 + 0.5 * Math.sin(elapsed * 2)) * 0.1;
+      const haloPulse = reduced ? 0.15 : 0.1 + (0.5 + 0.5 * Math.sin(elapsed * 2)) * 0.1;
 
       for (const slug of SLUGS) {
         const matched = active === "all" || active === slug;
@@ -332,13 +332,15 @@ function ReachGlobeViewport({
 
       if (live) {
         for (const m of markers) {
-          const pulse = 1 + Math.sin(elapsed * 2.4 + m.lat) * 0.16;
+          const pulse = reduced ? 1 : 1 + Math.sin(elapsed * 2.4 + m.lat) * 0.16;
           m.core.scale.setScalar(m.base * curScale[m.slug] * pulse);
           m.halo.scale.setScalar(m.base * 2.6 * curScale[m.slug]);
         }
-        for (const p of pulses) {
-          const t = (elapsed * 0.16 + p.delay) % 1;
-          p.mesh.position.copy(p.curve.getPointAt(t));
+        if (!reduced) {
+          for (const p of pulses) {
+            const t = (elapsed * 0.16 + p.delay) % 1;
+            p.mesh.position.copy(p.curve.getPointAt(t));
+          }
         }
       } else {
         for (const m of markers) {
@@ -352,8 +354,23 @@ function ReachGlobeViewport({
     };
     animate();
 
+    // Pause the 3D render loop while the tab is hidden (no point burning the
+    // GPU on an off-screen globe). Reset the clock delta on resume so motion
+    // doesn't lurch after a long pause.
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      } else if (!frameId) {
+        clock.getDelta();
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       cancelAnimationFrame(frameId);
+      document.removeEventListener("visibilitychange", onVisibility);
       resizeObserver.disconnect();
       controls.dispose();
       apiRef.current = null;
