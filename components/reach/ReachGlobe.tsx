@@ -512,7 +512,7 @@ export function ReachGlobe() {
       </div>
 
       {/* ── Live ticker (compact) ── */}
-      <Rise delay={0.34} y={12} className="pointer-events-none absolute bottom-3 left-3 z-20 w-[min(88vw,24rem)] sm:bottom-4 sm:left-4">
+      <Rise delay={0.34} y={12} className="pointer-events-none absolute bottom-3 left-3 right-[7.25rem] z-20 sm:bottom-4 sm:left-4 sm:right-auto sm:w-[min(88vw,24rem)]">
         <div className="pointer-events-auto rounded-lg border border-white/10 bg-black/40 p-2.5 backdrop-blur-md">
           <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-text-low">
             <span className={`h-1.5 w-1.5 rounded-full ${isLive ? "animate-ping bg-emerald-400" : "bg-text-faint"}`} />
