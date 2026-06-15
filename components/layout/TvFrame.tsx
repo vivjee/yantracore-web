@@ -237,8 +237,8 @@ export function TvFrame({ children }: TvFrameProps) {
                   <span className="tv-console-label">Technologies</span>
                   <span className="tooltip">Technologies <KeyHint id="nav-technologies" /></span>
                 </Link>
-                <Link href="/activity" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/activity" ? "active" : ""}`} aria-label="Reach" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
-                  {isPowered && pathname === "/activity" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
+                <Link href="/reach" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/reach" ? "active" : ""}`} aria-label="Reach" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                  {isPowered && pathname === "/reach" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Globe2 className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Reach</span>
                   <span className="tooltip">Reach <KeyHint id="nav-entryport" /></span>
@@ -528,7 +528,7 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
     { href: "/", label: "Home", Icon: Home },
     { href: "/projects", label: "Projects", Icon: Boxes },
     { href: "/technologies", label: "Tech", Icon: StellarOrbitIcon },
-    { href: "/activity", label: "Reach", Icon: Globe2 },
+    { href: "/reach", label: "Reach", Icon: Globe2 },
     { href: "/contact", label: "Contact", Icon: Mail },
   ] as const;
   return (
