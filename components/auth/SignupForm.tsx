@@ -7,6 +7,7 @@ import { GlassInput } from "@/components/glass/GlassInput";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
 import { StaggerContainer, StaggerItem, ScaleFadeItem } from "@/components/motion/AnimationWrappers";
 import { cn } from "@/lib/utils/cn";
+import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 type FormState = "idle" | "loading" | "error" | "success";
 
@@ -318,14 +319,7 @@ export function SignupForm({ inTv = false }: { inTv?: boolean }) {
         >
           ←
         </span>
-        <img
-          src="/images/logo/logo-white.svg"
-          alt="YantraCore"
-          className="h-6 w-auto opacity-70 transition-opacity duration-200 group-hover:opacity-100"
-          style={{
-            filter: "drop-shadow(0 0 6px rgba(110, 86, 255, 0.4))",
-          }}
-        />
+        <ColorfulLogo size={24} animate={false} />
       </Link>}
 
       {/* Card */}

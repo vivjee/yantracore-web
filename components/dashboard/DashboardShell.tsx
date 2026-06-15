@@ -11,6 +11,7 @@ import React, {
 
 import Link from "next/link";
 import Image from "next/image";
+import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 import {
   LayoutDashboard,
   MessageSquareText,
@@ -234,7 +235,7 @@ function renderInline(text: string): ReactNode[] {
         <code
           key={i}
           className="px-1.5 py-0.5 rounded-md text-[0.82em] font-mono"
-          style={{ background: "rgba(110,86,255,0.15)", color: "var(--accent-2)", border: "1px solid rgba(110,86,255,0.2)" }}
+          style={{ background: "color-mix(in srgb, var(--accent-1) 15%, transparent)", color: "var(--accent-2)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)" }}
         >
           {part.slice(1, -1)}
         </code>
@@ -293,7 +294,7 @@ function MarkdownBlock({ content }: { content: string }) {
     if (line.startsWith("> ")) {
       nodes.push(
         <blockquote key={i} className="pl-3 py-0.5 my-2 text-text-low italic text-sm"
-          style={{ borderLeft: "3px solid rgba(110,86,255,0.5)" }}>
+          style={{ borderLeft: "3px solid var(--accent-1)" }}>
           {renderInline(line.slice(2))}
         </blockquote>
       );
@@ -524,8 +525,8 @@ function AddEmailModal({
         className="w-full max-w-md rounded-2xl overflow-hidden"
         style={{
           background: "linear-gradient(145deg, rgba(16,18,36,0.98) 0%, rgba(10,12,22,0.99) 100%)",
-          border: "1px solid rgba(110,86,255,0.25)",
-          boxShadow: "0 24px 64px -12px rgba(0,0,0,0.7), 0 0 0 1px rgba(110,86,255,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
+          border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)",
+          boxShadow: "0 24px 64px -12px rgba(0,0,0,0.7), 0 0 0 1px color-mix(in srgb, var(--accent-1) 8%, transparent), inset 0 1px 0 rgba(255,255,255,0.04)",
         }}
       >
         {/* Header */}
@@ -533,7 +534,7 @@ function AddEmailModal({
           style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, rgba(110,86,255,0.3) 0%, rgba(0,224,203,0.15) 100%)", border: "1px solid rgba(110,86,255,0.25)" }}>
+              style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 30%, transparent) 0%, color-mix(in srgb, var(--accent-2) 15%, transparent) 100%)", border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)" }}>
               <Mail size={16} className="text-accent-1" style={{ color: "var(--accent-1)" }} />
             </div>
             <div>
@@ -754,8 +755,8 @@ function AddEmailModal({
             disabled={loading || success}
             className="w-full py-3 rounded-xl text-sm font-semibold transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{
-              background: "linear-gradient(135deg, rgba(110,86,255,0.9) 0%, rgba(0,224,203,0.7) 100%)",
-              boxShadow: loading || success ? "none" : "0 4px 20px -6px rgba(110,86,255,0.5)",
+              background: "linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%)",
+              boxShadow: loading || success ? "none" : "0 4px 20px -6px color-mix(in srgb, var(--accent-1) 50%, transparent)",
               color: "white",
             }}
           >
@@ -839,21 +840,9 @@ function Sidebar({
       }}
     >
       {/* Logo */}
-      <div className="px-4 pt-4 pb-4 border-b border-white/[0.05] shrink-0">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 shrink-0 relative">
-            <Image
-              src="/images/logo/logo-white.svg"
-              alt="YantraCore logo"
-              fill
-              style={{ objectFit: "contain" }}
-              priority
-            />
-          </div>
-          <div>
-            <span className="text-base font-bold text-text-hi tracking-tight font-display">YantraCore</span>
-            <span className="block text-[10px] font-mono tracking-[0.15em] uppercase" style={{ color: "var(--accent-2)", opacity: 0.8 }}>Control Center</span>
-          </div>
+      <div className="px-4 pt-4 pb-4 border-b border-white/[0.05] shrink-0 flex justify-center">
+        <Link href="/" className="group flex items-center justify-center">
+          <ColorfulLogo size={40} />
         </Link>
       </div>
 
@@ -900,8 +889,8 @@ function Sidebar({
               activeSection === "projects" ? "text-text-hi" : "text-text-low hover:text-text-mid"
             )}
             style={activeSection === "projects" ? {
-              background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-              border: "1px solid rgba(110,86,255,0.22)",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+              border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)",
             } : {}}
           >
             {activeSection === "projects" && (
@@ -922,8 +911,8 @@ function Sidebar({
               activeSection === "requests" ? "text-text-hi" : "text-text-low hover:text-text-mid"
             )}
             style={activeSection === "requests" ? {
-              background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-              border: "1px solid rgba(110,86,255,0.22)",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+              border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)",
             } : {}}
           >
             {activeSection === "requests" && (
@@ -945,8 +934,8 @@ function Sidebar({
               isEmailActive ? "text-text-hi" : "text-text-low hover:text-text-mid"
             )}
             style={isEmailActive ? {
-              background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-              border: "1px solid rgba(110,86,255,0.22)",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+              border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)",
             } : {}}
           >
             {isEmailActive && (
@@ -956,7 +945,7 @@ function Sidebar({
             <span className="flex-1 text-left">Email</span>
             {emailAccounts.length > 0 && (
               <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-md mr-1"
-                style={{ background: "rgba(110,86,255,0.15)", color: "var(--accent-1)", border: "1px solid rgba(110,86,255,0.2)" }}>
+                style={{ background: "color-mix(in srgb, var(--accent-1) 15%, transparent)", color: "var(--accent-1)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)" }}>
                 {emailAccounts.length}
               </span>
             )}
@@ -996,7 +985,7 @@ function Sidebar({
                           onClick={() => onSelectEmail(acct)}
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-all duration-200 group"
                           style={isActive ? {
-                            background: "linear-gradient(135deg, rgba(110,86,255,0.15) 0%, rgba(0,224,203,0.06) 100%)",
+                            background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 15%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
                           } : {}}
                         >
                           {/* Avatar */}
@@ -1004,7 +993,7 @@ function Sidebar({
                             className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[9px] font-bold"
                             style={{
                               background: isActive
-                                ? "linear-gradient(135deg, rgba(110,86,255,0.6) 0%, rgba(0,224,203,0.4) 100%)"
+                                ? "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 60%, transparent) 0%, color-mix(in srgb, var(--accent-2) 40%, transparent) 100%)"
                                 : "rgba(255,255,255,0.08)",
                               color: "white",
                             }}
@@ -1054,8 +1043,8 @@ function Sidebar({
               activeSection === "drive" ? "text-text-hi" : "text-text-low hover:text-text-mid"
             )}
             style={activeSection === "drive" ? {
-              background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-              border: "1px solid rgba(110,86,255,0.22)",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+              border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)",
             } : {}}
           >
             {activeSection === "drive" && (
@@ -1076,8 +1065,8 @@ function Sidebar({
               activeSection === "settings" ? "text-text-hi" : "text-text-low hover:text-text-mid"
             )}
             style={activeSection === "settings" ? {
-              background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-              border: "1px solid rgba(110,86,255,0.22)",
+              background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+              border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)",
             } : {}}
           >
             {activeSection === "settings" && (
@@ -1094,7 +1083,7 @@ function Sidebar({
       <div className="p-3 border-t border-white/[0.05] shrink-0">
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1" style={{ background: "rgba(255,255,255,0.03)" }}>
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 capitalize"
-            style={{ background: "linear-gradient(135deg, rgba(110,86,255,0.6) 0%, rgba(255,79,176,0.4) 100%)", color: "var(--text-hi)" }}>
+            style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 60%, transparent) 0%, color-mix(in srgb, var(--accent-3) 40%, transparent) 100%)", color: "var(--text-hi)" }}>
             {(userEmail || "T")[0]}
           </div>
           <div className="flex-1 min-w-0">
@@ -1150,7 +1139,7 @@ function SourceStrip({ sources }: { sources: AskSource[] }) {
 
           const scoreChip = (
             <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded"
-              style={{ background: pct >= 70 ? "rgba(0,224,203,0.12)" : "rgba(255,255,255,0.06)", color: pct >= 70 ? "var(--accent-2)" : "var(--text-faint)" }}>
+              style={{ background: pct >= 70 ? "color-mix(in srgb, var(--accent-2) 12%, transparent)" : "rgba(255,255,255,0.06)", color: pct >= 70 ? "var(--accent-2)" : "var(--text-faint)" }}>
               {pct}%
             </span>
           );
@@ -1191,11 +1180,11 @@ function ChatTurn({ msg }: { msg: ChatMessage }) {
       {/* User bubble */}
       <div className="flex items-start gap-3 justify-end">
         <div className="max-w-[75%] px-4 py-3 rounded-2xl rounded-tr-sm text-sm text-text-hi leading-relaxed"
-          style={{ background: "linear-gradient(135deg, rgba(110,86,255,0.25) 0%, rgba(0,224,203,0.12) 100%)", border: "1px solid rgba(110,86,255,0.25)" }}>
+          style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 25%, transparent) 0%, color-mix(in srgb, var(--accent-2) 12%, transparent) 100%)", border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)" }}>
           {msg.question}
         </div>
         <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
-          style={{ background: "linear-gradient(135deg, rgba(110,86,255,0.5) 0%, rgba(255,79,176,0.4) 100%)" }}>
+          style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 50%, transparent) 0%, color-mix(in srgb, var(--accent-3) 40%, transparent) 100%)" }}>
           <User size={14} className="text-white" />
         </div>
       </div>
@@ -1203,7 +1192,7 @@ function ChatTurn({ msg }: { msg: ChatMessage }) {
       {/* AI response */}
       <div className="flex items-start gap-3">
         <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center mt-0.5"
-          style={{ background: "linear-gradient(135deg, rgba(0,224,203,0.3) 0%, rgba(110,86,255,0.3) 100%)", border: "1px solid rgba(0,224,203,0.2)" }}>
+          style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 30%, transparent) 0%, color-mix(in srgb, var(--accent-1) 30%, transparent) 100%)", border: "1px solid color-mix(in srgb, var(--accent-2) 20%, transparent)" }}>
           <Bot size={14} className="text-white" />
         </div>
 
@@ -1262,7 +1251,7 @@ function AskEmptyState({ onSuggest }: { onSuggest: (q: string) => void }) {
     <StaggerContainer delay={50} staggerDelay={0.08} className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 gap-6">
       <StaggerItem>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider uppercase mb-4"
-          style={{ background: "rgba(110,86,255,0.12)", border: "1px solid rgba(110,86,255,0.25)", color: "var(--accent-1)" }}>
+          style={{ background: "color-mix(in srgb, var(--accent-1) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)", color: "var(--accent-1)" }}>
           <Sparkles size={11} />YantraCore AI
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-text-hi font-display tracking-tight mb-3">
@@ -1310,7 +1299,7 @@ function EmailEmptyState({
     <StaggerContainer delay={50} staggerDelay={0.08} className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 gap-6">
       <StaggerItem>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono tracking-wider uppercase mb-4"
-          style={{ background: "rgba(110,86,255,0.12)", border: "1px solid rgba(110,86,255,0.25)", color: "var(--accent-1)" }}>
+          style={{ background: "color-mix(in srgb, var(--accent-1) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 25%, transparent)", color: "var(--accent-1)" }}>
           <Mail size={11} />{account.label || account.email}
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-text-hi font-display tracking-tight mb-3">
@@ -1346,7 +1335,7 @@ function NoAccountSelected({ onAddEmail }: { onAddEmail: () => void }) {
     <StaggerContainer delay={50} staggerDelay={0.08} className="flex-1 flex flex-col items-center justify-center text-center px-6 py-12 gap-5">
       <StaggerItem>
         <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-          style={{ background: "rgba(110,86,255,0.1)", border: "1px solid rgba(110,86,255,0.2)" }}>
+          style={{ background: "color-mix(in srgb, var(--accent-1) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)" }}>
           <Mail size={28} style={{ color: "var(--accent-1)", opacity: 0.7 }} />
         </div>
       </StaggerItem>
@@ -1360,7 +1349,7 @@ function NoAccountSelected({ onAddEmail }: { onAddEmail: () => void }) {
         <button
           onClick={onAddEmail}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
-          style={{ background: "linear-gradient(135deg, rgba(110,86,255,0.3) 0%, rgba(0,224,203,0.15) 100%)", border: "1px solid rgba(110,86,255,0.3)", color: "var(--accent-1)" }}
+          style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 30%, transparent) 0%, color-mix(in srgb, var(--accent-2) 15%, transparent) 100%)", border: "1px solid color-mix(in srgb, var(--accent-1) 30%, transparent)", color: "var(--accent-1)" }}
         >
           <Plus size={14} /> Add email account
         </button>
@@ -1414,8 +1403,8 @@ function InputBar({
         <div className="relative rounded-2xl transition-all duration-300"
           style={{
             background: focused ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)",
-            border: focused ? "1px solid rgba(110,86,255,0.45)" : "1px solid rgba(255,255,255,0.08)",
-            boxShadow: focused ? "0 0 0 3px rgba(110,86,255,0.1), 0 16px 40px -12px rgba(0,0,0,0.5)" : "0 4px 16px -4px rgba(0,0,0,0.4)",
+            border: focused ? "1px solid color-mix(in srgb, var(--accent-1) 45%, transparent)" : "1px solid rgba(255,255,255,0.08)",
+            boxShadow: focused ? "0 0 0 3px color-mix(in srgb, var(--accent-1) 10%, transparent), 0 16px 40px -12px rgba(0,0,0,0.5)" : "0 4px 16px -4px rgba(0,0,0,0.4)",
           }}>
           <textarea
             ref={textareaRef}
@@ -1439,9 +1428,9 @@ function InputBar({
             className="absolute right-3 bottom-3 w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-1"
             style={{
               background: query.trim() && !disabled
-                ? "linear-gradient(135deg, rgba(110,86,255,0.9) 0%, rgba(0,224,203,0.7) 100%)"
+                ? "linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%)"
                 : "rgba(255,255,255,0.08)",
-              boxShadow: query.trim() && !disabled ? "0 4px 14px -4px rgba(110,86,255,0.6)" : "none",
+              boxShadow: query.trim() && !disabled ? "0 4px 14px -4px color-mix(in srgb, var(--accent-1) 60%, transparent)" : "none",
             }}
           >
             {disabled
@@ -1540,8 +1529,8 @@ function DrivePane({
               disabled={syncing}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
-                background: "linear-gradient(135deg, rgba(110,86,255,0.25) 0%, rgba(0,224,203,0.12) 100%)",
-                border: "1px solid rgba(110,86,255,0.3)",
+                background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 25%, transparent) 0%, color-mix(in srgb, var(--accent-2) 12%, transparent) 100%)",
+                border: "1px solid color-mix(in srgb, var(--accent-1) 30%, transparent)",
                 color: "var(--accent-1)",
               }}
             >
@@ -1598,7 +1587,7 @@ function DrivePane({
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
                 >
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: "rgba(110,86,255,0.12)", border: "1px solid rgba(110,86,255,0.2)" }}>
+                    style={{ background: "color-mix(in srgb, var(--accent-1) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)" }}>
                     <FolderOpen size={16} style={{ color: "var(--accent-1)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -1705,8 +1694,8 @@ function ProjectsPane({
                       onClick={() => onSelectProject(proj.id)}
                       className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200"
                       style={isActive ? {
-                        background: "linear-gradient(135deg, rgba(110,86,255,0.18) 0%, rgba(0,224,203,0.06) 100%)",
-                        border: "1px solid rgba(110,86,255,0.3)",
+                        background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 18%, transparent) 0%, color-mix(in srgb, var(--accent-2) 6%, transparent) 100%)",
+                        border: "1px solid color-mix(in srgb, var(--accent-1) 30%, transparent)",
                       } : {
                         background: "rgba(255,255,255,0.03)",
                         border: "1px solid rgba(255,255,255,0.07)",
@@ -1714,8 +1703,8 @@ function ProjectsPane({
                     >
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                         style={{
-                          background: isActive ? "rgba(110,86,255,0.2)" : "rgba(255,255,255,0.05)",
-                          border: isActive ? "1px solid rgba(110,86,255,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                          background: isActive ? "color-mix(in srgb, var(--accent-1) 20%, transparent)" : "rgba(255,255,255,0.05)",
+                          border: isActive ? "1px solid color-mix(in srgb, var(--accent-1) 30%, transparent)" : "1px solid rgba(255,255,255,0.07)",
                         }}>
                         <FolderOpen size={14} style={{ color: isActive ? "var(--accent-1)" : "var(--text-faint)" }} />
                       </div>
@@ -1746,7 +1735,7 @@ function ProjectsPane({
                 <div className="flex items-center gap-3 mb-4">
                   <h2 className="text-sm font-semibold text-text-hi flex-1">{activeProject.name}</h2>
                   <span className="text-xs font-mono px-2 py-0.5 rounded-md shrink-0"
-                    style={{ background: "rgba(110,86,255,0.12)", border: "1px solid rgba(110,86,255,0.2)", color: "var(--accent-1)" }}>
+                    style={{ background: "color-mix(in srgb, var(--accent-1) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)", color: "var(--accent-1)" }}>
                     {projectFilesLoading ? "…" : `${projectFiles.length} files`}
                   </span>
                 </div>
@@ -1873,9 +1862,9 @@ function ClientRequestsPane({ requests, userEmail, onSubmitRequest }: ClientRequ
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300"
             style={{
-              background: "linear-gradient(135deg, rgba(110,86,255,0.9) 0%, rgba(0,224,203,0.7) 100%)",
+              background: "linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%)",
               color: "white",
-              boxShadow: "0 4px 20px -6px rgba(110,86,255,0.5)"
+              boxShadow: "0 4px 20px -6px color-mix(in srgb, var(--accent-1) 50%, transparent)"
             }}
           >
             <Plus size={14} />
@@ -1921,7 +1910,7 @@ function ClientRequestsPane({ requests, userEmail, onSubmitRequest }: ClientRequ
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                       <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md"
-                        style={{ background: "rgba(110,86,255,0.1)", color: "var(--accent-1)", border: "1px solid rgba(110,86,255,0.2)" }}>
+                        style={{ background: "color-mix(in srgb, var(--accent-1) 10%, transparent)", color: "var(--accent-1)", border: "1px solid color-mix(in srgb, var(--accent-1) 20%, transparent)" }}>
                         {req.category}
                       </span>
                       <span className={cn(
@@ -2050,8 +2039,8 @@ function ClientRequestsPane({ requests, userEmail, onSubmitRequest }: ClientRequ
                 type="submit"
                 className="w-full py-3 mt-2 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all duration-300"
                 style={{
-                  background: "linear-gradient(135deg, rgba(110,86,255,0.9) 0%, rgba(0,224,203,0.7) 100%)",
-                  boxShadow: "0 4px 20px -6px rgba(110,86,255,0.5)"
+                  background: "linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%)",
+                  boxShadow: "0 4px 20px -6px color-mix(in srgb, var(--accent-1) 50%, transparent)"
                 }}
               >
                 Submit Request
@@ -2158,8 +2147,8 @@ function ManageRequestsPane({ requests, onUpdateStatus, onAssignStaff }: ManageR
                       onClick={() => setSelectedRequest(req)}
                       className="w-full text-left px-5 py-4 rounded-xl transition-all duration-200"
                       style={isActive ? {
-                        background: "linear-gradient(135deg, rgba(110,86,255,0.12) 0%, rgba(0,224,203,0.04) 100%)",
-                        border: "1px solid rgba(110,86,255,0.3)"
+                        background: "linear-gradient(135deg, color-mix(in srgb, var(--accent-1) 12%, transparent) 0%, color-mix(in srgb, var(--accent-2) 4%, transparent) 100%)",
+                        border: "1px solid color-mix(in srgb, var(--accent-1) 30%, transparent)"
                       } : {
                         background: "rgba(255,255,255,0.03)",
                         border: "1px solid rgba(255,255,255,0.07)"
@@ -2750,7 +2739,7 @@ export function DashboardShell({
 
           <div className="ml-auto">
             <div className="px-2.5 py-1 rounded-lg text-[10px] font-mono tracking-wider uppercase"
-              style={{ background: "rgba(110,86,255,0.12)", border: "1px solid rgba(110,86,255,0.22)", color: "var(--accent-1)" }}>
+              style={{ background: "color-mix(in srgb, var(--accent-1) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--accent-1) 22%, transparent)", color: "var(--accent-1)" }}>
               v1.0.0
             </div>
           </div>

@@ -10,22 +10,22 @@ import {
   Check,
   Sparkles,
   ArrowLeft,
-  Monitor,
-  User,
-  Bell,
-  Shield,
   LayoutDashboard,
   MessageSquareText,
   FolderOpen,
   Mail,
   HardDriveUpload,
   LogOut,
+  Type,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useTheme, type CursorStyleType } from "@/lib/theme/ThemeProvider";
+import { useTheme, type CursorStyleType, type FontStyleType } from "@/lib/theme/ThemeProvider";
 import { type Palette as PaletteType } from "@/lib/theme/palettes";
 import { StaggerContainer, StaggerItem } from "@/components/motion/AnimationWrappers";
 import { audioSynth } from "@/lib/audio";
+import { HeaderLogo } from "@/components/chrome/Header";
+import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 /* Ambient color glow */
 function AmbientOrbs({ palette }: { palette: PaletteType }) {
@@ -59,20 +59,9 @@ function SettingsSidebar() {
         backdropFilter: "blur(20px)",
       }}
     >
-      <div className="px-4 pt-5 pb-4 border-b border-white/[0.04]">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 shrink-0 relative">
-            <Image
-              src="/images/logo/logo-white.svg"
-              alt="YantraCore logo"
-              fill
-              style={{ objectFit: "contain" }}
-              priority
-            />
-          </div>
-          <div>
-            <span className="text-sm font-bold text-text-hi tracking-tight font-display">YantraCore</span>
-          </div>
+      <div className="px-4 pt-5 pb-4 border-b border-white/[0.04] flex justify-center">
+        <Link href="/" className="flex items-center justify-center">
+          <ColorfulLogo size={32} />
         </Link>
       </div>
 
@@ -125,21 +114,23 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
     palette,
     palettes,
     setPaletteId,
-    themeMode,
-    setThemeMode,
     cursorStyle,
     setCursorStyle,
     customCursorEnabled,
     setCustomCursorEnabled,
     resetCursorSettings,
-    reducedMotionEnabled,
-    setReducedMotionEnabled,
+    fontStyle,
+    setFontStyle,
+    logoHeartbeatEnabled,
+    setLogoHeartbeatEnabled,
   } = useTheme();
 
   const [toastVisible, setToastVisible] = useState(false);
+  const [toastText, setToastText] = useState("Settings updated");
 
   function handlePaletteSelect(id: string) {
     setPaletteId(id);
+    setToastText("Theme updated");
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 2000);
   }
@@ -186,7 +177,7 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
               }}
             >
               <Check size={9} strokeWidth={3} />
-              Theme updated
+              {toastText}
             </div>
           </header>
         )}
@@ -214,12 +205,13 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
           </StaggerItem>
 
           {/* Unified Compact Settings Card */}
-          <StaggerItem className="rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-xl overflow-hidden shadow-xl">
+          <StaggerItem className="rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-xl overflow-hidden shadow-xl relative">
+            <div className="h-[2px] w-full" style={{ background: `linear-gradient(to right, ${palette.accent1}, ${palette.accent2})` }} />
             
             {/* 1. Theme Selection Row */}
             <div className="p-4 border-b border-white/5">
               <div className="flex items-center gap-2 mb-3">
-                <Palette size={14} className="text-text-mid" />
+                <Palette size={14} style={{ color: palette.accent1 }} />
                 <p className="text-xs font-semibold text-text-hi">Color Theme</p>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -232,9 +224,14 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
                       className={cn(
                         "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer",
                         isActive
-                          ? "bg-white/10 border-white/20 text-white shadow"
+                          ? "text-white shadow"
                           : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
                       )}
+                      style={isActive ? {
+                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
+                        borderColor: `${palette.accent1}50`,
+                        boxShadow: `0 0 12px ${palette.accent1}20`,
+                      } : {}}
                     >
                       <div className="flex items-center gap-0.5 shrink-0">
                         {[p.accent1, p.accent2, p.accent3, p.accentWarm].map((c, i) => (
@@ -253,10 +250,58 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
               </div>
             </div>
 
+            {/* Font Style Selection Row */}
+            <div className="p-4 border-b border-white/5">
+              <div className="flex items-center gap-2 mb-3">
+                <Type size={14} style={{ color: palette.accent2 }} />
+                <p className="text-xs font-semibold text-text-hi">Font Style</p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "default", name: "Crystal Tech", desc: "Space Grotesk + Inter", emoji: "💎" },
+                  { id: "cyber", name: "Aero Cyber", desc: "Orbitron + Space Grotesk", emoji: "🚀" },
+                  { id: "wide", name: "Quantum Wide", desc: "Syncopate + Inter", emoji: "🌌" },
+                  { id: "mono", name: "Neo-Chrono", desc: "JetBrains Mono + Mono", emoji: "📟" },
+                  { id: "avant-garde", name: "Chroma Organic", desc: "Syne + Outfit", emoji: "🎨" },
+                ].map((f) => {
+                  const isActive = f.id === fontStyle;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        audioSynth.playClick();
+                        setFontStyle(f.id as FontStyleType);
+                        setToastText("Fonts updated");
+                        setToastVisible(true);
+                        setTimeout(() => setToastVisible(false), 2000);
+                      }}
+                      className={cn(
+                        "flex flex-col items-start px-3 py-1.5 rounded-lg text-left border transition-all duration-200 cursor-pointer min-w-[130px] flex-1",
+                        isActive
+                          ? "text-white shadow"
+                          : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
+                      )}
+                      style={isActive ? {
+                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
+                        borderColor: `${palette.accent1}50`,
+                        boxShadow: `0 0 12px ${palette.accent1}20`,
+                      } : {}}
+                    >
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-xs shrink-0">{f.emoji}</span>
+                        <span className="text-[11px] font-bold">{f.name}</span>
+                      </div>
+                      <span className="text-[9px] opacity-60 leading-none">{f.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* 2. Cursor Design Selector */}
             <div className="p-4 border-b border-white/5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles size={14} className="text-text-mid" />
+                <Sparkles size={14} style={{ color: palette.accent3 }} />
                 <p className="text-xs font-semibold text-text-hi">Cursor Design</p>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -283,13 +328,17 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
                         }
                         setCursorStyle(c.id as CursorStyleType);
                       }}
-                      disabled={!customCursorEnabled && !isDefault}
                       className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed",
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer",
                         isActive
-                          ? "bg-white/10 border-white/20 text-white shadow"
+                          ? "text-white shadow"
                           : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
                       )}
+                      style={isActive ? {
+                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
+                        borderColor: `${palette.accent1}50`,
+                        boxShadow: `0 0 12px ${palette.accent1}20`,
+                      } : {}}
                     >
                       <span className="text-xs">{c.icon}</span>
                       <span>{c.name}</span>
@@ -299,137 +348,56 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
               </div>
             </div>
 
-            {/* 3. Display Settings Toggles */}
-            <div className="p-4 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-3">
-                <Monitor size={14} className="text-text-mid" />
-                <p className="text-xs font-semibold text-text-hi">Display & Animation</p>
-              </div>
-              
-              <div className="space-y-2.5">
-                {/* Toggle 0: Theme Mode (Light / Dark) */}
-                <div className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-white/[0.01] transition-all">
-                  <div>
-                    <p className="text-[11px] font-medium text-text-hi">Neumorphic Light Theme</p>
-                    <p className="text-[10px] text-text-faint mt-0.5">Switch between retro dark-mesh and physical light neumorphic styles</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      audioSynth.playClick();
-                      setThemeMode(themeMode === "dark" ? "light" : "dark");
-                    }}
-                    className="relative w-8 h-4.5 rounded-full transition-all duration-200 focus:outline-none shrink-0 cursor-pointer"
-                    style={{
-                      background: themeMode === "light" ? "var(--accent-1)" : "rgba(255,255,255,0.08)",
-                      width: "34px",
-                      height: "18px",
-                    }}
-                  >
-                    <span
-                      className="absolute top-[2px] w-3.5 h-3.5 rounded-full bg-white shadow transition-all duration-200"
-                      style={{ left: themeMode === "light" ? "calc(100% - 16px)" : "2px" }}
-                    />
-                  </button>
-                </div>
-
-                {/* Toggle 1: Custom Cursor */}
-                <div className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-white/[0.01] transition-all">
-                  <div>
-                    <p className="text-[11px] font-medium text-text-hi">Custom Cursor</p>
-                    <p className="text-[10px] text-text-faint mt-0.5">Render glowing futuristic pointers instead of standard system arrow</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      audioSynth.playClick();
-                      setCustomCursorEnabled(!customCursorEnabled);
-                    }}
-                    className="relative w-8 h-4.5 rounded-full transition-all duration-200 focus:outline-none shrink-0 cursor-pointer"
-                    style={{
-                      background: customCursorEnabled ? "var(--accent-1)" : "rgba(255,255,255,0.08)",
-                      width: "34px",
-                      height: "18px",
-                    }}
-                  >
-                    <span
-                      className="absolute top-[2px] w-3.5 h-3.5 rounded-full bg-white shadow transition-all duration-200"
-                      style={{ left: customCursorEnabled ? "calc(100% - 16px)" : "2px" }}
-                    />
-                  </button>
-                </div>
-
-                {/* Toggle 2: Reduced Motion */}
-                <div className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-white/[0.01] transition-all">
-                  <div>
-                    <p className="text-[11px] font-medium text-text-hi">Reduced Motion</p>
-                    <p className="text-[10px] text-text-faint mt-0.5">Freeze background meshes, tickers, and transitions globally</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setReducedMotionEnabled(!reducedMotionEnabled)}
-                    className="relative w-8 h-4.5 rounded-full transition-all duration-200 focus:outline-none shrink-0 cursor-pointer"
-                    style={{
-                      background: reducedMotionEnabled ? "var(--accent-1)" : "rgba(255,255,255,0.08)",
-                      width: "34px",
-                      height: "18px",
-                    }}
-                  >
-                    <span
-                      className="absolute top-[2px] w-3.5 h-3.5 rounded-full bg-white shadow transition-all duration-200"
-                      style={{ left: reducedMotionEnabled ? "calc(100% - 16px)" : "2px" }}
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Profile Section Context */}
+            {/* 3. Logo Animation Settings */}
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <User size={14} className="text-text-mid" />
-                <p className="text-xs font-semibold text-text-hi">Workspace Context</p>
+                <Activity size={14} style={{ color: palette.accentWarm }} />
+                <p className="text-xs font-semibold text-text-hi">Logo Animation</p>
               </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 text-white"
-                    style={{ background: `linear-gradient(135deg, var(--accent-1) 0%, var(--accent-3) 100%)` }}
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="flex-1">
+                  <p className="text-[11px] text-text-mid mb-2">
+                    Enable the dynamic "heartbeat" squish effect on logos throughout the application.
+                  </p>
+                  <button
+                    onClick={() => {
+                      audioSynth.playClick();
+                      setLogoHeartbeatEnabled(!logoHeartbeatEnabled);
+                      setToastText(logoHeartbeatEnabled ? "Logo heartbeat disabled" : "Logo heartbeat enabled");
+                      setToastVisible(true);
+                      setTimeout(() => setToastVisible(false), 2000);
+                    }}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer w-fit",
+                      logoHeartbeatEnabled
+                        ? "text-white shadow"
+                        : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
+                    )}
+                    style={logoHeartbeatEnabled ? {
+                      background: `linear-gradient(135deg, ${palette.accentWarm}1c, ${palette.accent3}0c)`,
+                      borderColor: `${palette.accentWarm}50`,
+                      boxShadow: `0 0 12px ${palette.accentWarm}20`,
+                    } : {}}
                   >
-                    T
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-medium text-text-hi">Test User</p>
-                    <p className="text-[10px] text-text-faint mt-0.5">test@yantracore.com</p>
-                  </div>
+                    <div className={cn(
+                      "w-2 h-2 rounded-full",
+                      logoHeartbeatEnabled ? "bg-white animate-pulse" : "bg-white/30"
+                    )} />
+                    {logoHeartbeatEnabled ? "Heartbeat Enabled" : "Heartbeat Disabled"}
+                  </button>
                 </div>
-                <button
-                  disabled
-                  className="text-[10px] px-2.5 py-1 rounded border border-white/5 bg-white/[0.01] text-text-faint opacity-50 cursor-not-allowed"
+                
+                {/* Live Preview Container */}
+                <div 
+                  className="flex flex-col items-center gap-2 p-3 rounded-xl border border-white/5 bg-[#06070D] shrink-0"
+                  style={{ width: "120px", boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)" }}
                 >
-                  Admin
-                </button>
+                  <span className="text-[9px] font-mono text-text-faint uppercase tracking-wider">Preview</span>
+                  <HeaderLogo size="small" />
+                </div>
               </div>
             </div>
 
-          </StaggerItem>
-
-          {/* Placeholders for secondary screens */}
-          <StaggerItem className="grid grid-cols-2 gap-3 mt-4 opacity-50">
-            <div className="p-3 rounded-lg border border-dashed border-white/10 bg-white/[0.01]">
-              <div className="flex items-center gap-2 text-text-low text-[10px] font-semibold">
-                <Bell size={12} />
-                Notifications
-              </div>
-              <p className="text-[9px] text-text-faint mt-1">Configure email alerts (Coming soon)</p>
-            </div>
-            <div className="p-3 rounded-lg border border-dashed border-white/10 bg-white/[0.01]">
-              <div className="flex items-center gap-2 text-text-low text-[10px] font-semibold">
-                <Shield size={12} />
-                Security Keys
-              </div>
-              <p className="text-[9px] text-text-faint mt-1">Manage 2FA preferences (Coming soon)</p>
-            </div>
           </StaggerItem>
 
           <div className="h-12" />
