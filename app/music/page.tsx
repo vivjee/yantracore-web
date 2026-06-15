@@ -101,6 +101,9 @@ export default function MusicPage() {
   };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Logical (CSS-pixel) canvas size + device pixel ratio, kept in a ref so the
+  // render loop can read the current dimensions without restarting on resize.
+  const sizeRef = useRef({ w: 1, h: 1, dpr: 1 });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize Audio Visualizer Canvas Rendering
@@ -111,13 +114,20 @@ export default function MusicPage() {
     const ctx2d = canvas.getContext("2d");
     if (!ctx2d) return;
 
+    // Allocate analyser buffers once per (re)subscription instead of every frame.
+    const bufferLength = analyser ? analyser.frequencyBinCount : 128;
+    const freqData = new Uint8Array(bufferLength);
+    const timeData = new Uint8Array(bufferLength);
+
     let localFrameId: number;
 
     const draw = () => {
       localFrameId = requestAnimationFrame(draw);
 
-      const width = canvas.width;
-      const height = canvas.height;
+      // Draw in logical pixels; the backing store is scaled by dpr for crispness.
+      const { w: width, h: height, dpr } = sizeRef.current;
+      if (width <= 0 || height <= 0) return;
+      ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Color maps based on visualizerColor theme
       let cLow = "rgba(110, 86, 255, 0.15)";
@@ -164,11 +174,8 @@ export default function MusicPage() {
       }
 
       if (analyser && isPlaying) {
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-
         if (visualizerStyle === "scope") {
-          analyser.getByteTimeDomainData(dataArray);
+          analyser.getByteTimeDomainData(timeData);
 
           ctx2d.beginPath();
           ctx2d.strokeStyle = cHi;
@@ -180,7 +187,7 @@ export default function MusicPage() {
           let xWave = 0;
 
           for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
+            const v = timeData[i] / 128.0;
             const yWave = (v * height / 2);
 
             if (i === 0) {
@@ -196,13 +203,13 @@ export default function MusicPage() {
           ctx2d.stroke();
         } 
         else if (visualizerStyle === "circular") {
-          analyser.getByteFrequencyData(dataArray);
+          analyser.getByteFrequencyData(freqData);
           const centerX = width / 2;
           const centerY = height / 2;
           const baseRadius = isVisualizerExpanded ? Math.min(width, height) * 0.35 : Math.min(width, height) * 0.22;
 
           let bassSum = 0;
-          for (let i = 0; i < 8; i++) bassSum += dataArray[i];
+          for (let i = 0; i < 8; i++) bassSum += freqData[i];
           const bassAvg = bassSum / 8;
           const radius = baseRadius + (bassAvg / 255) * (isVisualizerExpanded ? 24 : 12);
 
@@ -220,7 +227,7 @@ export default function MusicPage() {
           for (let i = 0; i < numBars; i++) {
             const angle = (i / numBars) * 2 * Math.PI;
             const dataIndex = Math.floor((i / numBars) * (bufferLength / 2));
-            const value = dataArray[dataIndex] / 255;
+            const value = freqData[dataIndex] / 255;
             const barLength = value * (isVisualizerExpanded ? 60 : 30);
 
             const startX = centerX + Math.cos(angle) * radius;
@@ -237,13 +244,13 @@ export default function MusicPage() {
           }
         }
         else if (visualizerStyle === "bars") {
-          analyser.getByteFrequencyData(dataArray);
+          analyser.getByteFrequencyData(freqData);
           const numBars = isVisualizerExpanded ? 64 : 48;
           const barWidth = (width / numBars) - 2;
           let x = 0;
 
           for (let i = 0; i < numBars; i++) {
-            const percent = dataArray[i] / 255;
+            const percent = freqData[i] / 255;
             const barHeight = percent * (height - 35);
             
             const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
@@ -260,14 +267,14 @@ export default function MusicPage() {
           }
         }
         else { // "mixed"
-          analyser.getByteFrequencyData(dataArray);
+          analyser.getByteFrequencyData(freqData);
 
           // Mirrored frequencies
           const barWidth = (width / 32) - 3;
           let x = 0;
 
           for (let i = 0; i < 32; i++) {
-            const percent = dataArray[i] / 255;
+            const percent = freqData[i] / 255;
             const barHeight = percent * (height - 35);
             
             const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
@@ -286,8 +293,7 @@ export default function MusicPage() {
           }
 
           // Central oscilloscope
-          const timeArray = new Uint8Array(bufferLength);
-          analyser.getByteTimeDomainData(timeArray);
+          analyser.getByteTimeDomainData(timeData);
 
           ctx2d.beginPath();
           ctx2d.lineWidth = 1.5;
@@ -299,7 +305,7 @@ export default function MusicPage() {
           let xWave = 0;
 
           for (let i = 0; i < bufferLength; i++) {
-            const v = timeArray[i] / 128.0;
+            const v = timeData[i] / 128.0;
             const yWave = (v * height / 2);
 
             if (i === 0) {
@@ -340,28 +346,53 @@ export default function MusicPage() {
     };
   }, [isPlaying, analyser, visualizerStyle, visualizerColor, isVisualizerExpanded]);
 
-  // Resize canvas bounds dynamically using ResizeObserver
+  // Keep the canvas backing store matched to its rendered size (DPR-aware).
+  //
+  // The expand/collapse animation reflows this canvas for ~300ms. Re-sizing the
+  // backing store mid-transition would clear it every frame and make the
+  // visualization look like it "disappears" until the layout settles. Instead we
+  // keep the current backing store (the browser just scales it — a smooth zoom)
+  // and only commit a fresh, crisp size once movement has stopped. Explicit snaps
+  // after the toggle guarantee the final size even if no resize event lands.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleResize = () => {
+    const applySize = () => {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(rect.width, 1);
-      canvas.height = Math.max(rect.height, 1);
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = Math.max(rect.width, 1);
+      const cssH = Math.max(rect.height, 1);
+      sizeRef.current = { w: cssW, h: cssH, dpr };
+
+      const pxW = Math.round(cssW * dpr);
+      const pxH = Math.round(cssH * dpr);
+      // Only touch the backing store when it actually changes — assigning
+      // width/height clears the canvas, so avoid redundant clears.
+      if (canvas.width !== pxW || canvas.height !== pxH) {
+        canvas.width = pxW;
+        canvas.height = pxH;
+      }
     };
 
+    let debounceId: ReturnType<typeof setTimeout>;
     const observer = new ResizeObserver(() => {
-      handleResize();
+      clearTimeout(debounceId);
+      debounceId = setTimeout(applySize, 120);
     });
-
     observer.observe(canvas);
-    handleResize();
+
+    // Track logical size immediately, then snap to a crisp size once the
+    // expand/collapse transition (duration-300) has finished.
+    applySize();
+    const settleId = setTimeout(applySize, 340);
 
     return () => {
       observer.disconnect();
+      clearTimeout(debounceId);
+      clearTimeout(settleId);
     };
-  }, []);
+  }, [isVisualizerExpanded]);
 
   // Handle local file upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -541,11 +572,11 @@ export default function MusicPage() {
                 
                 {/* Visualizer Canvas Container */}
                 <div className={`relative group overflow-hidden rounded-lg ${isVisualizerExpanded ? "flex-1 my-3 flex flex-col min-h-0" : "w-full"}`}>
-                  <canvas 
-                    ref={canvasRef} 
-                    className={`w-full rounded-lg bg-black/40 border border-white/5 transition-all duration-300 cursor-pointer ${
-                      isVisualizerExpanded ? "flex-1" : "h-[140px]"
-                    }`} 
+                  <canvas
+                    ref={canvasRef}
+                    className={`w-full rounded-lg bg-black/40 border border-white/5 ${
+                      isVisualizerExpanded ? "flex-1 cursor-default" : "h-[140px] cursor-pointer"
+                    }`}
                     onClick={() => {
                       if (!isVisualizerExpanded) {
                         toggleVisualizerExpanded();
