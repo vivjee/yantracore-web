@@ -28,9 +28,21 @@ import {
   CloudRain,
   Cpu,
   Sparkles,
+  ChevronDown,
+  Wand2,
 } from "lucide-react";
 import { useAudioPlayer, Track } from "@/lib/audio/AudioPlayerContext";
 import { audioSynth } from "@/lib/audio";
+import {
+  VISUALIZERS,
+  PALETTES,
+  getVisualizer,
+  makeAnalysis,
+  updateAnalysis,
+  type Analysis,
+  type ColorKey,
+  type VizFrame,
+} from "@/lib/audio/visualizers";
 
 export default function MusicPage() {
   const {
@@ -84,8 +96,12 @@ export default function MusicPage() {
   const [isLocalGlitching, setIsLocalGlitching] = useState(false);
   const [activeConsoleTab, setActiveConsoleTab] = useState<"eq" | "ambient">("ambient");
   const [customUrl, setCustomUrl] = useState("");
-  const [visualizerStyle, setVisualizerStyle] = useState<"mixed" | "bars" | "scope" | "circular">("mixed");
-  const [visualizerColor, setVisualizerColor] = useState<"teal" | "purple" | "amber" | "emerald">("teal");
+  const [visualizerStyle, setVisualizerStyle] = useState<string>("mixed");
+  const [visualizerColor, setVisualizerColor] = useState<ColorKey>("teal");
+  const [isVizMenuOpen, setIsVizMenuOpen] = useState(false);
+  const [autoCycle, setAutoCycle] = useState(false);
+
+  const currentViz = getVisualizer(visualizerStyle);
 
   const toggleVisualizerExpanded = () => {
     if (isVisualizerExpanded) {
@@ -104,9 +120,17 @@ export default function MusicPage() {
   // Logical (CSS-pixel) canvas size + device pixel ratio, kept in a ref so the
   // render loop can read the current dimensions without restarting on resize.
   const sizeRef = useRef({ w: 1, h: 1, dpr: 1 });
+  // Smoothing / beat-detection state, persisted across effect re-subscriptions.
+  const analysisRef = useRef<Analysis | null>(null);
+  // Per-visualizer scratch space (particles, ring lists, spectrogram buffers…).
+  const vizStateRef = useRef<Record<string, unknown>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize Audio Visualizer Canvas Rendering
+  // Audio Visualizer render loop.
+  //
+  // A single rAF loop pulls analyser bytes, derives a smoothed/beat-aware
+  // Analysis, then dispatches to the active visualizer module. All shared
+  // smoothing + beat state lives in refs so it survives effect re-subscriptions.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -119,6 +143,10 @@ export default function MusicPage() {
     const freqData = new Uint8Array(bufferLength);
     const timeData = new Uint8Array(bufferLength);
 
+    if (!analysisRef.current || analysisRef.current.smooth.length !== bufferLength) {
+      analysisRef.current = makeAnalysis(bufferLength);
+    }
+
     let localFrameId: number;
 
     const draw = () => {
@@ -129,214 +157,39 @@ export default function MusicPage() {
       if (width <= 0 || height <= 0) return;
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Color maps based on visualizerColor theme
-      let cLow = "rgba(110, 86, 255, 0.15)";
-      let cMid = "rgba(110, 86, 255, 0.7)";
-      let cHi = "rgba(0, 224, 203, 1)";
-      let shadowColor = "rgba(0, 224, 203, 0.4)";
-
-      if (visualizerColor === "purple") {
-        cLow = "rgba(255, 79, 176, 0.15)";
-        cMid = "rgba(255, 79, 176, 0.7)";
-        cHi = "rgba(110, 86, 255, 1)";
-        shadowColor = "rgba(110, 86, 255, 0.4)";
-      } else if (visualizerColor === "amber") {
-        cLow = "rgba(239, 68, 68, 0.15)";
-        cMid = "rgba(239, 68, 68, 0.7)";
-        cHi = "rgba(245, 158, 11, 1)";
-        shadowColor = "rgba(245, 158, 11, 0.4)";
-      } else if (visualizerColor === "emerald") {
-        cLow = "rgba(59, 130, 246, 0.15)";
-        cMid = "rgba(59, 130, 246, 0.7)";
-        cHi = "rgba(16, 185, 129, 1)";
-        shadowColor = "rgba(16, 185, 129, 0.4)";
-      }
-
-      // Trail fade background
-      ctx2d.fillStyle = "rgba(6, 7, 13, 0.22)";
-      ctx2d.fillRect(0, 0, width, height);
-
-      // Draw glowing background grid
-      ctx2d.strokeStyle = "rgba(255, 255, 255, 0.012)";
-      ctx2d.lineWidth = 1;
-      const gridSize = 16;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx2d.beginPath();
-        ctx2d.moveTo(x, 0);
-        ctx2d.lineTo(x, height);
-        ctx2d.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx2d.beginPath();
-        ctx2d.moveTo(0, y);
-        ctx2d.lineTo(width, y);
-        ctx2d.stroke();
-      }
-
-      if (analyser && isPlaying) {
-        if (visualizerStyle === "scope") {
-          analyser.getByteTimeDomainData(timeData);
-
-          ctx2d.beginPath();
-          ctx2d.strokeStyle = cHi;
-          ctx2d.lineWidth = isVisualizerExpanded ? 3 : 1.5;
-          ctx2d.shadowBlur = 10;
-          ctx2d.shadowColor = shadowColor;
-
-          const sliceWidth = width / bufferLength;
-          let xWave = 0;
-
-          for (let i = 0; i < bufferLength; i++) {
-            const v = timeData[i] / 128.0;
-            const yWave = (v * height / 2);
-
-            if (i === 0) {
-              ctx2d.moveTo(xWave, yWave);
-            } else {
-              ctx2d.lineTo(xWave, yWave);
-            }
-
-            xWave += sliceWidth;
-          }
-
-          ctx2d.lineTo(width, height / 2);
-          ctx2d.stroke();
-        } 
-        else if (visualizerStyle === "circular") {
-          analyser.getByteFrequencyData(freqData);
-          const centerX = width / 2;
-          const centerY = height / 2;
-          const baseRadius = isVisualizerExpanded ? Math.min(width, height) * 0.35 : Math.min(width, height) * 0.22;
-
-          let bassSum = 0;
-          for (let i = 0; i < 8; i++) bassSum += freqData[i];
-          const bassAvg = bassSum / 8;
-          const radius = baseRadius + (bassAvg / 255) * (isVisualizerExpanded ? 24 : 12);
-
-          // Central ring
-          ctx2d.beginPath();
-          ctx2d.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-          ctx2d.strokeStyle = cHi;
-          ctx2d.lineWidth = isVisualizerExpanded ? 4.5 : 2;
-          ctx2d.shadowBlur = 15;
-          ctx2d.shadowColor = shadowColor;
-          ctx2d.stroke();
-
-          // Spikes
-          const numBars = 60;
-          for (let i = 0; i < numBars; i++) {
-            const angle = (i / numBars) * 2 * Math.PI;
-            const dataIndex = Math.floor((i / numBars) * (bufferLength / 2));
-            const value = freqData[dataIndex] / 255;
-            const barLength = value * (isVisualizerExpanded ? 60 : 30);
-
-            const startX = centerX + Math.cos(angle) * radius;
-            const startY = centerY + Math.sin(angle) * radius;
-            const endX = centerX + Math.cos(angle) * (radius + barLength);
-            const endY = centerY + Math.sin(angle) * (radius + barLength);
-
-            ctx2d.beginPath();
-            ctx2d.moveTo(startX, startY);
-            ctx2d.lineTo(endX, endY);
-            ctx2d.strokeStyle = cMid;
-            ctx2d.lineWidth = isVisualizerExpanded ? 3.5 : 1.75;
-            ctx2d.stroke();
-          }
-        }
-        else if (visualizerStyle === "bars") {
-          analyser.getByteFrequencyData(freqData);
-          const numBars = isVisualizerExpanded ? 64 : 48;
-          const barWidth = (width / numBars) - 2;
-          let x = 0;
-
-          for (let i = 0; i < numBars; i++) {
-            const percent = freqData[i] / 255;
-            const barHeight = percent * (height - 35);
-            
-            const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
-            gradient.addColorStop(0, cLow);
-            gradient.addColorStop(0.5, cMid);
-            gradient.addColorStop(1, cHi);
-
-            ctx2d.fillStyle = gradient;
-            ctx2d.shadowBlur = 6;
-            ctx2d.shadowColor = shadowColor;
-
-            ctx2d.fillRect(x, height - barHeight - 8, barWidth, barHeight);
-            x += barWidth + 2;
-          }
-        }
-        else { // "mixed"
-          analyser.getByteFrequencyData(freqData);
-
-          // Mirrored frequencies
-          const barWidth = (width / 32) - 3;
-          let x = 0;
-
-          for (let i = 0; i < 32; i++) {
-            const percent = freqData[i] / 255;
-            const barHeight = percent * (height - 35);
-            
-            const gradient = ctx2d.createLinearGradient(0, height, 0, height - barHeight);
-            gradient.addColorStop(0, cLow);
-            gradient.addColorStop(0.5, cMid);
-            gradient.addColorStop(1, cHi);
-
-            ctx2d.fillStyle = gradient;
-            ctx2d.shadowBlur = 8;
-            ctx2d.shadowColor = shadowColor;
-
-            ctx2d.fillRect(width / 2 + x, height - barHeight - 10, barWidth, barHeight);
-            ctx2d.fillRect(width / 2 - x - barWidth, height - barHeight - 10, barWidth, barHeight);
-
-            x += barWidth + 3;
-          }
-
-          // Central oscilloscope
-          analyser.getByteTimeDomainData(timeData);
-
-          ctx2d.beginPath();
-          ctx2d.lineWidth = 1.5;
-          ctx2d.strokeStyle = cHi;
-          ctx2d.shadowBlur = 10;
-          ctx2d.shadowColor = shadowColor;
-
-          const sliceWidth = width / bufferLength;
-          let xWave = 0;
-
-          for (let i = 0; i < bufferLength; i++) {
-            const v = timeData[i] / 128.0;
-            const yWave = (v * height / 2);
-
-            if (i === 0) {
-              ctx2d.moveTo(xWave, yWave);
-            } else {
-              ctx2d.lineTo(xWave, yWave);
-            }
-
-            xWave += sliceWidth;
-          }
-
-          ctx2d.lineTo(width, height / 2);
-          ctx2d.stroke();
-        }
+      if (analyser) {
+        analyser.getByteFrequencyData(freqData);
+        analyser.getByteTimeDomainData(timeData);
       } else {
-        // Idle ambient line
-        ctx2d.beginPath();
-        ctx2d.lineWidth = 1;
-        ctx2d.strokeStyle = cLow;
-        ctx2d.shadowBlur = 0;
-        ctx2d.moveTo(0, height / 2);
-        
-        const time = Date.now() * 0.003;
-        for (let ix = 0; ix < width; ix += 5) {
-          const wobble = Math.sin(ix * 0.05 + time) * 1.5;
-          ctx2d.lineTo(ix, height / 2 + wobble);
-        }
-        ctx2d.stroke();
+        freqData.fill(0);
+        timeData.fill(128);
       }
 
+      const t = performance.now() / 1000;
+      const analysis = analysisRef.current!;
+      updateAnalysis(analysis, freqData, timeData, t, isPlaying);
+
+      const frame: VizFrame = {
+        ctx: ctx2d,
+        width,
+        height,
+        dpr,
+        freq: freqData,
+        time: timeData,
+        a: analysis,
+        palette: PALETTES[visualizerColor] || PALETTES.teal,
+        expanded: isVisualizerExpanded,
+        playing: isPlaying,
+        t,
+        state: vizStateRef.current,
+      };
+
+      getVisualizer(visualizerStyle).draw(frame);
+
+      // Reset shared context state so visualizers never leak into each other.
       ctx2d.shadowBlur = 0;
+      ctx2d.globalCompositeOperation = "source-over";
+      ctx2d.globalAlpha = 1;
     };
 
     draw();
@@ -345,6 +198,24 @@ export default function MusicPage() {
       cancelAnimationFrame(localFrameId);
     };
   }, [isPlaying, analyser, visualizerStyle, visualizerColor, isVisualizerExpanded]);
+
+  // Reset per-visualizer scratch when switching modes so old particles / rings
+  // / spectrogram buffers don't bleed into the next visualizer.
+  useEffect(() => {
+    vizStateRef.current = {};
+  }, [visualizerStyle]);
+
+  // Auto-cycle through visualizers for hands-off ambience.
+  useEffect(() => {
+    if (!autoCycle) return;
+    const id = setInterval(() => {
+      setVisualizerStyle((prev) => {
+        const i = VISUALIZERS.findIndex((v) => v.value === prev);
+        return VISUALIZERS[(i + 1) % VISUALIZERS.length].value;
+      });
+    }, 12000);
+    return () => clearInterval(id);
+  }, [autoCycle]);
 
   // Keep the canvas backing store matched to its rendered size (DPR-aware).
   //
@@ -449,14 +320,6 @@ export default function MusicPage() {
     return `${m}:${String(s).padStart(2, "0")}`;
   };
 
-  // Setup visualizer preset controls
-  const visualizerStyles = [
-    { value: "mixed", label: "Spectrum Wave" },
-    { value: "bars", label: "EQ Columns" },
-    { value: "scope", label: "Oscilloscope" },
-    { value: "circular", label: "Radial Portal" },
-  ];
-
   const themeColors = [
     { value: "teal", label: "Neo Teal", class: "bg-accent-2" },
     { value: "purple", label: "Cyber Purple", class: "bg-accent-1" },
@@ -515,30 +378,67 @@ export default function MusicPage() {
               `}>
                 {/* Visualizer Panel Header */}
                 <div className="flex items-center justify-between z-10 w-full select-none">
-                  <div className="flex items-center gap-1.5 pointer-events-none">
-                    <Activity className="w-5 h-5 text-accent-2" />
-                    <span className="text-[9px] font-mono text-text-low uppercase tracking-wider font-semibold">
-                      {isVisualizerExpanded ? "TV Mode // Ambient Space" : "Visualization"}
+                  <div className="flex items-center gap-1.5 pointer-events-none min-w-0">
+                    <Activity className="w-5 h-5 text-accent-2 flex-shrink-0" />
+                    <span className="text-[9px] font-mono text-text-low uppercase tracking-wider font-semibold truncate">
+                      {isVisualizerExpanded ? `TV Mode // ${currentViz.label}` : "Visualization"}
                     </span>
                   </div>
 
                   {/* Settings selectors & Expand control */}
-                  <div className="flex items-center gap-3">
-                    {/* Visualizer style selector */}
-                    <div className="flex items-center gap-1 bg-black/40 border border-white/5 rounded-md p-0.5">
-                      {visualizerStyles.map((s) => (
-                        <button
-                          key={s.value}
-                          onClick={() => setVisualizerStyle(s.value as any)}
-                          className={`px-1.5 py-0.5 text-[8px] font-mono rounded transition-colors ${
-                            visualizerStyle === s.value 
-                              ? "bg-white/10 text-text-hi" 
-                              : "text-text-low hover:text-text-mid"
-                          }`}
-                        >
-                          {s.label.split(" ")[0]}
-                        </button>
-                      ))}
+                  <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                    {/* Auto-cycle toggle */}
+                    <button
+                      onClick={() => { audioSynth.playClick(); setAutoCycle((v) => !v); }}
+                      title={`Auto-cycle visualizers: ${autoCycle ? "ON" : "OFF"}`}
+                      className={`flex items-center gap-1 px-1.5 py-1 text-[8px] font-mono rounded border transition-colors ${
+                        autoCycle
+                          ? "bg-accent-2/15 border-accent-2/40 text-accent-2"
+                          : "bg-black/40 border-white/5 text-text-low hover:text-text-mid"
+                      }`}
+                    >
+                      <Wand2 className={`w-2.5 h-2.5 ${autoCycle ? "animate-pulse" : ""}`} />
+                      AUTO
+                    </button>
+
+                    {/* Visualizer style dropdown */}
+                    <div className="relative">
+                      <button
+                        onClick={() => { audioSynth.playClick(); setIsVizMenuOpen((o) => !o); }}
+                        className="flex items-center gap-1.5 px-2 py-1 text-[8.5px] font-mono rounded bg-black/40 border border-white/5 text-text-hi hover:border-accent-2/40 transition-colors min-w-[78px] justify-between"
+                        title="Choose visualization"
+                      >
+                        <span className="truncate">{currentViz.short}</span>
+                        <ChevronDown className={`w-2.5 h-2.5 flex-shrink-0 transition-transform ${isVizMenuOpen ? "rotate-180" : ""}`} />
+                      </button>
+
+                      {isVizMenuOpen && (
+                        <>
+                          {/* click-away backdrop */}
+                          <div className="fixed inset-0 z-40" onClick={() => setIsVizMenuOpen(false)} />
+                          <div className="absolute right-0 mt-1.5 z-50 w-44 max-h-[280px] overflow-y-auto bg-[#0a0c14]/98 border border-white/10 rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.7)] p-1 backdrop-blur-md custom-scrollbar flex flex-col gap-0.5">
+                            {VISUALIZERS.map((v) => (
+                              <button
+                                key={v.value}
+                                onClick={() => {
+                                  audioSynth.playClick();
+                                  setAutoCycle(false);
+                                  setVisualizerStyle(v.value);
+                                  setIsVizMenuOpen(false);
+                                }}
+                                className={`text-left px-2 py-1.5 rounded text-[9px] font-mono flex items-center justify-between gap-2 transition-colors ${
+                                  visualizerStyle === v.value
+                                    ? "bg-accent-2/15 text-accent-2"
+                                    : "text-text-low hover:bg-white/5 hover:text-text-hi"
+                                }`}
+                              >
+                                <span>{v.label}</span>
+                                {visualizerStyle === v.value && <span className="w-1.5 h-1.5 rounded-full bg-accent-2 flex-shrink-0" />}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* Color selectors */}
@@ -546,7 +446,7 @@ export default function MusicPage() {
                       {themeColors.map((c) => (
                         <button
                           key={c.value}
-                          onClick={() => setVisualizerColor(c.value as any)}
+                          onClick={() => setVisualizerColor(c.value as ColorKey)}
                           className={`w-2 h-2 rounded-full transition-transform hover:scale-125 ${c.class} ${
                             visualizerColor === c.value ? "ring-2 ring-white scale-110" : "opacity-60"
                           }`}
