@@ -3232,32 +3232,9 @@ html[data-theme="light"] .orbital-node__emblem {
   animation: home-orbit-in 1s var(--ease-out-soft) 0.35s both;
 }
 
-/* Section labels — kept from the column layout, now crowning each arc. */
-.home-orbit__label {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--text-mid);
-  animation: home-orbit-in 0.7s var(--ease-out-soft) var(--label-delay, 0.45s) both;
-}
-.home-orbit__label-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--label-accent, var(--accent-1));
-  box-shadow: 0 0 9px color-mix(in srgb, var(--label-accent, var(--accent-1)) 75%, transparent);
-}
-
-/* Satellite list + slot. Each slot is anchored by its inner edge on the orbit
-   and vertically centred; the side modifier flips which edge meets the ring. */
+/* Satellite list + slot. Each slot is anchored on the orbit and vertically
+   centred; the side modifier picks which edge meets the ring (the top crown
+   node is centred horizontally instead). */
 .home-orbit__ring {
   margin: 0;
   padding: 0;
@@ -3270,6 +3247,7 @@ html[data-theme="light"] .orbital-node__emblem {
 }
 .home-orbit__planet--left  { transform: translate(-100%, -50%); }
 .home-orbit__planet--right { transform: translate(0, -50%); }
+.home-orbit__planet--top   { transform: translate(-50%, -50%); }
 
 /* Slow, independent drift — the satellites hold station and breathe. The
    per-slot amplitude / tempo / phase arrive as inline custom properties. */
