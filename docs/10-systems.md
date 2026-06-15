@@ -68,7 +68,7 @@ Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/ne
 
 - **Power state** — boot/shutdown animation with synth sounds (`isPowered`, `isPoweringOn`).
 - **CRT overlays** — optional scanlines / phosphor flicker / curvature / distortion filter, toggled by `isCrtEnabled` (adds `.crt-active`).
-- **Glitch on navigate** — brief distortion + sound when the route changes (works with `template.tsx` re-mounting).
+- **Power-on static burst** — a brief CRT static overlay (`isGlitching`) flashes only as the screen re-ignites on power-on. Navigation between pages is seamless: there is **no** channel-change glitch (it was removed site-wide).
 - **Top chrome bar** (`.tv-chrome-bar`) — logo, primary nav pills (Home / Entryport / Technologies / Music / Contact), theme toggle, account button, fullscreen toggle.
 - **Console tabs** (`.tv-console-tabs-container`) — dock above the frame and act as the sticky nav on app pages.
 - **Body locks** — `body.app-mode-active` (lock scroll, hide global header) vs. `body.brochure-mode-active`.
@@ -151,6 +151,6 @@ Three sources of animation, used deliberately:
 2. **Framer Motion** — component-level: entrance/stagger (`AnimationWrappers`), the `StarSystem` orbits, `Header`/`Showcase`/`TvFrame` transitions, mobile menus.
 3. **GSAP + split-type** — installed for scroll-tied/text-split scenes (per VISION). Verify current usage before assuming a given scene uses it.
 
-**Reusable primitives:** `Reveal` (scroll-into-view fade/translate — the most-used), `MarqueeRow` (infinite scroll), `CountUp` (number animation), `JellyRotateWrapper` (click spin), `StaggerContainer`/`StaggerItem`/`ScaleFadeItem` (Framer entrances). See [11-ui-components.md](./11-ui-components.md).
+**Reusable primitives:** `Reveal` (scroll-into-view fade/translate — the most-used), `Rise` (mount-time fade/translate — the on-load sibling of `Reveal`; give a screenful of items increasing `delay`s for a staggered entrance, as Home / Reach / Contact do), `MarqueeRow` (infinite scroll), `CountUp` (number animation), `JellyRotateWrapper` (click spin), `StaggerContainer`/`StaggerItem`/`ScaleFadeItem` (Framer entrances). See [11-ui-components.md](./11-ui-components.md).
 
 **Always respect reduced motion.** New looping or large-movement animation must be disabled under `prefers-reduced-motion` — the global CSS handles most cases, but JS-driven motion (rAF loops) must check `window.matchMedia("(prefers-reduced-motion: reduce)")` or `useTheme().reducedMotionEnabled` itself, the way `Reveal`, `CountUp`, and `Cursor` do.

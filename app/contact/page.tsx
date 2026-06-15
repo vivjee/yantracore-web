@@ -7,6 +7,7 @@ import { TvFrame } from "@/components/layout/TvFrame";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { GlassInput } from "@/components/glass/GlassInput";
 import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
+import { Rise } from "@/components/motion/Rise";
 import { submitContact } from "@/lib/api/contact";
 import { audioSynth } from "@/lib/audio";
 import { useTheme } from "@/lib/theme/ThemeProvider";
@@ -65,35 +66,43 @@ export default function ContactPage() {
           <div className="max-w-2xl mx-auto">
             {/* Header */}
             <div className="mb-10 text-center">
-              <Eyebrow>Get In Touch</Eyebrow>
-              <h1 
-                className="text-4xl md:text-5xl font-bold tracking-tight text-text-hi mt-3 font-display uppercase"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Contact{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-1 to-accent-2">
-                  Us
-                </span>
-              </h1>
-              <p className="text-text-mid text-sm md:text-base mt-3 max-w-lg mx-auto font-sans leading-relaxed">
-                Have a question, feedback, or want to collaborate? Drop us a message below and we’ll get back to you shortly.
-              </p>
-              <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-text-low">
-                Have a specific project in mind?{" "}
-                <Link
-                  href="/book"
-                  className="text-accent-2 underline-offset-4 transition-colors hover:underline"
+              <Rise delay={0.08}>
+                <Eyebrow>Get In Touch</Eyebrow>
+              </Rise>
+              <Rise delay={0.16}>
+                <h1
+                  className="text-4xl md:text-5xl font-bold tracking-tight text-text-hi mt-3 font-display uppercase"
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
-                  Book a consultation →
-                </Link>
-              </p>
+                  Contact{" "}
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-1 to-accent-2">
+                    Us
+                  </span>
+                </h1>
+              </Rise>
+              <Rise delay={0.24}>
+                <p className="text-text-mid text-sm md:text-base mt-3 max-w-lg mx-auto font-sans leading-relaxed">
+                  Have a question, feedback, or want to collaborate? Drop us a message below and we’ll get back to you shortly.
+                </p>
+              </Rise>
+              <Rise delay={0.32}>
+                <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-text-low">
+                  Have a specific project in mind?{" "}
+                  <Link
+                    href="/book"
+                    className="text-accent-2 underline-offset-4 transition-colors hover:underline"
+                  >
+                    Book a consultation →
+                  </Link>
+                </p>
+              </Rise>
             </div>
 
             {/* Form Panel */}
-            <div className="w-full">
+            <Rise delay={0.42} className="w-full">
               <AnimatePresence mode="wait">
                 {formState === "success" ? (
                   <motion.div
@@ -242,7 +251,7 @@ export default function ContactPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </Rise>
           </div>
         </div>
       </TvFrame>

@@ -65,16 +65,9 @@ function TvInlineControls({ isPowered }: { isPowered: boolean }) {
 
 interface TvFrameProps {
   children: React.ReactNode;
-  /**
-   * Suppress the CRT channel-change glitch on route changes. Used by the
-   * orbital route group, where one TvFrame instance persists across pages and
-   * the transition between them must be seamless. Power on/off and the CRT
-   * toggle keep their own animations — only the navigation glitch is gated.
-   */
-  seamless?: boolean;
 }
 
-export function TvFrame({ children, seamless = false }: TvFrameProps) {
+export function TvFrame({ children }: TvFrameProps) {
   const { themeMode, setThemeMode } = useTheme();
   const [isCrtEnabled, setIsCrtEnabled] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
@@ -89,7 +82,6 @@ export function TvFrame({ children, seamless = false }: TvFrameProps) {
   const { isFullscreen, isSupported: isFullscreenSupported, toggle: toggleFullscreenApi } = useFullscreen();
 
   const pathname = usePathname();
-  const isFirstMount = useRef(true);
   const sectionRef = useRef<HTMLElement | null>(null);
 
   // Set the body class to app-mode-active on mount
@@ -110,32 +102,6 @@ export function TvFrame({ children, seamless = false }: TvFrameProps) {
 
     return () => clearTimeout(syncAuthTimer);
   }, [pathname]);
-
-  // Trigger CRT Static Channel Glitch on pathname changes
-  useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
-    }
-    if (!isPowered) return;
-    // Orbital routes share one persistent frame — keep their transitions seamless.
-    if (seamless) return;
-
-    // Play static channel change sound
-    audioSynth.playStatic();
-    const glitchStartTimer = setTimeout(() => {
-      setIsGlitching(true);
-    }, 0);
-
-    const timer = setTimeout(() => {
-      setIsGlitching(false);
-    }, 220);
-
-    return () => {
-      clearTimeout(glitchStartTimer);
-      clearTimeout(timer);
-    };
-  }, [pathname, isPowered, seamless]);
 
   const handleCrtToggle = () => {
     if (!isPowered) return;
@@ -517,7 +483,7 @@ export function TvFrame({ children, seamless = false }: TvFrameProps) {
               </>
             )}
 
-            {/* CRT Channel Static Glitch Overlay */}
+            {/* CRT power-on static burst (shown only while the screen re-ignites) */}
             {isGlitching && (
               <div className="absolute inset-0 bg-[#06070d] z-[99] pointer-events-none flex flex-col items-center justify-center">
                 <div className="crt-glitch-static" />

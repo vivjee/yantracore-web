@@ -26,7 +26,7 @@ Both run inside a signature **retro-CRT "TV" shell** (`TvFrame`) and share one r
 
 ## The mental model (four things to know)
 
-1. **Everything renders inside `TvFrame`.** Most pages wrap their content in `components/layout/TvFrame.tsx` — a CRT television shell with power on/off, scanlines, glitch-on-navigate, console tabs, and a top chrome bar. It is the app's chrome, not a decoration. See [10-systems.md](./10-systems.md#tvcrt-shell).
+1. **Everything renders inside `TvFrame`.** Most pages wrap their content in `components/layout/TvFrame.tsx` — a CRT television shell with power on/off, scanlines, console tabs, and a top chrome bar. It is the app's chrome, not a decoration. See [10-systems.md](./10-systems.md#tvcrt-shell).
 
 2. **The design system is runtime-themeable.** Colors, fonts, cursor, and motion are driven by CSS custom properties on `<html>`, set by `ThemeProvider` (`lib/theme/`). There are **5 palettes**, **5 font styles**, light/dark mode, and **3 cursor styles**, all persisted to `localStorage`. **Never hardcode an accent hex — use the `--accent-*` tokens.** See [02-brand-system.md](./02-brand-system.md).
 
@@ -77,7 +77,7 @@ Declared in earlier planning for v2 but **not yet wired**: `NODE_API_URL`, `NODE
 ```
 app/                 # Next.js App Router: pages, layouts, and /api proxy routes
   api/               # Server-side proxies to YantraMate (ask, drive, email, projects)
-  (orbital)/         # Orbital route group — shared layout = persistent Sun + TvFrame (seamless)
+  (orbital)/         # Orbital route group — shared layout = persistent Sun + shared TvFrame (seamless nav)
     layout.tsx       #   mounts the Sun + frame ONCE; satellites swap beneath it
     page.tsx         #   / — calm orbital navigation hub (HomeOrbital)
     projects/        #   /projects — Showcase product constellation (externalSun → shares the Sun)
@@ -92,10 +92,10 @@ app/                 # Next.js App Router: pages, layouts, and /api proxy routes
   globals.css        # ~2,840 lines: ALL design tokens, glass classes, keyframes, CRT/TV + orbital styles
 components/
   glass/             # Design-system primitives (GlassCard, GlassButton, ...)
-  motion/            # Reveal, MarqueeRow, CountUp, StarSystem, ...
+  motion/            # Reveal, Rise, MarqueeRow, CountUp, StarSystem, ...
   backgrounds/       # SiteBackground + MeshGradient/DotField/LineWeave/NoiseAura
   chrome/            # Header, Footer, Cursor, SmoothScrollProvider, NavIcons
-  layout/            # Container, SectionDivider, TvFrame (has a `seamless` prop for orbital routes)
+  layout/            # Container, SectionDivider, TvFrame (shared CRT shell)
   typography/        # Eyebrow, YantraElectricTitle
   orbital/           # Sun (persistent logo), OrbitalRings, SatelliteTransition — the orbital shell
   home/              # HomeOrbital hub + OrbitNode (calm satellite) — the new homepage

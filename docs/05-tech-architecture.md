@@ -87,7 +87,7 @@ yantra-web/
 ## Rendering model
 
 - **Root layout** (`app/layout.tsx`, server) loads 7 Google fonts as CSS variables, sets metadata (`metadataBase: https://yantracore.com`, OG image `/images/brand/frame-hero-og.png`), and wraps the tree in: `ThemeProvider` → `AudioPlayerProvider` → `Cursor` + `SmoothScrollProvider`.
-- **`template.tsx`** is a pass-through that re-mounts per navigation (used by the TV glitch-on-navigate effect).
+- There is **no root `template.tsx`** — it was removed so the `(orbital)` group's shared layout (persistent `Sun` + `TvFrame`) survives soft navigations. The TV glitch-on-navigate effect it once powered was retired with it; navigation is now seamless everywhere.
 - Most pages are **client components** (`"use client"`) because of the interactive shell, theming, and canvases. Auth pages and a few section components are server components.
 - **`TvFrame`** is the de-facto app chrome: pages compose `<TvFrame><PageContent/></TvFrame>` over a fixed `<SiteBackground/>`.
 

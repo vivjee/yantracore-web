@@ -87,7 +87,7 @@ interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
 `components/layout/SectionDivider.tsx` · Server · no props. A near-invisible gradient seam between sections.
 
 ### TvFrame
-`components/layout/TvFrame.tsx` · Client · `{ children }`. The CRT television app shell — power state, CRT overlays, glitch-on-navigate, top chrome bar, console tabs, fullscreen, synth sounds. **See [10-systems.md](./10-systems.md#tvcrt-shell) for the full system.** Most pages wrap content in it.
+`components/layout/TvFrame.tsx` · Client · `{ children }`. The CRT television app shell — power state, CRT overlays, top chrome bar, console tabs, fullscreen, synth sounds. **See [10-systems.md](./10-systems.md#tvcrt-shell) for the full system.** Most pages wrap content in it.
 
 ---
 
@@ -136,6 +136,17 @@ interface RevealProps {
 }
 ```
 Fade + Y-translate when scrolled into view (IntersectionObserver). Respects reduced motion (instant show). `once` disconnects after first reveal.
+
+### Rise — `components/motion/Rise.tsx` · Client.
+```ts
+interface RiseProps {        // extends HTMLMotionProps<"div">
+  delay?: number;     // s, default 0 — the stagger handle
+  y?: number;         // px, default 18 — rises from y → 0
+  x?: number;         // px, default 0 — optional slide-in from a side
+  duration?: number;  // s, default 0.7
+}
+```
+Mount-time fade + translate (Framer Motion) — the on-load sibling of `Reveal` (which waits for scroll). Use it for a screenful of items that are all visible at once: give each an increasing `delay` and they bloom in sequence. Opacity + transform only (no CLS); respects reduced motion (renders at rest). Powers the staggered entrances on Home (`HomeOrbital`), Reach (`EntryportGlobe`), and Contact.
 
 ### MarqueeRow — `components/motion/MarqueeRow.tsx` · Client.
 ```ts

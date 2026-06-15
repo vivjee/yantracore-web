@@ -4,6 +4,7 @@ import { Activity, Crosshair, Gauge, Globe2, LocateFixed, Pause, Play, RefreshCw
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { Rise } from "@/components/motion/Rise";
 
 type ActivityKind = "Aid" | "Build" | "Food" | "Learning" | "Signal";
 
@@ -355,50 +356,56 @@ export function EntryportGlobe() {
 
       <div className="relative z-10 grid h-full grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-4 p-4 md:p-5">
         <aside className="order-2 xl:order-1 flex min-h-0 flex-col gap-3">
-          <section className="glass-medium rounded-[8px] border border-white/[0.07] p-4">
-            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
-              <Satellite className="h-3.5 w-3.5 text-accent-2" />
-              Entryport Status
-            </div>
-            <h1 className="mt-2 font-display text-xl font-semibold tracking-tight text-text-hi">GLOBAL_ACTIVITY_EARTH</h1>
-            <p className="mt-2 text-xs leading-5 text-text-low">
-              Simulated live activity monitor with Nepal as the primary origin and global field nodes orbiting the feed.
-            </p>
-          </section>
+          <Rise delay={0.14} x={-16}>
+            <section className="glass-medium rounded-[8px] border border-white/[0.07] p-4">
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
+                <Satellite className="h-3.5 w-3.5 text-accent-2" />
+                Entryport Status
+              </div>
+              <h1 className="mt-2 font-display text-xl font-semibold tracking-tight text-text-hi">GLOBAL_ACTIVITY_EARTH</h1>
+              <p className="mt-2 text-xs leading-5 text-text-low">
+                Simulated live activity monitor with Nepal as the primary origin and global field nodes orbiting the feed.
+              </p>
+            </section>
+          </Rise>
 
-          <section className="grid grid-cols-2 gap-2">
-            <MetricTile label="Events" value={totalEvents.toLocaleString()} tone="var(--accent-1)" />
-            <MetricTile label="Nepal Share" value={`${nepalShare}%`} tone="#6ee7b7" />
-            <MetricTile label="Regions" value={`${activeRegions}`} tone="#22d3ee" />
-            <MetricTile label="Latency" value="42ms" tone="#f59e0b" />
-          </section>
+          <Rise delay={0.24} x={-16}>
+            <section className="grid grid-cols-2 gap-2">
+              <MetricTile label="Events" value={totalEvents.toLocaleString()} tone="var(--accent-1)" />
+              <MetricTile label="Nepal Share" value={`${nepalShare}%`} tone="#6ee7b7" />
+              <MetricTile label="Regions" value={`${activeRegions}`} tone="#22d3ee" />
+              <MetricTile label="Latency" value="42ms" tone="#f59e0b" />
+            </section>
+          </Rise>
 
-          <section className="glass-medium min-h-0 flex-1 rounded-[8px] border border-white/[0.07] p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
-                <Activity className="h-3.5 w-3.5 text-accent-1" />
-                Event Feed
-              </span>
-              <span className="flex items-center gap-1 text-[8px] uppercase tracking-[0.14em] text-emerald-300 font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                Live
-              </span>
-            </div>
-            <div className="space-y-2 overflow-hidden">
-              {events.map((event) => (
-                <div key={event.id} className="rounded-md border border-white/[0.06] bg-black/30 px-3 py-2 font-mono">
-                  <div className="flex items-center justify-between gap-2 text-[9px]">
-                    <span className="text-text-faint">[{event.stamp}]</span>
-                    <span style={{ color: KIND_TONE[event.kind] }}>{event.kind}</span>
+          <Rise delay={0.34} x={-16} className="flex min-h-0 flex-1 flex-col">
+            <section className="glass-medium min-h-0 flex-1 rounded-[8px] border border-white/[0.07] p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
+                  <Activity className="h-3.5 w-3.5 text-accent-1" />
+                  Event Feed
+                </span>
+                <span className="flex items-center gap-1 text-[8px] uppercase tracking-[0.14em] text-emerald-300 font-mono">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  Live
+                </span>
+              </div>
+              <div className="space-y-2 overflow-hidden">
+                {events.map((event) => (
+                  <div key={event.id} className="rounded-md border border-white/[0.06] bg-black/30 px-3 py-2 font-mono">
+                    <div className="flex items-center justify-between gap-2 text-[9px]">
+                      <span className="text-text-faint">[{event.stamp}]</span>
+                      <span style={{ color: KIND_TONE[event.kind] }}>{event.kind}</span>
+                    </div>
+                    <p className="mt-1 truncate text-[10px] text-text-hi">{event.message}</p>
+                    <p className="mt-0.5 truncate text-[9px] text-text-low">
+                      {event.city}, {event.country}
+                    </p>
                   </div>
-                  <p className="mt-1 truncate text-[10px] text-text-hi">{event.message}</p>
-                  <p className="mt-0.5 truncate text-[9px] text-text-low">
-                    {event.city}, {event.country}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          </Rise>
         </aside>
 
         <main className="order-1 xl:order-2 relative min-h-[420px] overflow-hidden rounded-[8px] border border-white/[0.08] bg-black/50">
@@ -427,76 +434,84 @@ export function EntryportGlobe() {
             <span>Arcs originate from Nepal</span>
           </div>
 
-          <ThreeEarthViewport isLive={isLive} focusNepal={focusNepal} />
+          <Rise delay={0.05} y={0} duration={0.9} className="absolute inset-0">
+            <ThreeEarthViewport isLive={isLive} focusNepal={focusNepal} />
+          </Rise>
         </main>
 
         <aside className="order-3 flex min-h-0 flex-col gap-3">
-          <section className="glass-medium rounded-[8px] border border-white/[0.07] p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
-                <Gauge className="h-3.5 w-3.5 text-accent-3" />
-                Regional Load
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setEvents(Array.from({ length: 8 }, makeEvent));
-                  setTotalEvents((current) => current + 12);
-                }}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-black/25 text-text-mid transition hover:text-text-hi"
-                aria-label="Refresh activity simulation"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              {[
-                ["Nepal", 86, "#6ee7b7"],
-                ["Gulf Corridor", 58, "#22d3ee"],
-                ["Asia Pacific", 44, "#c084fc"],
-                ["Europe", 31, "#60a5fa"],
-                ["Americas", 24, "#f59e0b"],
-              ].map(([label, value, tone]) => (
-                <div key={label as string}>
-                  <div className="mb-1 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-text-low font-mono">
-                    <span>{label}</span>
-                    <span>{value}%</span>
+          <Rise delay={0.2} x={16}>
+            <section className="glass-medium rounded-[8px] border border-white/[0.07] p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
+                  <Gauge className="h-3.5 w-3.5 text-accent-3" />
+                  Regional Load
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEvents(Array.from({ length: 8 }, makeEvent));
+                    setTotalEvents((current) => current + 12);
+                  }}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-black/25 text-text-mid transition hover:text-text-hi"
+                  aria-label="Refresh activity simulation"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                {[
+                  ["Nepal", 86, "#6ee7b7"],
+                  ["Gulf Corridor", 58, "#22d3ee"],
+                  ["Asia Pacific", 44, "#c084fc"],
+                  ["Europe", 31, "#60a5fa"],
+                  ["Americas", 24, "#f59e0b"],
+                ].map(([label, value, tone]) => (
+                  <div key={label as string}>
+                    <div className="mb-1 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-text-low font-mono">
+                      <span>{label}</span>
+                      <span>{value}%</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${value}%`, background: tone as string }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${value}%`, background: tone as string }} />
+                ))}
+              </div>
+            </section>
+          </Rise>
+
+          <Rise delay={0.3} x={16} className="flex min-h-0 flex-1 flex-col">
+            <section className="glass-medium flex-1 rounded-[8px] border border-white/[0.07] p-4">
+              <div className="mb-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
+                <Crosshair className="h-3.5 w-3.5 text-accent-2" />
+                Active Categories
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {(Object.keys(KIND_TONE) as ActivityKind[]).map((kind, index) => (
+                  <div key={kind} className="flex items-center justify-between rounded-md border border-white/[0.06] bg-black/30 px-3 py-2">
+                    <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-text-mid font-mono">
+                      <span className="h-2 w-2 rounded-full" style={{ background: KIND_TONE[kind] }} />
+                      {kind}
+                    </span>
+                    <span className="font-mono text-[10px] text-text-hi">{Math.max(7, 34 - index * 5)} nodes</span>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          </Rise>
 
-          <section className="glass-medium flex-1 rounded-[8px] border border-white/[0.07] p-4">
-            <div className="mb-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-text-low font-mono">
-              <Crosshair className="h-3.5 w-3.5 text-accent-2" />
-              Active Categories
-            </div>
-            <div className="grid grid-cols-1 gap-2">
-              {(Object.keys(KIND_TONE) as ActivityKind[]).map((kind, index) => (
-                <div key={kind} className="flex items-center justify-between rounded-md border border-white/[0.06] bg-black/30 px-3 py-2">
-                  <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-text-mid font-mono">
-                    <span className="h-2 w-2 rounded-full" style={{ background: KIND_TONE[kind] }} />
-                    {kind}
-                  </span>
-                  <span className="font-mono text-[10px] text-text-hi">{Math.max(7, 34 - index * 5)} nodes</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-[8px] border border-cyan-300/15 bg-cyan-300/[0.04] p-4">
-            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-cyan-200 font-mono">
-              <Globe2 className="h-3.5 w-3.5" />
-              v1 Simulation
-            </div>
-            <p className="mt-2 text-xs leading-5 text-text-low">
-              Current feed is generated locally for the entryport concept. The globe is ready for real event coordinates when the API exists.
-            </p>
-          </section>
+          <Rise delay={0.4} x={16}>
+            <section className="rounded-[8px] border border-cyan-300/15 bg-cyan-300/[0.04] p-4">
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-cyan-200 font-mono">
+                <Globe2 className="h-3.5 w-3.5" />
+                v1 Simulation
+              </div>
+              <p className="mt-2 text-xs leading-5 text-text-low">
+                Current feed is generated locally for the entryport concept. The globe is ready for real event coordinates when the API exists.
+              </p>
+            </section>
+          </Rise>
         </aside>
       </div>
     </div>
