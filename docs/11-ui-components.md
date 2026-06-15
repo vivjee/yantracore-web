@@ -42,7 +42,7 @@ interface GlassInputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 ```
-Glass text field with optional label; focus adds an accent ring/glow, `error` shows a red border + message.
+Glass text field with optional label; focus adds an accent ring/glow, `error` shows a red ring + message (wired via `aria-invalid`/`aria-describedby`). When `required`, the label gets an accent `*`. Composes any passed `onFocus`/`onBlur` with its internal focus state, so audio/analytics handlers don't clobber the glow.
 
 ### GlassPanel
 `components/glass/GlassPanel.tsx` · **Server** · extends `HTMLAttributes<HTMLDivElement>`.
