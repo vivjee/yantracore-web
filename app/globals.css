@@ -3176,6 +3176,132 @@ html[data-theme="light"] .orbital-node__emblem {
   );
 }
 
+/* ── Home orbit — desktop constellation (md+) ─────────────────────────
+   The large-screen Home arranges its six satellites on an elliptical orbit
+   around the persistent Sun instead of two flat columns: the three "Explore"
+   destinations ride the left arc, the three "Our Projects" initiatives ride
+   the right arc, and the wordmark + CTAs nest in the open base of the ring.
+   Each satellite is anchored by its INNER edge on the orbit (so the ring
+   threads through the row of nodes) and drifts on a slow, independent bob —
+   planets holding station. Positions are polar: HomeOrbital writes each
+   node's `left/top` from its angle, multiplying the shared --orbit-rx /
+   --orbit-ry radii (which scale with the viewport) by a pre-computed
+   cos/sin. Purely a md+ enhancement; phones keep the 2-col grid below. */
+.home-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: none;
+  /* Orbit geometry — centre matches the Sun (50% / 44%); radii scale fluidly
+     and pull in on tighter viewports so the nodes clear the screen edges. */
+  --orbit-cy: 44%;
+  --orbit-rx: clamp(200px, 26vw, 372px);
+  --orbit-ry: clamp(150px, 22vh, 250px);
+}
+@media (min-width: 768px) {
+  .home-orbit { display: block; }
+}
+@media (max-width: 1023.98px) {
+  .home-orbit {
+    --orbit-rx: clamp(178px, 30vw, 300px);
+    --orbit-ry: clamp(140px, 23vh, 212px);
+  }
+}
+@media (max-height: 760px) {
+  .home-orbit { --orbit-ry: clamp(120px, 18vh, 182px); }
+}
+@media (max-height: 640px) {
+  .home-orbit { --orbit-ry: clamp(104px, 15vh, 150px); }
+}
+
+/* The faint path the satellites ride. Sized to the orbit diameter, centred on
+   the Sun; the lower arc is masked away so it never crosses the centre copy. */
+.home-orbit__path {
+  position: absolute;
+  left: 50%;
+  top: var(--orbit-cy);
+  width: calc(var(--orbit-rx) * 2);
+  height: calc(var(--orbit-ry) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--accent-1) 24%, transparent);
+  opacity: 0.6;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 84%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 52%, transparent 84%);
+  animation: home-orbit-in 1s var(--ease-out-soft) 0.35s both;
+}
+
+/* Section labels — kept from the column layout, now crowning each arc. */
+.home-orbit__label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  animation: home-orbit-in 0.7s var(--ease-out-soft) var(--label-delay, 0.45s) both;
+}
+.home-orbit__label-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--label-accent, var(--accent-1));
+  box-shadow: 0 0 9px color-mix(in srgb, var(--label-accent, var(--accent-1)) 75%, transparent);
+}
+
+/* Satellite list + slot. Each slot is anchored by its inner edge on the orbit
+   and vertically centred; the side modifier flips which edge meets the ring. */
+.home-orbit__ring {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-orbit__planet {
+  position: absolute;
+  pointer-events: auto;
+  width: max-content;
+}
+.home-orbit__planet--left  { transform: translate(-100%, -50%); }
+.home-orbit__planet--right { transform: translate(0, -50%); }
+
+/* Slow, independent drift — the satellites hold station and breathe. The
+   per-slot amplitude / tempo / phase arrive as inline custom properties. */
+.home-orbit__float {
+  animation: orbit-bob var(--bob-dur, 9s) ease-in-out var(--bob-delay, 0s) infinite;
+  will-change: transform;
+}
+@keyframes orbit-bob {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(var(--bob-x, 0px), var(--bob-y, -8px)); }
+}
+
+@keyframes home-orbit-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Desktop centre copy — nested in the open base of the orbit ring. */
+.home-orbit-copy {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(18px, 6vh, 60px);
+  transform: translateX(-50%);
+  z-index: 5;
+  display: none;
+  justify-content: center;
+  width: min(92vw, 520px);
+}
+@media (min-width: 768px) {
+  .home-orbit-copy { display: flex; }
+}
+
 /* ── Orbital HUD — ambient mission-control instrumentation ─────────────
    Frames the Home hub's negative space: viewfinder corners, a bottom
    telemetry strip, and side spines. All purely decorative; the root is

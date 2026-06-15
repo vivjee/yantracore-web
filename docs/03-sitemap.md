@@ -6,7 +6,7 @@
 
 | Route | Surface | What it is |
 |---|---|---|
-| `/` | Brochure | Homepage — calm **orbital navigation hub** (`HomeOrbital`). Lives in the `app/(orbital)/` route group; the animated logo (`Sun`) is a *persistent* centre. Satellites: 3 initiative portals (Jimbo/Restroverse/Shramdan) + 3 wayfinding nodes (Projects/Technologies/About) + identity copy & two CTAs (Book a Consultation → `/book`, Explore Projects → `/projects`) |
+| `/` | Brochure | Homepage — calm **orbital navigation hub** (`HomeOrbital`). Lives in the `app/(orbital)/` route group; the animated logo (`Sun`) is a *persistent* centre. Satellites: 3 initiative portals (Jimbo/Restroverse/Shramdan) + 3 wayfinding nodes (Projects/Technologies/About) + identity copy & two CTAs (Book a Consultation → `/book`, Explore Projects → `/projects`). On **md+** the satellites ride a single elliptical **orbit ring** around the Sun (left arc = *Explore* / wayfinding, right arc = *Our Projects* / initiatives), each drifting on its own slow bob, with the copy nested in the ring's open base; phones keep a compact 2-column grid |
 | `/projects` | Brochure (orbital) | The live product "solar system" (`Showcase`) — **now in the `(orbital)` group, sharing the persistent `Sun`** (seamless from Home). YC's *own* products; client work + testimonials live on `/work` |
 | `/work` | Brochure | Client-work grid (+ modal) + testimonials + CTA. Reuses the VISION `Work` / `Voices` sections (`WorkWalkthrough`) |
 | `/about` | Brochure | Studio identity walkthrough — thesis hero + `Manifesto` / `Capabilities` / `Forge` + CTA (channel page, internal scroll) |
