@@ -5,6 +5,7 @@ import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { AudioPlayerProvider } from "@/lib/audio/AudioPlayerContext";
+import { ShortcutsProvider } from "@/lib/shortcuts/ShortcutsProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -95,8 +96,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-ink-0 text-text-hi antialiased">
         <ThemeProvider>
           <AudioPlayerProvider>
-            <Cursor />
-            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <ShortcutsProvider>
+              <Cursor />
+              <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            </ShortcutsProvider>
           </AudioPlayerProvider>
         </ThemeProvider>
       </body>

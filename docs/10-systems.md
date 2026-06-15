@@ -2,7 +2,7 @@
 
 > **Layer: REFERENCE** — the cross-cutting systems that the whole app depends on. If a component behaves "magically," the explanation is usually here.
 
-Six systems: **Theme**, **Audio**, **TV/CRT shell**, **Cursor**, **Backgrounds**, **Motion**. Each is small and self-contained; together they define the app's feel.
+Seven systems: **Theme**, **Audio**, **TV/CRT shell**, **Keyboard shortcuts**, **Cursor**, **Backgrounds**, **Motion**. Each is small and self-contained; together they define the app's feel.
 
 ---
 
@@ -74,6 +74,37 @@ Capabilities: playlist (2 bundled lofi tracks in `public/music/`), play/pause/ne
 - **Body locks** — `body.app-mode-active` (lock scroll, hide global header) vs. `body.brochure-mode-active`.
 
 Pages opt in by composing `<TvFrame>{children}</TvFrame>`. Several components also render "inside the TV" via an `inTv` prop (`LoginForm`, `SignupForm`, `SettingsShell`, `Showcase`) so they adapt padding/background.
+
+---
+
+## Keyboard shortcuts
+
+**Files:** [`lib/shortcuts/shortcuts.ts`](../lib/shortcuts/shortcuts.ts) (registry), [`lib/shortcuts/ShortcutsProvider.tsx`](../lib/shortcuts/ShortcutsProvider.tsx) (engine), [`lib/hooks/useFullscreen.ts`](../lib/hooks/useFullscreen.ts), [`components/chrome/KeyHint.tsx`](../components/chrome/KeyHint.tsx) (on-button badges), [`components/chrome/ShortcutHelp.tsx`](../components/chrome/ShortcutHelp.tsx) (`?` cheat sheet).
+
+`shortcuts.ts` is the **single source of truth** — a flat `SHORTCUTS` array of `{ id, key, display, label, group }`. The engine, the tooltip/button hints, and the cheat sheet all read from it, so adding a shortcut is one entry here plus one handler in the provider's `switch`.
+
+`ShortcutsProvider` is mounted in the root layout *inside* `ThemeProvider` + `AudioPlayerProvider` (so its handlers can use `useRouter`, `useAudioPlayer`, `useTheme`, `useFullscreen`). It attaches **one** `window` keydown listener that:
+- ignores keystrokes while typing (input / textarea / select / contentEditable);
+- ignores any combo with `Ctrl`/`Cmd`/`Alt` (never overrides browser/OS shortcuts);
+- matches the literal `e.key` against the registry — `Shift`+letter yields an uppercase key (`"H"`), and `?`/`>`/`<` are already shifted, so no modifier bookkeeping is needed;
+- on match: `preventDefault`, `audioSynth.playClick()`, run the handler.
+
+### Bindings
+| Key | Action | | Key | Action |
+|---|---|---|---|---|
+| `F` | Fullscreen | | `⇧H` | Home |
+| `?` | Cheat sheet (Esc closes) | | `⇧L` | Live Activity (`/entryport`) |
+| `⇧P` | Play / Pause | | `⇧T` | Technologies |
+| `⟩` (`⇧.`) | Next track | | `⇧M` | Music Lab |
+| `⟨` (`⇧,`) | Previous track | | `⇧C` | Contact |
+| `⇧X` | Mute / Unmute | | `⇧S` | Settings |
+| `⇧D` | Toggle theme | | `⇧A` | Account (`/dashboard` or `/login`) |
+| `⇧Q` | TV power | | | |
+
+### Notes
+- **Fullscreen** lives in `useFullscreen()`, shared by the chrome button and the `F` key (one implementation, no duplication). The chrome button keeps its `isPowered` gate; the `F` key works regardless (fullscreen is OS-level).
+- **TV power** state is page-local to `TvFrame`, so `⇧Q` dispatches a `POWER_TOGGLE_EVENT` (`"yantra:toggle-power"`) window event that the mounted `TvFrame` listens for.
+- **Hints on buttons:** `KeyHint` renders a small `.kbd-hint` badge from the registry. Icon-only chrome buttons show it inside the `.tooltip`; labeled nav buttons reveal an inline `.tv-console-key` on hover; the music player uses native `title` text. All hints hide under `@media (pointer: coarse)` (no keyboard, no point).
 
 ---
 

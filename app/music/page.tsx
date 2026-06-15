@@ -729,7 +729,7 @@ export default function MusicPage() {
                         <button
                           onClick={handlePrev}
                           className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                          title="Previous Track"
+                          title="Previous Track (⟨)"
                         >
                           <SkipBack className="w-6 h-6" />
                         </button>
@@ -741,7 +741,7 @@ export default function MusicPage() {
                               ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
                               : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
                           }`}
-                          title={isPlaying ? "Pause" : "Play"}
+                          title={`${isPlaying ? "Pause" : "Play"} (⇧P)`}
                         >
                           {isPlaying && currentTrack.isPlayable ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
                         </button>
@@ -749,7 +749,7 @@ export default function MusicPage() {
                         <button
                           onClick={handleNext}
                           className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                          title="Next Track"
+                          title="Next Track (⟩)"
                         >
                           <SkipForward className="w-6 h-6" />
                         </button>
@@ -761,7 +761,7 @@ export default function MusicPage() {
                           <button
                             onClick={toggleMute}
                             className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
-                            title={isMuted ? "Unmute" : "Mute"}
+                            title={`${isMuted ? "Unmute" : "Mute"} (⇧X)`}
                           >
                             {isMuted ? <VolumeX className="w-5 h-5 text-accent-3" /> : <Volume2 className="w-5 h-5" />}
                           </button>
@@ -1068,7 +1068,7 @@ export default function MusicPage() {
                       <button
                         onClick={handlePrev}
                         className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                        title="Previous Track"
+                        title="Previous Track (⟨)"
                       >
                         <SkipBack className="w-6 h-6" />
                       </button>
@@ -1081,7 +1081,7 @@ export default function MusicPage() {
                              ? "bg-accent-2 text-black hover:bg-accent-2/80 shadow-[0_0_15px_rgba(0,224,203,0.4)]"
                              : "bg-accent-1 text-text-hi hover:bg-accent-1/80 shadow-[0_0_15px_rgba(110,86,255,0.4)]"
                         }`}
-                        title={isPlaying ? "Pause" : "Play"}
+                        title={`${isPlaying ? "Pause" : "Play"} (⇧P)`}
                       >
                         {isPlaying && currentTrack.isPlayable ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
                       </button>
@@ -1090,7 +1090,7 @@ export default function MusicPage() {
                       <button
                         onClick={handleNext}
                         className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid hover:text-text-hi flex items-center justify-center transition-all"
-                        title="Next Track"
+                        title="Next Track (⟩)"
                       >
                         <SkipForward className="w-6 h-6" />
                       </button>
@@ -1101,7 +1101,7 @@ export default function MusicPage() {
                       <button
                         onClick={toggleMute}
                         className="w-11 h-11 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-text-mid flex items-center justify-center transition-all"
-                        title={isMuted ? "Unmute" : "Mute"}
+                        title={`${isMuted ? "Unmute" : "Mute"} (⇧X)`}
                       >
                         {isMuted ? <VolumeX className="w-5 h-5 text-accent-3" /> : <Volume2 className="w-5 h-5" />}
                       </button>
