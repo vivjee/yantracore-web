@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Showcase } from "@/components/sections/01-arrival/Showcase";
 import { Work } from "@/components/sections/06-work/Work";
@@ -41,20 +41,6 @@ export default function ProjectsPage() {
       {/* ── Screen 1 — the solar system: YC's own products, orbiting the Sun ── */}
       <div className="relative min-h-full">
         <Showcase inTv externalSun />
-
-        {/* Scroll cue → the client constellation below. md+ only: the phone
-            layout already anchors its product grid low and the tab bar sits
-            right beneath it, so a cue there would only crowd the screen. */}
-        <a
-          href="#work"
-          className="group absolute inset-x-0 bottom-5 z-20 mx-auto hidden w-max flex-col items-center gap-1 text-text-low transition-colors hover:text-text-hi md:flex"
-          aria-label="Scroll to client work"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.28em]">
-            Client work
-          </span>
-          <ChevronDown className="h-4 w-4 animate-bounce" aria-hidden />
-        </a>
       </div>
 
       {/* ── Below the fold — the client constellation + testimonials ── */}

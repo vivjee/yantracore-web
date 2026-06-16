@@ -19,6 +19,7 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
 import {
   Activity,
   Bot,
+  ChevronDown,
   Clock,
   Compass,
   Cpu,
@@ -518,6 +519,27 @@ function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
           Build your project with us
         </GlassButton>
       </Rise>
+
+      {/* Scroll cue → the client constellation lower on the page. Sits right
+          under the CTA rather than pinned to the bottom of the tall first
+          screen (which fell below the fold). Desktop only: the phone layout
+          flows straight into its product grid + tab bar, so a cue there would
+          only crowd it. */}
+      {!mobile && (
+        <Rise delay={0.32} y={14} className="mt-1.5">
+          <a
+            href="#work"
+            onMouseEnter={() => audioSynth.playHover()}
+            className="group flex flex-col items-center gap-1 text-text-low transition-colors hover:text-text-hi"
+            aria-label="Scroll to client work"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em]">
+              Client work
+            </span>
+            <ChevronDown className="h-4 w-4 animate-bounce" aria-hidden />
+          </a>
+        </Rise>
+      )}
     </div>
   );
 }
