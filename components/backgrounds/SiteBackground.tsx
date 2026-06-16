@@ -24,6 +24,9 @@ export function SiteBackground() {
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       style={{ background: "var(--ink-0)" }}
     >
+      {/* ── Layer 0: Rotating galaxy of twinkling stars (WebGL, opaque base) ── */}
+      <GalaxyField />
+
       {/* ── Layer 1: Mesh gradient nebula (toned down — galaxy carries colour now) ── */}
       <div
         className="site-bg-fx absolute -inset-1/4 opacity-40"
@@ -87,15 +90,12 @@ export function SiteBackground() {
         }}
       />
 
-      {/* ── Layer 4: Rotating galaxy of twinkling stars (WebGL) ── */}
-      <GalaxyField />
-
-      {/* ── Layer 5: Soft edge vignette — frames the canvas, fades the galaxy rim ── */}
+      {/* ── Layer 4: Soft corner vignette — only the far corners, so the galaxy arms stay visible ── */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 35%, transparent 38%, rgba(6,7,13,0.72) 100%)",
+            "radial-gradient(ellipse at 50% 45%, transparent 62%, rgba(6,7,13,0.55) 100%)",
         }}
       />
     </div>
