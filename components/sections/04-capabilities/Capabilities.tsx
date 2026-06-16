@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils/cn";
 import { Container } from "@/components/layout/Container";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { Reveal } from "@/components/motion/Reveal";
@@ -46,13 +45,25 @@ const KEYFRAMES = `
   0%,100% { transform: scale(1);   opacity: 1; }
   50%      { transform: scale(1.5); opacity: 0.6; }
 }
-@keyframes cap-panel-out {
-  0%   { opacity: 1; transform: translateY(0) scale(1);    filter: blur(0px); }
-  100% { opacity: 0; transform: translateY(-10px) scale(0.98); filter: blur(6px); }
+@keyframes cap-enter {
+  0%   { opacity: 0; transform: translateY(var(--enter-y, 22px)) scale(0.985); filter: blur(6px); }
+  100% { opacity: 1; transform: translateY(0) scale(1);                        filter: blur(0px); }
 }
-@keyframes cap-panel-in {
-  0%   { opacity: 0; transform: translateY(18px) scale(0.98); filter: blur(8px); }
-  100% { opacity: 1; transform: translateY(0) scale(1);     filter: blur(0px); }
+@keyframes cap-exit {
+  0%   { opacity: 1; transform: translateY(0) scale(1);                        filter: blur(0px); }
+  100% { opacity: 0; transform: translateY(var(--exit-y, -16px)) scale(0.985); filter: blur(7px); }
+}
+@keyframes cap-sweep {
+  0%   { transform: translateX(-170%) skewX(-14deg); opacity: 0; }
+  22%  { opacity: 0.6; }
+  78%  { opacity: 0.5; }
+  100% { transform: translateX(170%) skewX(-14deg);  opacity: 0; }
+}
+@keyframes cap-trace {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  14%  { opacity: 1; }
+  76%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
 }
 @keyframes cap-icon-bounce {
   0%   { transform: scale(0.55) rotate(-8deg); opacity: 0; }
@@ -90,6 +101,13 @@ const KEYFRAMES = `
   40%      { opacity: 0.4; }
   42%      { opacity: 1; }
   80%      { opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #capabilities *, #capabilities *::before, #capabilities *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 `;
 
@@ -269,29 +287,308 @@ function CapTab({ cap, index, active, onClick, entryDelay }: CapTabProps) {
   );
 }
 
-/* ─── Detail panel ───────────────────────────────────────────────────── */
-interface DetailPanelProps {
+/* ─── Panel content (one capability, one layer of the crossfade) ─────── */
+interface PanelContentProps {
+  cap: (typeof capabilities)[0];
   capIndex: number;
-  phase: "idle" | "out" | "in";
+  /** true = the arriving layer (staggered reveal); false = the leaving layer (block fade-out) */
+  entering: boolean;
+  /** +1 selecting a lower capability, -1 a higher one — drives slide direction */
+  dir: number;
+  reduced: boolean;
 }
 
-function DetailPanel({ capIndex, phase }: DetailPanelProps) {
-  const cap = capabilities[capIndex];
+function PanelContent({ cap, capIndex, entering, dir, reduced }: PanelContentProps) {
   const illustration = capabilityIllustrations[capIndex] ?? capabilityIllustrations[0];
   const accentColor = `var(${cap.accentVar})`;
+  const ea = entering && !reduced; // element-stagger gate (only the arriving layer)
 
-  const animStyle = ((): React.CSSProperties => {
-    if (phase === "out")
-      return { animation: "cap-panel-out 0.28s cubic-bezier(0.4,0,1,1) both" };
-    if (phase === "in")
-      return { animation: "cap-panel-in 0.5s cubic-bezier(0.22,1,0.36,1) 0.05s both" };
-    return {};
-  })();
+  /* Layer container: arriving slides in from `dir`, leaving slides out the opposite way. */
+  const rootStyle: CSSProperties = {
+    position: "relative",
+    zIndex: 1,
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: 24,
+    height: "100%",
+  };
+  if (!reduced) {
+    if (entering) {
+      rootStyle.animation = "cap-enter 0.5s cubic-bezier(0.22,1,0.36,1) both";
+      (rootStyle as Record<string, string>)["--enter-y"] = dir >= 0 ? "22px" : "-22px";
+    } else {
+      rootStyle.animation = "cap-exit 0.34s cubic-bezier(0.4,0,1,1) both";
+      (rootStyle as Record<string, string>)["--exit-y"] = dir >= 0 ? "-16px" : "16px";
+    }
+  }
+
+  return (
+    <div style={rootStyle} className="md:!grid-cols-[1fr_220px]">
+      {/* Text side */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {/* Icon + title */}
+        <div
+          style={{ display: "flex", alignItems: "flex-start", gap: 16 }}
+          aria-label={cap.title}
+        >
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 16,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              background: `color-mix(in srgb, ${accentColor} 18%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${accentColor} 35%, transparent)`,
+              boxShadow: `0 0 32px -10px color-mix(in srgb, ${accentColor} 60%, transparent)`,
+              animation: ea ? "cap-icon-bounce 0.65s cubic-bezier(0.22,1,0.36,1) 0.1s both" : undefined,
+            }}
+          >
+            <cap.icon size={24} style={{ color: accentColor }} aria-hidden />
+          </div>
+          <div>
+            <span
+              style={{
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: 10,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--text-faint)",
+                animation: ea ? "cap-line-in 0.5s ease 0.15s both" : undefined,
+                display: "block",
+              }}
+            >
+              {cap.index} —
+            </span>
+            <h3
+              style={{
+                fontSize: "clamp(1.35rem, 2.5vw, 1.75rem)",
+                fontWeight: 600,
+                color: "var(--text-hi)",
+                marginTop: 2,
+                fontFamily: "var(--font-display)",
+                animation: ea ? "cap-line-in 0.55s ease 0.2s both" : undefined,
+              }}
+            >
+              {cap.title}
+            </h3>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p
+          style={{
+            color: "var(--text-mid)",
+            lineHeight: 1.7,
+            fontSize: 15,
+            animation: ea ? "cap-line-in 0.55s ease 0.27s both" : undefined,
+          }}
+        >
+          {cap.description}
+        </p>
+
+        {/* Bullets */}
+        <ul style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {cap.bullets.map((b, bi) => (
+            <li
+              key={b}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+                fontSize: 14,
+                color: "var(--text-mid)",
+                animation: ea
+                  ? `cap-bullet-in 0.45s cubic-bezier(0.22,1,0.36,1) ${0.33 + bi * 0.07}s both`
+                  : undefined,
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  marginTop: 6,
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: accentColor,
+                  flexShrink: 0,
+                  boxShadow: `0 0 6px 1px color-mix(in srgb, ${accentColor} 50%, transparent)`,
+                }}
+              />
+              {b}
+            </li>
+          ))}
+        </ul>
+
+        {/* Stack chips */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            paddingTop: 16,
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            marginTop: "auto",
+          }}
+        >
+          {cap.stack.map((s, si) => (
+            <Tag
+              key={s}
+              tone="accent"
+              shape="square"
+              size="sm"
+              accentColor={accentColor}
+              style={{
+                animation: ea
+                  ? `cap-chip-in 0.4s cubic-bezier(0.22,1,0.36,1) ${0.42 + si * 0.055}s both`
+                  : undefined,
+              }}
+            >
+              {s}
+            </Tag>
+          ))}
+        </div>
+      </div>
+
+      {/* Illustration side */}
+      <div
+        className="hidden md:flex"
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Radial glow behind illustration */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `radial-gradient(ellipse at center, color-mix(in srgb, ${accentColor} 20%, transparent) 0%, transparent 70%)`,
+          }}
+        />
+        {/* Orbit ring decoration */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            border: `1px solid color-mix(in srgb, ${accentColor} 18%, transparent)`,
+            animation: "cap-glow-pulse 4s ease-in-out infinite",
+          }}
+        />
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            width: 130,
+            height: 130,
+            borderRadius: "50%",
+            border: `1px dashed color-mix(in srgb, ${accentColor} 12%, transparent)`,
+            animation: "cap-glow-pulse 4s ease-in-out 1.5s infinite",
+          }}
+        />
+        <Image
+          key={illustration}
+          src={illustration}
+          alt={`${cap.title} illustration`}
+          width={220}
+          height={190}
+          className="w-full h-auto max-h-[190px] object-contain relative z-10"
+          style={{
+            filter: "brightness(1.08) saturate(0.88)",
+            animation: ea
+              ? "cap-icon-bounce 0.7s cubic-bezier(0.22,1,0.36,1) 0.12s both"
+              : undefined,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Accent re-skin (energy sweep + self-tracing border) ─────────────── */
+/* Mounted fresh on every capability change via `key`, so each plays once to
+   completion — decoupled from the shorter-lived crossfade layers. */
+function AccentReskin({ accentColor }: { accentColor: string }) {
+  return (
+    <>
+      {/* Energy sweep — a beam in the new colour crossing the panel */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-12%",
+          bottom: "-12%",
+          left: 0,
+          width: "55%",
+          zIndex: 4,
+          pointerEvents: "none",
+          mixBlendMode: "screen",
+          filter: "blur(6px)",
+          background: `linear-gradient(90deg, transparent, color-mix(in srgb, ${accentColor} 14%, transparent), color-mix(in srgb, ${accentColor} 26%, transparent), color-mix(in srgb, ${accentColor} 14%, transparent), transparent)`,
+          animation: "cap-sweep 0.85s cubic-bezier(0.4,0,0.2,1) both",
+        }}
+      />
+
+      {/* Self-tracing border — the glass outline redraws once in the new accent */}
+      <svg
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 1,
+          width: "calc(100% - 2px)",
+          height: "calc(100% - 2px)",
+          overflow: "visible",
+          zIndex: 5,
+          pointerEvents: "none",
+        }}
+      >
+        <rect
+          x="0.75"
+          y="0.75"
+          width="98%"
+          height="98%"
+          rx={23}
+          ry={23}
+          fill="none"
+          stroke={accentColor}
+          strokeWidth={1.5}
+          pathLength={1}
+          strokeDasharray={1}
+          style={{
+            filter: `drop-shadow(0 0 6px color-mix(in srgb, ${accentColor} 55%, transparent))`,
+            animation: "cap-trace 0.95s cubic-bezier(0.4,0,0.2,1) both",
+          }}
+        />
+      </svg>
+    </>
+  );
+}
+
+/* ─── Detail panel (persistent glass shell + crossfade + accent re-skin) ─ */
+interface DetailPanelProps {
+  current: number;
+  leaving: { index: number; dir: number } | null;
+  reduced: boolean;
+  /** true once the user has selected a tab — gates the re-skin off the load. */
+  flourish: boolean;
+}
+
+function DetailPanel({ current, leaving, reduced, flourish }: DetailPanelProps) {
+  const cap = capabilities[current];
+  const accentColor = `var(${cap.accentVar})`;
+  const dir = leaving?.dir ?? 1;
 
   return (
     <div
       style={{
-        ...animStyle,
         height: "100%",
         borderRadius: 24,
         overflow: "hidden",
@@ -333,234 +630,83 @@ function DetailPanel({ capIndex, phase }: DetailPanelProps) {
         }}
       />
 
-      {/* Content grid */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: 24,
-          height: "100%",
-        }}
-        className="md:!grid-cols-[1fr_220px]"
-      >
-        {/* Text side */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Icon + title */}
+      {/* Crossfade stack: arriving layer in flow (defines height), leaving layer overlaid */}
+      <div style={{ position: "relative", zIndex: 1, height: "100%" }}>
+        <PanelContent
+          key={current}
+          cap={cap}
+          capIndex={current}
+          entering
+          dir={dir}
+          reduced={reduced}
+        />
+        {leaving && !reduced && (
           <div
-            style={{ display: "flex", alignItems: "flex-start", gap: 16 }}
-            aria-label={cap.title}
+            aria-hidden
+            style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}
           >
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 16,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-                background: `color-mix(in srgb, ${accentColor} 18%, transparent)`,
-                border: `1px solid color-mix(in srgb, ${accentColor} 35%, transparent)`,
-                boxShadow: `0 0 32px -10px color-mix(in srgb, ${accentColor} 60%, transparent)`,
-                animation: phase !== "out" ? "cap-icon-bounce 0.65s cubic-bezier(0.22,1,0.36,1) 0.1s both" : undefined,
-              }}
-            >
-              <cap.icon
-                size={24}
-                style={{ color: accentColor }}
-                aria-hidden
-              />
-            </div>
-            <div>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "var(--text-faint)",
-                  animation: phase !== "out" ? "cap-line-in 0.5s ease 0.15s both" : undefined,
-                  display: "block",
-                }}
-              >
-                {cap.index} —
-              </span>
-              <h3
-                style={{
-                  fontSize: "clamp(1.35rem, 2.5vw, 1.75rem)",
-                  fontWeight: 600,
-                  color: "var(--text-hi)",
-                  marginTop: 2,
-                  fontFamily: "var(--font-display)",
-                  animation: phase !== "out" ? "cap-line-in 0.55s ease 0.2s both" : undefined,
-                }}
-              >
-                {cap.title}
-              </h3>
-            </div>
+            <PanelContent
+              key={`leave-${leaving.index}`}
+              cap={capabilities[leaving.index]}
+              capIndex={leaving.index}
+              entering={false}
+              dir={leaving.dir}
+              reduced={reduced}
+            />
           </div>
-
-          {/* Description */}
-          <p
-            style={{
-              color: "var(--text-mid)",
-              lineHeight: 1.7,
-              fontSize: 15,
-              animation: phase !== "out" ? "cap-line-in 0.55s ease 0.27s both" : undefined,
-            }}
-          >
-            {cap.description}
-          </p>
-
-          {/* Bullets */}
-          <ul style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {cap.bullets.map((b, bi) => (
-              <li
-                key={b}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 10,
-                  fontSize: 14,
-                  color: "var(--text-mid)",
-                  animation: phase !== "out"
-                    ? `cap-bullet-in 0.45s cubic-bezier(0.22,1,0.36,1) ${0.33 + bi * 0.07}s both`
-                    : undefined,
-                }}
-              >
-                <span
-                  aria-hidden
-                  style={{
-                    marginTop: 6,
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: accentColor,
-                    flexShrink: 0,
-                    boxShadow: `0 0 6px 1px color-mix(in srgb, ${accentColor} 50%, transparent)`,
-                  }}
-                />
-                {b}
-              </li>
-            ))}
-          </ul>
-
-          {/* Stack chips */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              paddingTop: 16,
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-              marginTop: "auto",
-            }}
-          >
-            {cap.stack.map((s, si) => (
-              <Tag
-                key={s}
-                tone="accent"
-                shape="square"
-                size="sm"
-                accentColor={accentColor}
-                style={{
-                  animation:
-                    phase !== "out"
-                      ? `cap-chip-in 0.4s cubic-bezier(0.22,1,0.36,1) ${0.42 + si * 0.055}s both`
-                      : undefined,
-                }}
-              >
-                {s}
-              </Tag>
-            ))}
-          </div>
-        </div>
-
-        {/* Illustration side */}
-        <div
-          className="hidden md:flex"
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {/* Radial glow behind illustration */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: `radial-gradient(ellipse at center, color-mix(in srgb, ${accentColor} 20%, transparent) 0%, transparent 70%)`,
-            }}
-          />
-          {/* Orbit ring decoration */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              width: 180,
-              height: 180,
-              borderRadius: "50%",
-              border: `1px solid color-mix(in srgb, ${accentColor} 18%, transparent)`,
-              animation: "cap-glow-pulse 4s ease-in-out infinite",
-            }}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              width: 130,
-              height: 130,
-              borderRadius: "50%",
-              border: `1px dashed color-mix(in srgb, ${accentColor} 12%, transparent)`,
-              animation: "cap-glow-pulse 4s ease-in-out 1.5s infinite",
-            }}
-          />
-          <Image
-            key={illustration}
-            src={illustration}
-            alt={`${cap.title} illustration`}
-            width={220}
-            height={190}
-            className="w-full h-auto max-h-[190px] object-contain relative z-10"
-            style={{
-              filter: "brightness(1.08) saturate(0.88)",
-              animation: phase !== "out"
-                ? "cap-icon-bounce 0.7s cubic-bezier(0.22,1,0.36,1) 0.12s both"
-                : undefined,
-            }}
-          />
-        </div>
+        )}
       </div>
+
+      {/* Accent re-skin — sweep + border trace, replayed on each change */}
+      {flourish && !reduced && (
+        <AccentReskin key={current} accentColor={accentColor} />
+      )}
     </div>
   );
 }
 
 /* ─── Main export ────────────────────────────────────────────────────── */
+/* Duration the leaving layer stays mounted (matches cap-exit). */
+const EXIT_MS = 340;
+
 export function Capabilities() {
-  const [active, setActive] = useState(0);
-  const [displayed, setDisplayed] = useState(0);
-  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
-  const pendingRef = useRef<number | null>(null);
+  const [current, setCurrent] = useState(0);
+  const [leaving, setLeaving] = useState<{ index: number; dir: number } | null>(null);
+  const [reduced, setReduced] = useState(false);
+  const [interacted, setInteracted] = useState(false);
+  const lock = useRef(false);
 
   /* Inject keyframes once on mount */
   useEffect(injectKeyframes, []);
 
+  /* Honour prefers-reduced-motion (matches the Reveal primitive). */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
   function handleSelect(i: number) {
-    if (i === active || phase !== "idle") return;
-    pendingRef.current = i;
-    setPhase("out");
-    setActive(i); // tab highlights immediately
+    if (i === current || lock.current) return;
+    const dir = i > current ? 1 : -1;
+    setInteracted(true);
+
+    if (reduced) {
+      setCurrent(i); // instant swap, no transition layers
+      return;
+    }
+
+    lock.current = true;
+    setLeaving({ index: current, dir }); // old content overlays + fades out
+    setCurrent(i); // new content crossfades in underneath; tab highlights now
 
     setTimeout(() => {
-      setDisplayed(pendingRef.current ?? i);
-      setPhase("in");
-      setTimeout(() => setPhase("idle"), 550);
-    }, 300);
+      setLeaving(null);
+      lock.current = false;
+    }, EXIT_MS);
   }
 
   return (
@@ -639,7 +785,7 @@ export function Capabilities() {
                   key={c.id}
                   cap={c}
                   index={i}
-                  active={active === i}
+                  active={current === i}
                   onClick={() => handleSelect(i)}
                   entryDelay={200 + i * 60}
                 />
@@ -650,7 +796,12 @@ export function Capabilities() {
           {/* Detail panel */}
           <Reveal delay={300}>
             <div style={{ height: "100%", minHeight: 420 }}>
-              <DetailPanel capIndex={displayed} phase={phase} />
+              <DetailPanel
+                current={current}
+                leaving={leaving}
+                reduced={reduced}
+                flourish={interacted}
+              />
             </div>
           </Reveal>
         </div>
