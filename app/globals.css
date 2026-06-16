@@ -119,8 +119,17 @@
    Global Font Styles Mapping
    ============================================================ */
 
-/* 1. Default Style: Crystal Tech */
-:root, [data-font-style="default"] {
+/* Site-wide default typeface — Soft Pillow (Quicksand).
+   Applies during SSR / before JS hydrates and whenever no
+   preference is stored. The "default" option below stays Crystal Tech. */
+:root {
+  --font-display-val: var(--font-quicksand), "Trebuchet MS", system-ui, sans-serif;
+  --font-body-val: var(--font-quicksand), system-ui, sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 1. Crystal Tech */
+[data-font-style="default"] {
   --font-display-val: var(--font-space-grotesk), "General Sans", var(--font-inter), system-ui, sans-serif;
   --font-body-val: var(--font-inter), system-ui, sans-serif;
   --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
@@ -151,6 +160,41 @@
 [data-font-style="avant-garde"] {
   --font-display-val: var(--font-syne), sans-serif;
   --font-body-val: var(--font-outfit), var(--font-inter), sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 6. Editorial Ink (warm literary serif) */
+[data-font-style="editorial"] {
+  --font-display-val: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-body-val: var(--font-inter), system-ui, sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 7. Maison Couture (high-fashion thin serif) */
+[data-font-style="couture"] {
+  --font-display-val: var(--font-instrument-serif), Georgia, serif;
+  --font-body-val: var(--font-outfit), var(--font-inter), sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 8. Bold Marquee (poster impact) */
+[data-font-style="marquee"] {
+  --font-display-val: var(--font-anton), "Arial Narrow", Impact, sans-serif;
+  --font-body-val: var(--font-inter), system-ui, sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 9. Soft Pillow (rounded and friendly) */
+[data-font-style="pillow"] {
+  --font-display-val: var(--font-quicksand), "Trebuchet MS", system-ui, sans-serif;
+  --font-body-val: var(--font-quicksand), system-ui, sans-serif;
+  --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+/* 10. Studio Quirk (contemporary characterful grotesque) */
+[data-font-style="bricolage"] {
+  --font-display-val: var(--font-bricolage), system-ui, sans-serif;
+  --font-body-val: var(--font-inter), system-ui, sans-serif;
   --font-mono-val: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 

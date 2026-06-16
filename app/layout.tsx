@@ -1,5 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Orbitron, Space_Grotesk, Syncopate, Syne, Outfit } from "next/font/google";
+import {
+  Inter,
+  JetBrains_Mono,
+  Orbitron,
+  Space_Grotesk,
+  Syncopate,
+  Syne,
+  Outfit,
+  Fraunces,
+  Instrument_Serif,
+  Anton,
+  Quicksand,
+  Bricolage_Grotesque,
+} from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/chrome/SmoothScrollProvider";
 import { Cursor } from "@/components/chrome/Cursor";
@@ -51,6 +64,38 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-fraunces",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-instrument-serif",
+});
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-anton",
+});
+
+const quicksand = Quicksand({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-quicksand",
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-bricolage",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://yantracore.com"),
   title: {
@@ -100,7 +145,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} ${syncopate.variable} ${syne.variable} ${outfit.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} ${syncopate.variable} ${syne.variable} ${outfit.variable} ${fraunces.variable} ${instrumentSerif.variable} ${anton.variable} ${quicksand.variable} ${bricolage.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-ink-0 text-text-hi antialiased">
