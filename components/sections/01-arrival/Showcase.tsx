@@ -530,6 +530,14 @@ function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
           <a
             href="#work"
             onMouseEnter={() => audioSynth.playHover()}
+            onClick={(e) => {
+              e.preventDefault();
+              audioSynth.playClick();
+              const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              document
+                .getElementById("work")
+                ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+            }}
             className="group flex flex-col items-center gap-1 text-text-low transition-colors hover:text-text-hi"
             aria-label="Scroll to client work"
           >

@@ -7,6 +7,7 @@ import { Voices } from "@/components/sections/07-voices/Voices";
 import { Container } from "@/components/layout/Container";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { Reveal } from "@/components/motion/Reveal";
+import { OrbitalScroll } from "@/components/orbital/OrbitalScroll";
 
 /**
  * Projects ( /projects ) — an ORBITAL route, now the home of the WHOLE portfolio.
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
 
 export default function ProjectsPage() {
   return (
-    <div className="no-scrollbar relative z-10 h-full w-full overflow-y-auto">
+    <OrbitalScroll>
       {/* ── Screen 1 — the solar system: YC's own products, orbiting the Sun ── */}
       <div className="relative min-h-full">
         <Showcase inTv externalSun />
@@ -82,6 +83,6 @@ export default function ProjectsPage() {
           </Reveal>
         </Container>
       </section>
-    </div>
+    </OrbitalScroll>
   );
 }
