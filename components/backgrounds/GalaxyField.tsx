@@ -106,6 +106,12 @@ export function GalaxyField() {
     const mount = mountRef.current;
     if (!mount) return;
 
+    // Mobile performance mode: the WebGL galaxy (~12.9k additive points + a rAF
+    // loop) is the single biggest constant GPU cost on touch devices and a prime
+    // flicker source — skip it entirely there (no context, no loop). The static
+    // nebula + light cones in SiteBackground carry the backdrop instead.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
     const prefersReduced =
       window.matchMedia("(prefers-reduced-motion: reduce)").matches || reducedMotionEnabled;
 

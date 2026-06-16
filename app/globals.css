@@ -655,6 +655,47 @@ html.prefers-reduced-motion *::after {
   }
 }
 
+/* ============================================================
+   Mobile performance mode — coarse-pointer (touch) devices
+   Flagship phones (and tablets) still flicker because mobile GPUs can't
+   composite the stacked animated blurs + background-clip:text filters + WebGL
+   galaxy every frame. Gated on `(pointer: coarse)` (primary-touch = phones in
+   any orientation + tablets; excludes desktops/touch-laptops). We trade the
+   neon/animation for a calm, static, flicker-free render. The WebGL galaxy and
+   the logo's heavy layers are dropped in JS (CSS alone can't make them cheap);
+   this block handles the CSS-side costs.
+   ============================================================ */
+@media (pointer: coarse) {
+  /* Electric titles → static, full-gradient, flicker-free: no flow/pulse/scan/
+     flicker animations, no animated drop-shadow (the glyph re-raster + filter
+     combo that tears on Safari). The colorful gradient fill stays. */
+  .yantra-electric-title {
+    animation: none !important;
+    filter: none !important;
+    background-size: 100% 100% !important;
+    background-position: 0 0 !important;
+  }
+  .yantra-electric-title::before,
+  .yantra-electric-title::after {
+    display: none !important;
+  }
+
+  /* Drop all backdrop blur — chrome/glass backgrounds here are already
+     near-opaque, and backdrop-filter repaints on every scroll frame. */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Freeze the large animated background layers (a static blur composites once;
+     animating it re-rasterizes a huge area every frame). */
+  .site-bg-fx,
+  .star-drift-container,
+  .star-particle {
+    animation: none !important;
+  }
+}
+
 /* LogoMark — slow Y-axis rotation with tilted planet axis.
    The axial tilt (rotateZ) gently wobbles like a real planetary body.
    30 s per full revolution = serene, never distracting. */

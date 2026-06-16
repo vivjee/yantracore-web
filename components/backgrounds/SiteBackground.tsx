@@ -26,7 +26,7 @@ export function SiteBackground() {
     >
       {/* ── Layer 1: Mesh gradient nebula (toned down — galaxy carries colour now) ── */}
       <div
-        className="absolute -inset-1/4 opacity-40"
+        className="site-bg-fx absolute -inset-1/4 opacity-40"
         style={{
           background:
             "radial-gradient(ellipse at 20% 20%, color-mix(in srgb, var(--accent-1) 35%, transparent) 0%, transparent 50%), " +
@@ -51,7 +51,7 @@ export function SiteBackground() {
       {/* ── Layer 3: Volumetric light cones (toned down ambient wash) ── */}
       {/* Primary violet cone — upper left */}
       <div
-        className="absolute w-[700px] h-[700px] rounded-full"
+        className="site-bg-fx absolute w-[700px] h-[700px] rounded-full"
         style={{
           left: "5%",
           top: "-15%",
@@ -63,7 +63,7 @@ export function SiteBackground() {
       />
       {/* Cyan cone — upper right */}
       <div
-        className="absolute w-[560px] h-[560px] rounded-full"
+        className="site-bg-fx absolute w-[560px] h-[560px] rounded-full"
         style={{
           right: "0%",
           top: "0%",
@@ -75,7 +75,7 @@ export function SiteBackground() {
       />
       {/* Violet — lower left */}
       <div
-        className="absolute w-[500px] h-[500px] rounded-full"
+        className="site-bg-fx absolute w-[500px] h-[500px] rounded-full"
         style={{
           left: "-5%",
           bottom: "10%",
