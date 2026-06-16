@@ -531,6 +531,42 @@ html.prefers-reduced-motion *::after {
 }
 
 /* ============================================================
+   Route navigation progress — a thin top bar shown while a soft
+   navigation is in flight (see components/chrome/RouteProgress).
+   Replaces the old opaque full-screen loading overlay, so the
+   chrome bar is never covered during a page switch. Portaled to
+   <body>, so it sits above the frame regardless of transforms.
+   Under reduced-motion the global collapse makes the slide instant,
+   leaving a static accent line — still visible, just not animated.
+   ============================================================ */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 300;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-2) 35%,
+    var(--accent-1) 65%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: route-progress-slide 1.1s linear infinite;
+}
+@keyframes route-progress-slide {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* ============================================================
    Button press shine — diagonal sweep across button interior
    ============================================================ */
 
