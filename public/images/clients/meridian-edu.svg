@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="meridian" x1="12" y1="18" x2="52" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6E9BFF"/>
+      <stop offset="1" stop-color="#00C2B0"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 17 54 27 32 37 10 27 32 17Z" fill="url(#meridian)"/>
+  <path d="M20 32v10c0 3 5.5 6 12 6s12-3 12-6V32" stroke="url(#meridian)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 27v11" stroke="url(#meridian)" stroke-width="3" stroke-linecap="round"/>
+</svg>

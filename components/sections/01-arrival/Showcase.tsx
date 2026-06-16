@@ -119,7 +119,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
     {
       name: "SHRAMDAN",
       logoImg: "/images/logo/shramdaan_logo.png",
-      desc: "Solve social problems, together.",
+      desc: "Founded by us, now community-led.",
       accent: "var(--accent-warm)",
       url: "/channels/shramdan"
     }
@@ -1819,7 +1819,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
         logoImg="/images/logo/shramdaan_logo.png"
         unicodeChar="🌱"
         title="SHRAMDAN"
-        description="Solve social problems, together."
+        description="Founded by YantraCore — now community-led."
         accentColor="var(--accent-warm)"
         url="https://shramdan.org"
       />
@@ -2535,7 +2535,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
 
   const handleHireYantracore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push("/contact");
+    router.push("/book");
   };
 
   return (
@@ -2604,7 +2604,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           className="w-full py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center cursor-pointer"
           style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
         >
-          Contact Us
+          Start a Project
         </button>
       </div>
     </div>

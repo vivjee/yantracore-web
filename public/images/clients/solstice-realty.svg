@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="solstice" x1="16" y1="18" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC85B"/>
+      <stop offset="1" stop-color="#FF7A3D"/>
+    </linearGradient>
+  </defs>
+  <path d="M15 34 32 19l17 15" stroke="url(#solstice)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="32" cy="41" r="9" fill="url(#solstice)"/>
+  <path d="M32 26v-3M45 30l2.5-2.5M19 30l-2.5-2.5" stroke="url(#solstice)" stroke-width="3" stroke-linecap="round"/>
+</svg>
