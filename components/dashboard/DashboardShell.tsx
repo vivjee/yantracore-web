@@ -1975,7 +1975,7 @@ function ClientRequestsPane({ requests, userEmail, onSubmitRequest }: ClientRequ
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-black/75 backdrop-blur-md"
              onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}>
-          <div className="w-full max-w-lg rounded-2xl overflow-x-hidden overflow-y-auto max-h-[calc(100dvh-2rem)] glass-heavy border border-accent-1/25 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl overflow-x-hidden overflow-y-auto max-h-[calc(100dvh-2rem)] glass-heavy glass-static border border-accent-1/25 shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/6">
               <div className="flex items-center gap-3">

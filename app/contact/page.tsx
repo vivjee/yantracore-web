@@ -6,7 +6,6 @@ import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { TvFrame } from "@/components/layout/TvFrame";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { GlassInput } from "@/components/glass/GlassInput";
-import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
 import { Rise } from "@/components/motion/Rise";
 import { submitContact, INQUIRY_TYPES, type InquiryType } from "@/lib/api/contact";
 import { audioSynth } from "@/lib/audio";
@@ -189,7 +188,7 @@ export default function ContactPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -15 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="glass-medium rounded-3xl p-8 md:p-10 border border-emerald-500/20 text-center relative overflow-hidden"
+                    className="glass-medium glass-static rounded-3xl p-8 md:p-10 border border-emerald-500/20 text-center relative overflow-hidden"
                   >
                     <div 
                       className="absolute inset-0 opacity-[0.03] pointer-events-none" 
@@ -225,8 +224,7 @@ export default function ContactPage() {
                     exit={{ opacity: 0, y: -15 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
                   >
-                    <AnimatedBorder variant="sweep" radius={24} duration={9000}>
-                      <div className="glass-heavy rounded-3xl p-6 md:p-8 flex flex-col gap-6">
+                      <div className="glass-heavy glass-static rounded-3xl p-6 md:p-8 flex flex-col gap-6">
                         {errorMessage && (
                           <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400 font-mono">
                             <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-500" />
@@ -476,7 +474,6 @@ export default function ContactPage() {
                           </button>
                         </form>
                       </div>
-                    </AnimatedBorder>
                   </motion.div>
                 )}
               </AnimatePresence>
