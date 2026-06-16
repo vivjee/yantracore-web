@@ -99,15 +99,16 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL("https://yantracore.com"),
   title: {
-    default: "YantraCore — The mechanisms that move modern business",
-    template: "%s — YantraCore",
+    // Mirrors the landing hero: the slogan is the tagline, no long dash.
+    default: "YantraCore | Technology for a Better World",
+    template: "%s | YantraCore",
   },
   description:
-    "YantraCore engineers software, AI, and infrastructure for ambitious companies — and for the communities we belong to.",
+    "At YantraCore, we transform bold ideas into powerful digital products - apps, platforms, and intelligent systems that are fast, elegant, practical, and built to make life simpler, work smarter, and communities stronger.",
   openGraph: {
-    title: "YantraCore — The mechanisms that move modern business",
+    title: "YantraCore | Technology for a Better World",
     description:
-      "YantraCore engineers software, AI, and infrastructure for ambitious companies — and for the communities we belong to.",
+      "At YantraCore, we transform bold ideas into powerful digital products - apps, platforms, and intelligent systems that are fast, elegant, practical, and built to make life simpler, work smarter, and communities stronger.",
     url: "https://yantracore.com",
     siteName: "YantraCore",
     images: [
@@ -123,9 +124,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "YantraCore — The mechanisms that move modern business",
+    title: "YantraCore | Technology for a Better World",
     description:
-      "YantraCore engineers software, AI, and infrastructure for ambitious companies — and for the communities we belong to.",
+      "At YantraCore, we transform bold ideas into powerful digital products - apps, platforms, and intelligent systems that are fast, elegant, practical, and built to make life simpler, work smarter, and communities stronger.",
     images: ["/images/brand/frame-hero-og.png"],
   },
 };

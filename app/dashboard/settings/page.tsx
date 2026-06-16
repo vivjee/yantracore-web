@@ -4,7 +4,7 @@ import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { TvFrame } from "@/components/layout/TvFrame";
 
 export const metadata: Metadata = {
-  title: "Settings — YantraCore",
+  title: "Settings",
   description: "Manage your YantraCore workspace preferences and appearance.",
 };
 

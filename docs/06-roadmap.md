@@ -25,7 +25,7 @@
 | Projects page (`/projects`) — `Showcase` in the orbital group | ✅ Live (own products; client work + testimonials moved to `/work`) |
 | `/work` — client work grid + testimonials | ✅ Live (reuses `Work` + `Voices`) |
 | `/about` — studio identity walkthrough | ✅ Live (reuses `Manifesto`/`Capabilities`/`Forge`) |
-| `/book` — Book a Consultation (estimator + intake) | ✅ Live (`submitProject` localStorage stub) |
+| `/book` — Start a Project (estimator + intake) | ✅ Live (`submitProject` localStorage stub) |
 | Console / dashboard (Ask AI, Email, Drive, Projects) | ✅ Live, wired to YantraMate |
 | YantraMate proxy routes (`app/api/*`) | ✅ Built |
 | Auth (login/signup) | ⚠️ Demo-grade (sessionStorage, no server session) |
@@ -61,7 +61,7 @@ Reorganizing the site around one idea: **YantraCore is the sun; every page is a 
 - [x] **Phase 2 — Projects folded into the orbital group.** `Showcase` gained an `externalSun` prop (drops its own centre logo/copy) so the cards orbit the shared `Sun`; `/projects` moved under `app/(orbital)/`. **First real seamless navigation** (Home ⇄ Projects, no glitch, Sun persists). Client work + testimonials were split out to a dedicated **`/work`** page (`WorkWalkthrough`, reusing `Work` + `Voices`) — the orbital screen is height-locked, so scrollable proof content lives better on its own route.
 - [x] **Phase 3 (mostly) — Technologies folded in; Activity renamed.** `/technologies` moved under `app/(orbital)/` for seamless nav — its opaque star-map (own centre star) covers the persistent Sun, sidestepping the big-Sun-vs-small-star scale mismatch. `/entryport` → `/activity` → `/reach` (308 redirects; kept a channel page since the globe is its own centerpiece). *Remaining: perfect the exit→enter cross-morph (frozen-router `AnimatePresence`) — now testable with 3 orbital routes.*
 - [x] **Phase 4 — About** (`/about`). Identity walkthrough assembling the VISION sections (custom hero + `Manifesto` + `Capabilities` + `Forge` + CTA). *Verified: static-prerendered, single `<h1>`, crawlable CTAs.*
-- [x] **Phase 5 — Book a Consultation** (`/book`). Budget estimator (`lib/content/estimator.ts` + `BudgetEstimator`) feeding the `submitProject` intake form. *Verified: static-prerendered, ESLint clean.*
+- [x] **Phase 5 — Start a Project** (`/book`). Budget estimator (`lib/content/estimator.ts` + `BudgetEstimator`) feeding the `submitProject` intake form. *Verified: static-prerendered, ESLint clean.*
 - [ ] **Phase 6 — nav/IA wiring + docs sweep.** Home ✅ (About node → `/about`; Book CTA → `/book`). Contact refresh ✅ (`/book` cross-link). Chrome-bar nav ✅ Home/Projects/Technologies/Reach/Contact (`/reach` relabel done). **Remaining:** add **About** + **Work** to the global nav, and **rewire the stale `Footer`** — it still links `#studio`, `#capabilities`, `/atelier`, `/signal`, `/privacy`, `/terms` (dead) instead of the real IA. Docs sweep ✅ (this update). (Staffing deferred.)
 
 ### Polish & decisions
