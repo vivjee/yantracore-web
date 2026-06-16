@@ -4,7 +4,6 @@ import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 
 const footerLinks = [
   { label: "Projects", href: "/projects" },
-  { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Technologies", href: "/technologies" },
   { label: "Lab", href: "/lab" },

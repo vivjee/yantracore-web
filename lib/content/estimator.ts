@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { Globe, Smartphone, Server, Cloud, BrainCircuit, Palette } from "lucide-react";
 
 /**
- * Budget estimator data + math for the Book a Consultation page (/book).
+ * Budget estimator data + math for the Start a Project page (/book).
  *
  * The numbers are INDICATIVE placeholders (round, defensible ranges) so the
  * estimator produces a believable ballpark — the real quote always follows a

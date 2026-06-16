@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="harvest" x1="22" y1="14" x2="42" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD27A"/>
+      <stop offset="1" stop-color="#E8821F"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 14v36" stroke="url(#harvest)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M32 24c-5-3-10-1-11 4 5 3 10 1 11-4ZM32 24c5-3 10-1 11 4-5 3-10 1-11-4ZM32 35c-5-3-10-1-11 4 5 3 10 1 11-4ZM32 35c5-3 10-1 11 4-5 3-10 1-11-4Z" fill="url(#harvest)"/>
+</svg>

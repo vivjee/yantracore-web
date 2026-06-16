@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Settings,
   Palette,
@@ -26,6 +25,55 @@ import { StaggerContainer, StaggerItem } from "@/components/motion/AnimationWrap
 import { audioSynth } from "@/lib/audio";
 import { HeaderLogo } from "@/components/chrome/Header";
 import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
+
+/* ── Font options — each renders its own name as a live type specimen ── */
+type FontOption = {
+  id: FontStyleType;
+  name: string;
+  desc: string;
+  emoji: string;
+  family: string; // the actual display family, for the live preview
+};
+
+const FONT_OPTIONS: FontOption[] = [
+  { id: "default", name: "Crystal Tech", desc: "Space Grotesk", emoji: "💎", family: "var(--font-space-grotesk)" },
+  { id: "cyber", name: "Aero Cyber", desc: "Orbitron", emoji: "🚀", family: "var(--font-orbitron)" },
+  { id: "wide", name: "Quantum Wide", desc: "Syncopate", emoji: "🌌", family: "var(--font-syncopate)" },
+  { id: "mono", name: "Neo-Chrono", desc: "JetBrains Mono", emoji: "📟", family: "var(--font-jetbrains-mono)" },
+  { id: "avant-garde", name: "Chroma Organic", desc: "Syne + Outfit", emoji: "🎨", family: "var(--font-syne)" },
+  { id: "editorial", name: "Editorial Ink", desc: "Fraunces", emoji: "📖", family: "var(--font-fraunces)" },
+  { id: "couture", name: "Maison Couture", desc: "Instrument Serif", emoji: "🥂", family: "var(--font-instrument-serif)" },
+  { id: "marquee", name: "Bold Marquee", desc: "Anton", emoji: "🎬", family: "var(--font-anton)" },
+  { id: "pillow", name: "Soft Pillow", desc: "Quicksand", emoji: "☁️", family: "var(--font-quicksand)" },
+  { id: "bricolage", name: "Studio Quirk", desc: "Bricolage", emoji: "🧩", family: "var(--font-bricolage)" },
+];
+
+const CURSOR_OPTIONS: { id: CursorStyleType; name: string; icon: string }[] = [
+  { id: "default", name: "System", icon: "🖱️" },
+  { id: "arrow", name: "Neon Arrow", icon: "↗️" },
+  { id: "crosshair", name: "Crosshair", icon: "🎯" },
+  { id: "dot", name: "Minimal Glow", icon: "🟢" },
+];
+
+/* ── Neumorphic surface helpers (single source of truth for depth) ── */
+const RAISED_CARD: React.CSSProperties = {
+  background: "var(--ink-1)",
+  boxShadow: "var(--nm-raised-medium)",
+};
+
+/** Raised by default; pressed-in (sunken) + accent ring when active. */
+function chipSurface(active: boolean, accent: string): React.CSSProperties {
+  return active
+    ? {
+        background: "var(--ink-1)",
+        boxShadow: `var(--nm-sunken-soft), 0 0 0 1px ${accent}59, 0 0 16px ${accent}1f`,
+        color: "var(--text-hi)",
+      }
+    : {
+        background: "var(--ink-1)",
+        boxShadow: "var(--nm-raised-soft)",
+      };
+}
 
 /* Ambient color glow */
 function AmbientOrbs({ palette }: { palette: PaletteType }) {
@@ -108,7 +156,35 @@ function SettingsSidebar() {
   );
 }
 
-/* Compact layout shell */
+/* Section heading with a recessed neumorphic icon well */
+function SectionHeader({
+  icon,
+  title,
+  hint,
+  accent,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint?: string;
+  accent: string;
+}) {
+  return (
+    <div className="mb-4 flex items-center gap-2.5">
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg"
+        style={{ boxShadow: "var(--nm-sunken-soft)", color: accent }}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold leading-none text-text-hi">{title}</p>
+        {hint && <p className="mt-1 truncate text-[10px] leading-none text-text-low">{hint}</p>}
+      </div>
+    </div>
+  );
+}
+
+/* Compact, neumorphic settings shell */
 export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
   const {
     palette,
@@ -117,7 +193,6 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
     cursorStyle,
     setCursorStyle,
     customCursorEnabled,
-    setCustomCursorEnabled,
     resetCursorSettings,
     fontStyle,
     setFontStyle,
@@ -128,11 +203,16 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
   const [toastVisible, setToastVisible] = useState(false);
   const [toastText, setToastText] = useState("Settings updated");
 
-  function handlePaletteSelect(id: string) {
-    setPaletteId(id);
-    setToastText("Theme updated");
+  function notify(text: string) {
+    setToastText(text);
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 2000);
+  }
+
+  function handlePaletteSelect(id: string) {
+    audioSynth.playClick();
+    setPaletteId(id);
+    notify("Palette updated");
   }
 
   return (
@@ -144,7 +224,7 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
         className={inTv ? "w-full flex flex-col" : "min-h-screen flex flex-col"}
         style={inTv ? {} : { paddingLeft: "200px" }}
       >
-        {/* Top Header bar */}
+        {/* Top Header bar (standalone route only) */}
         {!inTv && (
           <header
             className="sticky top-0 z-20 flex items-center gap-4 px-6 py-3 shrink-0"
@@ -163,244 +243,199 @@ export function SettingsShell({ inTv = false }: { inTv?: boolean }) {
             </Link>
             <ChevronRight size={10} className="text-text-faint opacity-40" />
             <span className="text-[11px] text-text-mid">Settings</span>
+          </header>
+        )}
 
-            {/* Changed toast */}
+        {/* Content — centred and width-capped so it never sprawls on lg screens */}
+        <StaggerContainer
+          delay={50}
+          staggerDelay={0.05}
+          className="mx-auto w-full max-w-3xl px-3 py-5 sm:px-5"
+        >
+          {/* Header */}
+          <StaggerItem className="mb-5 flex items-end justify-between gap-3">
+            <div>
+              <div className="mb-1 flex items-center gap-1.5">
+                <Sparkles size={11} style={{ color: palette.accent1 }} />
+                <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: palette.accent1 }}>
+                  Appearance
+                </span>
+              </div>
+              <h1 className="font-display text-xl font-bold tracking-tight text-text-hi">Theme &amp; Interface</h1>
+              <p className="mt-0.5 text-xs text-text-low">Make the workspace feel like yours.</p>
+            </div>
+
+            {/* Live "changed" pill */}
             <div
               className={cn(
-                "ml-auto flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1 rounded-full transition-all duration-300",
-                toastVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"
+                "flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] transition-all duration-300",
+                toastVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-1 opacity-0"
               )}
-              style={{
-                background: `${palette.accent1}12`,
-                color: palette.accent1,
-                border: `1px solid ${palette.accent1}22`,
-              }}
+              style={{ boxShadow: "var(--nm-sunken-soft)", color: palette.accent1 }}
             >
               <Check size={9} strokeWidth={3} />
               {toastText}
             </div>
-          </header>
-        )}
-
-        {/* Page Content wrapper */}
-        <StaggerContainer
-          delay={50}
-          staggerDelay={0.05}
-          className={inTv ? "w-full px-2 py-2" : "flex-1 px-6 py-6 max-w-2xl w-full"}
-        >
-          {/* Header section */}
-          <StaggerItem className="mb-6">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Sparkles size={12} style={{ color: "var(--accent-1)" }} />
-              <span className="text-[9px] font-mono uppercase tracking-widest text-text-low" style={{ color: "var(--accent-1)" }}>
-                Preference Center
-              </span>
-            </div>
-            <h1 className="text-xl font-bold text-text-hi tracking-tight font-display">
-              Workspace Settings
-            </h1>
-            <p className="text-text-low mt-0.5 text-xs">
-              Configure app appearance and cursor interface details.
-            </p>
           </StaggerItem>
 
-          {/* Unified Compact Settings Card */}
-          <StaggerItem className="rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-xl overflow-hidden shadow-xl relative">
-            <div className="h-[2px] w-full" style={{ background: `linear-gradient(to right, ${palette.accent1}, ${palette.accent2})` }} />
-            
-            {/* 1. Theme Selection Row */}
-            <div className="p-4 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-3">
-                <Palette size={14} style={{ color: palette.accent1 }} />
-                <p className="text-xs font-semibold text-text-hi">Color Theme</p>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {palettes.map((p) => {
-                  const isActive = p.id === palette.id;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => handlePaletteSelect(p.id)}
-                      className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer",
-                        isActive
-                          ? "text-white shadow"
-                          : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
-                      )}
-                      style={isActive ? {
-                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
-                        borderColor: `${palette.accent1}50`,
-                        boxShadow: `0 0 12px ${palette.accent1}20`,
-                      } : {}}
-                    >
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        {[p.accent1, p.accent2, p.accent3, p.accentWarm].map((c, i) => (
-                          <span
-                            key={i}
-                            className="w-1.5 h-1.5 rounded-full border border-black/20"
-                            style={{ backgroundColor: c }}
-                          />
-                        ))}
-                      </div>
-                      <span>{p.name}</span>
-                      <span className="opacity-80">{p.emoji}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Font Style Selection Row */}
-            <div className="p-4 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-3">
-                <Type size={14} style={{ color: palette.accent2 }} />
-                <p className="text-xs font-semibold text-text-hi">Font Style</p>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { id: "default", name: "Crystal Tech", desc: "Space Grotesk + Inter", emoji: "💎" },
-                  { id: "cyber", name: "Aero Cyber", desc: "Orbitron + Space Grotesk", emoji: "🚀" },
-                  { id: "wide", name: "Quantum Wide", desc: "Syncopate + Inter", emoji: "🌌" },
-                  { id: "mono", name: "Neo-Chrono", desc: "JetBrains Mono + Mono", emoji: "📟" },
-                  { id: "avant-garde", name: "Chroma Organic", desc: "Syne + Outfit", emoji: "🎨" },
-                ].map((f) => {
-                  const isActive = f.id === fontStyle;
-                  return (
-                    <button
-                      key={f.id}
-                      onClick={() => {
-                        audioSynth.playClick();
-                        setFontStyle(f.id as FontStyleType);
-                        setToastText("Fonts updated");
-                        setToastVisible(true);
-                        setTimeout(() => setToastVisible(false), 2000);
-                      }}
-                      className={cn(
-                        "flex flex-col items-start px-3 py-1.5 rounded-lg text-left border transition-all duration-200 cursor-pointer min-w-[130px] flex-1",
-                        isActive
-                          ? "text-white shadow"
-                          : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
-                      )}
-                      style={isActive ? {
-                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
-                        borderColor: `${palette.accent1}50`,
-                        boxShadow: `0 0 12px ${palette.accent1}20`,
-                      } : {}}
-                    >
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-xs shrink-0">{f.emoji}</span>
-                        <span className="text-[11px] font-bold">{f.name}</span>
-                      </div>
-                      <span className="text-[9px] opacity-60 leading-none">{f.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 2. Cursor Design Selector */}
-            <div className="p-4 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles size={14} style={{ color: palette.accent3 }} />
-                <p className="text-xs font-semibold text-text-hi">Cursor Design</p>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { id: "default", name: "Default Cursor", icon: "SYS" },
-                  { id: "arrow", name: "Neon Arrow", icon: "↗️" },
-                  { id: "crosshair", name: "Target Crosshair", icon: "🎯" },
-                  { id: "dot", name: "Minimal Glow", icon: "🟢" },
-                ].map((c) => {
-                  const isDefault = c.id === "default";
-                  const isActive = isDefault
-                    ? !customCursorEnabled || cursorStyle === "default"
-                    : c.id === cursorStyle && customCursorEnabled;
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => {
-                        audioSynth.playClick();
-                        if (isDefault) {
-                          resetCursorSettings();
-                          setToastVisible(true);
-                          setTimeout(() => setToastVisible(false), 2000);
-                          return;
-                        }
-                        setCursorStyle(c.id as CursorStyleType);
-                      }}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer",
-                        isActive
-                          ? "text-white shadow"
-                          : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
-                      )}
-                      style={isActive ? {
-                        background: `linear-gradient(135deg, ${palette.accent1}1c, ${palette.accent2}0c)`,
-                        borderColor: `${palette.accent1}50`,
-                        boxShadow: `0 0 12px ${palette.accent1}20`,
-                      } : {}}
-                    >
-                      <span className="text-xs">{c.icon}</span>
-                      <span>{c.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3. Logo Animation Settings */}
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Activity size={14} style={{ color: palette.accentWarm }} />
-                <p className="text-xs font-semibold text-text-hi">Logo Animation</p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <div className="flex-1">
-                  <p className="text-[11px] text-text-mid mb-2">
-                    Enable the dynamic "heartbeat" squish effect on logos throughout the application.
-                  </p>
+          {/* ── Color palette ── */}
+          <StaggerItem className="mb-4 rounded-2xl p-4 sm:p-5" style={RAISED_CARD}>
+            <SectionHeader
+              icon={<Palette size={14} />}
+              title="Color Palette"
+              hint={palette.name + " — " + palette.tagline}
+              accent={palette.accent1}
+            />
+            <div className="grid grid-cols-1 gap-2 xs:grid-cols-2 sm:grid-cols-3">
+              {palettes.map((p) => {
+                const isActive = p.id === palette.id;
+                return (
                   <button
+                    key={p.id}
+                    onClick={() => handlePaletteSelect(p.id)}
+                    aria-pressed={isActive}
+                    className="flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-300"
+                    style={chipSurface(isActive, palette.accent1)}
+                  >
+                    <span
+                      className="h-7 w-7 shrink-0 rounded-lg"
+                      style={{
+                        background: p.previewGradient,
+                        boxShadow: isActive
+                          ? `0 0 10px ${p.accent1}66`
+                          : "inset 0 0 0 1px rgba(255,255,255,0.07)",
+                      }}
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-text-hi">
+                        <span className="truncate">{p.name}</span>
+                        <span className="shrink-0 opacity-80">{p.emoji}</span>
+                      </span>
+                    </span>
+                    {isActive && <Check size={12} strokeWidth={3} className="shrink-0" style={{ color: p.accent1 }} />}
+                  </button>
+                );
+              })}
+            </div>
+          </StaggerItem>
+
+          {/* ── Typeface ── */}
+          <StaggerItem className="mb-4 rounded-2xl p-4 sm:p-5" style={RAISED_CARD}>
+            <SectionHeader
+              icon={<Type size={14} />}
+              title="Typeface"
+              hint="Each tile is a live specimen of the font"
+              accent={palette.accent2}
+            />
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {FONT_OPTIONS.map((f) => {
+                const isActive = f.id === fontStyle;
+                return (
+                  <button
+                    key={f.id}
                     onClick={() => {
                       audioSynth.playClick();
-                      setLogoHeartbeatEnabled(!logoHeartbeatEnabled);
-                      setToastText(logoHeartbeatEnabled ? "Logo heartbeat disabled" : "Logo heartbeat enabled");
-                      setToastVisible(true);
-                      setTimeout(() => setToastVisible(false), 2000);
+                      setFontStyle(f.id);
+                      notify("Typeface updated");
                     }}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer w-fit",
-                      logoHeartbeatEnabled
-                        ? "text-white shadow"
-                        : "bg-white/[0.01] border-white/5 text-text-low hover:border-white/10 hover:text-text-mid hover:bg-white/[0.03]"
-                    )}
-                    style={logoHeartbeatEnabled ? {
-                      background: `linear-gradient(135deg, ${palette.accentWarm}1c, ${palette.accent3}0c)`,
-                      borderColor: `${palette.accentWarm}50`,
-                      boxShadow: `0 0 12px ${palette.accentWarm}20`,
-                    } : {}}
+                    aria-pressed={isActive}
+                    className="flex cursor-pointer flex-col gap-1 rounded-xl px-3 py-2.5 text-left transition-all duration-300"
+                    style={chipSurface(isActive, palette.accent2)}
                   >
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      logoHeartbeatEnabled ? "bg-white animate-pulse" : "bg-white/30"
-                    )} />
-                    {logoHeartbeatEnabled ? "Heartbeat Enabled" : "Heartbeat Disabled"}
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span
+                        className="truncate text-[15px] leading-tight text-text-hi"
+                        style={{ fontFamily: f.family }}
+                      >
+                        {f.name}
+                      </span>
+                      <span className="shrink-0 text-xs">{f.emoji}</span>
+                    </span>
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-text-low">{f.desc}</span>
                   </button>
-                </div>
-                
-                {/* Live Preview Container */}
-                <div 
-                  className="flex flex-col items-center gap-2 p-3 rounded-xl border border-white/5 bg-[#06070D] shrink-0"
-                  style={{ width: "120px", boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)" }}
-                >
-                  <span className="text-[9px] font-mono text-text-faint uppercase tracking-wider">Preview</span>
-                  <HeaderLogo size="small" />
-                </div>
-              </div>
+                );
+              })}
             </div>
-
           </StaggerItem>
 
-          <div className="h-12" />
+          {/* ── Cursor ── */}
+          <StaggerItem className="mb-4 rounded-2xl p-4 sm:p-5" style={RAISED_CARD}>
+            <SectionHeader
+              icon={<Sparkles size={14} />}
+              title="Cursor"
+              hint="Swap the pointer for a custom design"
+              accent={palette.accent3}
+            />
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {CURSOR_OPTIONS.map((c) => {
+                const isDefault = c.id === "default";
+                const isActive = isDefault
+                  ? !customCursorEnabled || cursorStyle === "default"
+                  : c.id === cursorStyle && customCursorEnabled;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      audioSynth.playClick();
+                      if (isDefault) {
+                        resetCursorSettings();
+                        notify("Cursor reset");
+                        return;
+                      }
+                      setCursorStyle(c.id);
+                      notify("Cursor updated");
+                    }}
+                    aria-pressed={isActive}
+                    className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-[11px] font-medium text-text-mid transition-all duration-300"
+                    style={chipSurface(isActive, palette.accent3)}
+                  >
+                    <span className="text-xs">{c.icon}</span>
+                    <span className="truncate">{c.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </StaggerItem>
+
+          {/* ── Logo animation ── */}
+          <StaggerItem className="mb-4 rounded-2xl p-4 sm:p-5" style={RAISED_CARD}>
+            <SectionHeader
+              icon={<Activity size={14} />}
+              title="Logo Animation"
+              hint="The “heartbeat” squish on logos site-wide"
+              accent={palette.accentWarm}
+            />
+            <div className="flex items-center justify-between gap-4">
+              <button
+                onClick={() => {
+                  audioSynth.playClick();
+                  setLogoHeartbeatEnabled(!logoHeartbeatEnabled);
+                  notify(logoHeartbeatEnabled ? "Heartbeat off" : "Heartbeat on");
+                }}
+                role="switch"
+                aria-checked={logoHeartbeatEnabled}
+                className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-medium text-text-mid transition-all duration-300"
+                style={chipSurface(logoHeartbeatEnabled, palette.accentWarm)}
+              >
+                <span
+                  className={cn("h-2 w-2 rounded-full", logoHeartbeatEnabled && "animate-pulse")}
+                  style={{ background: logoHeartbeatEnabled ? palette.accentWarm : "var(--text-faint)" }}
+                />
+                {logoHeartbeatEnabled ? "Enabled" : "Disabled"}
+              </button>
+
+              {/* Live preview, recessed into the card */}
+              <div
+                className="flex shrink-0 flex-col items-center gap-1.5 rounded-xl px-4 py-2.5"
+                style={{ boxShadow: "var(--nm-sunken-soft)" }}
+              >
+                <span className="font-mono text-[8px] uppercase tracking-wider text-text-faint">Preview</span>
+                <HeaderLogo size="small" />
+              </div>
+            </div>
+          </StaggerItem>
+
+          <div className="h-10" />
         </StaggerContainer>
       </main>
     </div>

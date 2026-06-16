@@ -17,7 +17,30 @@ const MOTION_TOGGLE_STORAGE_KEY = "yantra_theme_motion_toggle";
 const LOGO_HEARTBEAT_STORAGE_KEY = "yantra_theme_logo_heartbeat";
 
 export type CursorStyleType = "default" | "arrow" | "crosshair" | "dot";
-export type FontStyleType = "default" | "cyber" | "wide" | "mono" | "avant-garde";
+export type FontStyleType =
+  | "default"
+  | "cyber"
+  | "wide"
+  | "mono"
+  | "avant-garde"
+  | "editorial"
+  | "couture"
+  | "marquee"
+  | "pillow"
+  | "bricolage";
+
+const FONT_STYLE_IDS: FontStyleType[] = [
+  "default",
+  "cyber",
+  "wide",
+  "mono",
+  "avant-garde",
+  "editorial",
+  "couture",
+  "marquee",
+  "pillow",
+  "bricolage",
+];
 
 interface ThemeContextValue {
   palette: Palette;
@@ -53,7 +76,7 @@ const ThemeContext = createContext<ThemeContextValue>({
   setReducedMotionEnabled: () => {},
   logoHeartbeatEnabled: true,
   setLogoHeartbeatEnabled: () => {},
-  fontStyle: "default",
+  fontStyle: "pillow",
   setFontStyle: () => {},
 });
 
@@ -95,7 +118,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [customCursorEnabled, setCustomCursorEnabledState] = useState<boolean>(false);
   const [reducedMotionEnabled, setReducedMotionEnabledState] = useState<boolean>(false);
   const [logoHeartbeatEnabled, setLogoHeartbeatEnabledState] = useState<boolean>(true);
-  const [fontStyle, setFontStyleState] = useState<FontStyleType>("default");
+  const [fontStyle, setFontStyleState] = useState<FontStyleType>("pillow");
 
   // On mount, read persisted preferences
   useEffect(() => {
@@ -141,11 +164,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
 
       const savedFontStyle = localStorage.getItem("yantra_font_style") as FontStyleType;
-      if (savedFontStyle && ["default", "cyber", "wide", "mono", "avant-garde"].includes(savedFontStyle)) {
+      if (savedFontStyle && FONT_STYLE_IDS.includes(savedFontStyle)) {
         setFontStyleState(savedFontStyle);
         applyFontStyle(savedFontStyle);
       } else {
-        applyFontStyle("default");
+        applyFontStyle("pillow");
       }
     } catch {
       // ignore (SSR / private mode)

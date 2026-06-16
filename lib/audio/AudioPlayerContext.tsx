@@ -24,6 +24,10 @@ export const TRACKS: Track[] = [
   { id: 3, title: "Island Drift", duration: "2:39", isPlayable: true, src: "/music/island-drift.mp3", description: "Sun-soaked lounge groove drifting on breezy, tropical textures.", tempo: "70 BPM", key: "A Major" },
   { id: 4, title: "Mango Moon", duration: "3:19", isPlayable: true, src: "/music/mango-moon.mp3", description: "Warm nocturnal chillout with mellow, fruit-ripe synth pads.", tempo: "68 BPM", key: "F Major" },
   { id: 5, title: "Sunlit Strings", duration: "2:40", isPlayable: true, src: "/music/sunlit-strings.mp3", description: "Golden-hour ambient piece carried by soft, sunlit strings.", tempo: "60 BPM", key: "G Major" },
+  { id: 6, title: "Glass Cursor", duration: "3:02", isPlayable: true, src: "/music/glass-cursor.mp3", description: "Crystalline glass tones gliding over a hushed ambient pulse.", tempo: "70 BPM", key: "B Minor" },
+  { id: 7, title: "Neon Tape Delay", duration: "2:59", isPlayable: true, src: "/music/neon-tape-delay.mp3", description: "Neon-lit dub textures smeared through warm analog tape delay.", tempo: "75 BPM", key: "A Minor" },
+  { id: 8, title: "Sky of Juniper", duration: "5:29", isPlayable: true, src: "/music/sky-of-juniper.mp3", description: "Wide, evergreen ambient drift beneath an open evening sky.", tempo: "62 BPM", key: "D Major" },
+  { id: 9, title: "Tideglass", duration: "2:44", isPlayable: true, src: "/music/tideglass.mp3", description: "Glassy tidal swells lapping in slow, meditative waves.", tempo: "66 BPM", key: "G Minor" },
 ];
 
 /** "m:ss" → seconds (300s fallback). Module-level so it can seed initial state. */

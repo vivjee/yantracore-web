@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { X, ExternalLink } from "lucide-react";
 import { MarqueeRow } from "@/components/motion/MarqueeRow";
 import { Container } from "@/components/layout/Container";
@@ -19,14 +21,19 @@ const ACCENT_CYCLE = [
   "var(--accent-2)",
 ];
 
+interface Selection {
+  project: ClientProject;
+  accent: string;
+}
+
 export function Work() {
-  const [selected, setSelected] = useState<ClientProject | null>(null);
+  const [selected, setSelected] = useState<Selection | null>(null);
 
   return (
     <section id="work" className="relative py-32 md:py-48 overflow-hidden">
       <Container width="default" className="relative z-10">
         <Reveal>
-          <Eyebrow>06 — Client Work</Eyebrow>
+          <Eyebrow tone="accent">The Client Constellation</Eyebrow>
         </Reveal>
         <Reveal delay={100}>
           <h2
@@ -51,8 +58,9 @@ export function Work() {
         </Reveal>
         <Reveal delay={180}>
           <p className="mt-6 text-lg text-text-mid max-w-2xl leading-relaxed">
-            A selection of projects across industries. Click any to see what we
-            built and how.
+            Beyond our own products, these are the worlds we&apos;ve built for clients —
+            across web, apps, AI, and infrastructure. Each one is owned by the people we
+            built it with. Click any to see what we made and how.
           </p>
         </Reveal>
       </Container>
@@ -61,14 +69,17 @@ export function Work() {
       <Container width="default" className="relative z-10 mt-16">
         <Reveal delay={240}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {clientProjects.map((project, pi) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                accent={ACCENT_CYCLE[pi % ACCENT_CYCLE.length]}
-                onClick={() => setSelected(project)}
-              />
-            ))}
+            {clientProjects.map((project, pi) => {
+              const accent = ACCENT_CYCLE[pi % ACCENT_CYCLE.length];
+              return (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  accent={accent}
+                  onClick={() => setSelected({ project, accent })}
+                />
+              );
+            })}
           </div>
         </Reveal>
       </Container>
@@ -95,18 +106,22 @@ export function Work() {
       {/* CTA */}
       <Container width="default" className="mt-12 text-center relative z-10">
         <Reveal delay={380}>
-          <a
-            href="#signal"
+          <Link
+            href="/book"
             className="inline-flex items-center gap-2 text-sm font-medium text-text-mid transition-colors duration-300 hover:text-accent-1 font-mono"
           >
-            Have a project? Send a signal →
-          </a>
+            Have a project? Book a consultation →
+          </Link>
         </Reveal>
       </Container>
 
       {/* Modal */}
       {selected && (
-        <ProjectModal project={selected} onClose={() => setSelected(null)} />
+        <ProjectModal
+          project={selected.project}
+          accent={selected.accent}
+          onClose={() => setSelected(null)}
+        />
       )}
     </section>
   );
@@ -114,19 +129,13 @@ export function Work() {
 
 function ProjectModal({
   project,
+  accent,
   onClose,
 }: {
   project: ClientProject;
+  accent: string;
   onClose: () => void;
 }) {
-  const accentColors: Record<string, string> = {
-    "Web App": "var(--accent-1)",
-    "AI": "var(--accent-2)",
-    "E-commerce": "var(--accent-warm)",
-    "Mobile": "var(--accent-3)",
-  };
-  const accent = accentColors[project.tags[0]] ?? "var(--accent-1)";
-
   return (
     <div
       role="dialog"
@@ -191,6 +200,34 @@ function ProjectModal({
 
           {/* Content */}
           <div className="relative z-10">
+            {/* Logo + name */}
+            <div className="mb-5 flex items-center gap-3.5">
+              <div
+                className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
+                style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-0 opacity-25 blur-[8px]"
+                  style={{ background: accent }}
+                />
+                <Image
+                  src={project.logo}
+                  alt={`${project.name} logo`}
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="relative z-10 object-contain"
+                />
+              </div>
+              <h3
+                className="text-2xl font-semibold text-text-hi"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {project.name}
+              </h3>
+            </div>
+
             {/* Tags */}
             <div className="flex flex-wrap gap-1.5 mb-5">
               {project.tags.map((tag) => (
@@ -200,12 +237,6 @@ function ProjectModal({
               ))}
             </div>
 
-            <h3
-              className="text-2xl font-semibold text-text-hi mb-3"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {project.name}
-            </h3>
             <p className="text-text-mid leading-relaxed">{project.description}</p>
 
             {project.url && (

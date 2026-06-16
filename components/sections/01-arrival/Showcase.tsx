@@ -19,6 +19,7 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
 import {
   Activity,
   Bot,
+  ChevronDown,
   Clock,
   Compass,
   Cpu,
@@ -119,7 +120,7 @@ export function Showcase({ inTv = false, externalSun = false }: ShowcaseProps) {
     {
       name: "SHRAMDAN",
       logoImg: "/images/logo/shramdaan_logo.png",
-      desc: "Solve social problems, together.",
+      desc: "Founded by us, now community-led.",
       accent: "var(--accent-warm)",
       url: "/channels/shramdan"
     }
@@ -518,6 +519,35 @@ function ProjectsIntro({ mobile = false }: { mobile?: boolean }) {
           Build your project with us
         </GlassButton>
       </Rise>
+
+      {/* Scroll cue → the client constellation lower on the page. Sits right
+          under the CTA rather than pinned to the bottom of the tall first
+          screen (which fell below the fold). Desktop only: the phone layout
+          flows straight into its product grid + tab bar, so a cue there would
+          only crowd it. */}
+      {!mobile && (
+        <Rise delay={0.32} y={14} className="mt-1.5">
+          <a
+            href="#work"
+            onMouseEnter={() => audioSynth.playHover()}
+            onClick={(e) => {
+              e.preventDefault();
+              audioSynth.playClick();
+              const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              document
+                .getElementById("work")
+                ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+            }}
+            className="group flex flex-col items-center gap-1 text-text-low transition-colors hover:text-text-hi"
+            aria-label="Scroll to client work"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em]">
+              Client work
+            </span>
+            <ChevronDown className="h-4 w-4 animate-bounce" aria-hidden />
+          </a>
+        </Rise>
+      )}
     </div>
   );
 }
@@ -1819,7 +1849,7 @@ function CardShramdan({ syncTick = 0 }: { syncTick?: number }) {
         logoImg="/images/logo/shramdaan_logo.png"
         unicodeChar="🌱"
         title="SHRAMDAN"
-        description="Solve social problems, together."
+        description="Founded by YantraCore — now community-led."
         accentColor="var(--accent-warm)"
         url="https://shramdan.org"
       />
@@ -2535,7 +2565,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
 
   const handleHireYantracore = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push("/contact");
+    router.push("/book");
   };
 
   return (
@@ -2604,7 +2634,7 @@ function CardCoreStatus({ syncTick = 0 }: { syncTick?: number }) {
           className="w-full py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-mono font-bold active:scale-95 transition-all text-ink-0 text-center cursor-pointer"
           style={{ backgroundColor: "var(--accent-2)", boxShadow: "0 0 12px rgba(0,224,203,0.3)" }}
         >
-          Contact Us
+          Start a Project
         </button>
       </div>
     </div>

@@ -396,8 +396,7 @@ export function LoginForm({ inTv = false }: { inTv?: boolean }) {
           }}
         />
 
-        <AnimatedBorder variant="sweep" radius={24} duration={8000}>
-          <div className="glass-heavy relative rounded-3xl p-5 sm:p-8 lg:p-10">
+          <div className="glass-heavy glass-static relative rounded-3xl p-5 sm:p-8 lg:p-10">
             <StaggerContainer delay={300} staggerDelay={0.06}>
               {/* Header */}
               <StaggerItem className="mb-6">
@@ -586,7 +585,6 @@ export function LoginForm({ inTv = false }: { inTv?: boolean }) {
               </StaggerItem>
             </StaggerContainer>
           </div>
-        </AnimatedBorder>
       </ScaleFadeItem>
     </div>
   );

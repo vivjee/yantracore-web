@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Check, Loader2, AlertCircle, CalendarCheck } from "lucide-react";
 import { Eyebrow } from "@/components/typography/Eyebrow";
 import { GlassInput } from "@/components/glass/GlassInput";
-import { AnimatedBorder } from "@/components/glass/AnimatedBorder";
 import { BudgetEstimator } from "./BudgetEstimator";
 import {
   estimate,
@@ -134,7 +133,7 @@ export function BookConsultation() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="relative overflow-hidden rounded-3xl glass-medium border border-emerald-500/20 p-8 text-center md:p-10"
+              className="relative overflow-hidden rounded-3xl glass-medium glass-static border border-emerald-500/20 p-8 text-center md:p-10"
             >
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10">
                 <Check className="h-8 w-8 text-emerald-400" />
@@ -164,8 +163,7 @@ export function BookConsultation() {
               className="flex flex-col gap-6"
             >
               {/* ── Step 01 · Project details ── */}
-              <AnimatedBorder variant="sweep" radius={24} duration={9000}>
-                <div className="rounded-3xl glass-heavy p-6 md:p-8">
+                <div className="rounded-3xl glass-heavy glass-static p-6 md:p-8">
                   <div className="mb-8 flex flex-col gap-2">
                     <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
                       Step 01
@@ -282,10 +280,9 @@ export function BookConsultation() {
                     </div>
                   </div>
                 </div>
-              </AnimatedBorder>
 
               {/* ── Step 02 · Your details ── */}
-              <div className="flex flex-col gap-6 rounded-3xl glass-heavy p-6 md:p-8">
+              <div className="flex flex-col gap-6 rounded-3xl glass-heavy glass-static p-6 md:p-8">
                 <div className="mb-2 flex flex-col gap-2">
                   <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">
                     Step 02

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="nimbus" x1="16" y1="18" x2="48" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5BC8FF"/>
+      <stop offset="1" stop-color="#3B6BFF"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 38h20a7.5 7.5 0 0 0 .5-15A11 11 0 0 0 21 21a8.5 8.5 0 0 0 1 17Z" fill="url(#nimbus)"/>
+  <path d="M26 47h16M30 53h12" stroke="url(#nimbus)" stroke-width="4" stroke-linecap="round"/>
+</svg>

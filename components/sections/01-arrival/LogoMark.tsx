@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 import { useTheme } from "@/lib/theme/ThemeProvider";
+import { useIsTouch } from "@/lib/hooks/useMediaQuery";
 
 /**
  * LogoMark — Showcase centerpiece.
@@ -49,6 +50,9 @@ export function LogoMark({ centerY = "34%", onClick, parallax = true, spin = tru
 
   const [hovered, setHovered] = useState(false);
   const hoveredRef = useRef(false);
+  // Touch devices (phones/tablets) render a static, colorful logo — the full
+  // mark stacks ~10 animated blur/filter/blend layers that flicker on mobile GPUs.
+  const lite = useIsTouch();
 
   // ── Mouse-parallax tilt — composes ON TOP of CSS planet spin ──
   useEffect(() => {
@@ -125,12 +129,47 @@ export function LogoMark({ centerY = "34%", onClick, parallax = true, spin = tru
     "drop-shadow(0 2px 20px rgba(110,86,255,0.15)) " +
     "drop-shadow(0 -1px 8px rgba(255,255,255,0.15))";
 
+  // ── Mobile lite render: one static, colorful, flicker-free logomark ──
+  if (lite) {
+    return (
+      <div
+        ref={wrapRef}
+        className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-[5] ${onClick ? "cursor-pointer active:scale-[0.98] transition-transform duration-150" : ""}`}
+        style={{ top: centerY, width: 320, height: 320, display: "flex", alignItems: "center", justifyContent: "center" }}
+        aria-hidden
+        onClick={onClick}
+      >
+        {/* one soft static glow — composited once, no animation/blur churn */}
+        <div style={{
+          position: "absolute", width: 300, height: 300, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(110,86,255,0.20) 0%, rgba(0,224,203,0.08) 45%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+        {/* static logomark — the brand gradient masked by the logo shape */}
+        <div style={{ position: "relative", width: 260, height: 260 }}>
+          <div style={{ position: "absolute", inset: 0, opacity: 0.12 }}>
+            <Image src="/images/logo/logo-white-no-text.svg" alt="YantraCore" fill className="object-contain" priority />
+          </div>
+          <div style={{
+            position: "absolute", inset: 0,
+            WebkitMaskImage: "url('/images/logo/logo-white-no-text.svg')",
+            maskImage: "url('/images/logo/logo-white-no-text.svg')",
+            WebkitMaskSize: "contain", maskSize: "contain",
+            WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center", maskPosition: "center",
+            background: "linear-gradient(135deg, #00e0cb 0%, #6e56ff 50%, #ff4fb0 100%)",
+          }} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={wrapRef}
       className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-[5] ${onClick ? 'cursor-pointer active:scale-[0.98] transition-transform duration-150' : 'transition-transform duration-300'}`}
-      style={{ 
-        top: centerY, 
+      style={{
+        top: centerY,
         cursor: onClick ? "pointer" : "default",
         width: 320,
         height: 320,

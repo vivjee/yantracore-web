@@ -34,11 +34,11 @@ import { audioSynth } from "@/lib/audio";
    on each side, leaving the whole lower wedge open for the centre copy. `bob`
    gives each its own drift so they never move in unison. */
 const SATELLITES = [
-  { name: "Projects",     tagline: "What we've built",     href: "/projects",     accent: "var(--accent-2)",    Icon: Boxes,            side: "top",   angle: 90,  bob: { dur: "9.5s", delay: "-2s",   x: "0px",  y: "-9px"  } },
-  { name: "Technologies", tagline: "The stack we wield",   href: "/technologies", accent: "var(--accent-1)",    Icon: StellarOrbitIcon, side: "left",  angle: 140, bob: { dur: "8.5s", delay: "-4s",   x: "-5px", y: "-10px" } },
-  { name: "Reach",        tagline: "Where our work lands", href: "/reach",        accent: "var(--accent-warm)", Icon: Globe2,           side: "left",  angle: 190, bob: { dur: "10s",  delay: "-2.5s", x: "-4px", y: "-7px"  } },
-  { name: "About",        tagline: "Who we are",           href: "/about",        accent: "var(--accent-3)",    Icon: Info,             side: "right", angle: 40,  bob: { dur: "9s",   delay: "-3s",   x: "5px",  y: "-8px"  } },
-  { name: "Contact",      tagline: "Start a conversation", href: "/contact",      accent: "var(--accent-2)",    Icon: Mail,             side: "right", angle: -10, bob: { dur: "11s",  delay: "-1s",   x: "6px",  y: "-6px"  } },
+  { name: "Projects",     tagline: "Things we've shipped",     href: "/projects",     accent: "var(--accent-2)",    Icon: Boxes,            side: "top",   angle: 90,  bob: { dur: "9.5s", delay: "-2s",   x: "0px",  y: "-9px"  } },
+  { name: "Technologies", tagline: "The tools of the craft",   href: "/technologies", accent: "var(--accent-1)",    Icon: StellarOrbitIcon, side: "left",  angle: 140, bob: { dur: "8.5s", delay: "-4s",   x: "-5px", y: "-10px" } },
+  { name: "Reach",        tagline: "How far our work travels", href: "/reach",        accent: "var(--accent-warm)", Icon: Globe2,           side: "left",  angle: 190, bob: { dur: "10s",  delay: "-2.5s", x: "-4px", y: "-7px"  } },
+  { name: "About",        tagline: "The minds behind it",      href: "/about",        accent: "var(--accent-3)",    Icon: Info,             side: "right", angle: 40,  bob: { dur: "9s",   delay: "-3s",   x: "5px",  y: "-8px"  } },
+  { name: "Contact",      tagline: "Let's build something",    href: "/contact",      accent: "var(--accent-2)",    Icon: Mail,             side: "right", angle: -10, bob: { dur: "11s",  delay: "-1s",   x: "6px",  y: "-6px"  } },
 ] as const;
 
 /* ── Entrance choreography ────────────────────────────────────────────────
@@ -120,7 +120,7 @@ function CenterCopy({ compact = false, as = "h1" }: { compact?: boolean; as?: "h
           onMouseEnter={() => audioSynth.playHover()}
           onClick={() => go("/book")}
         >
-          Book a Consultation
+          Start a Project
         </GlassButton>
       </Rise>
     </div>

@@ -139,7 +139,7 @@ export function AboutWalkthrough() {
                   href="/book"
                   className="glass-primary inline-flex items-center gap-2 rounded-xl px-6 py-3 font-mono text-sm font-semibold uppercase tracking-wider text-text-hi transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(110,86,255,0.45)]"
                 >
-                  Book a Consultation <ArrowRight size={15} />
+                  Start a Project <ArrowRight size={15} />
                 </Link>
                 <Link
                   href="/contact"

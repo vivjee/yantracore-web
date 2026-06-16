@@ -100,6 +100,8 @@ Four classes, three "elevations" + a primary:
 
 All share: `background: #0A0C16`, `backdrop-filter: none`, `border: 1px solid rgba(255,255,255,0.02)`, a top inset highlight, and a 300ms `--ease-out-soft` transition. Adding the `.active` class (or `:active`) presses the surface *into* the page (inset shadow).
 
+**`.glass-static` (opt-out):** add it alongside any `.glass-*` class to keep the surface raised on click — the press-in (and animated borders) are reserved for cards, buttons, and smaller controls, not big form/content containers. Implemented as a `:not(.glass-static)` guard on every `:active`/`.active` rule (both themes), so it needs no declarations of its own. Used by the auth, contact, and book form panels and the dashboard request modal.
+
 **Neumorphic shadow tokens:**
 ```
 --nm-raised-soft:   5px 5px 12px #020305, -5px -5px 12px #121626

@@ -83,7 +83,7 @@ app/                 # Next.js App Router: pages, layouts, and /api proxy routes
     projects/        #   /projects — Showcase product constellation (externalSun → shares the Sun)
   about/             # /about — studio identity walkthrough (channel page; reuses VISION sections)
   work/              # /work — client work grid + testimonials (Work + Voices)
-  book/              # /book — Book a Consultation (budget estimator + intake form)
+  book/              # /book — Start a Project (budget estimator + intake form)
   dashboard/         # The console (DashboardShell)
   login/ signup/     # Auth surfaces (currently localStorage/demo)
   music/ reach/      # Brochure feature pages

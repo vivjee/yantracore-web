@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { SiteBackground } from "@/components/backgrounds/SiteBackground";
 import { TvFrame } from "@/components/layout/TvFrame";
 import { PostCard } from "@/components/lab/PostCard";
+import { Rise } from "@/components/motion/Rise";
 import { fetchPost, fetchPosts } from "@/lib/api/posts";
 
 interface PageProps {
@@ -69,45 +70,55 @@ export default async function LabPostPage({ params }: PageProps) {
       <TvFrame>
         <div className="relative z-10 h-full w-full overflow-y-auto no-scrollbar px-6 pb-24 pt-12 md:pt-20">
           <article className="mx-auto max-w-[720px]">
-            <Link
-              href="/lab"
-              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-text-low transition-colors hover:text-text-hi"
-            >
-              <ArrowLeft size={13} aria-hidden /> All notes
-            </Link>
+            <Rise delay={0.08}>
+              <Link
+                href="/lab"
+                className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-text-low transition-colors hover:text-text-hi"
+              >
+                <ArrowLeft size={13} aria-hidden /> All notes
+              </Link>
+            </Rise>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-wider text-text-low">
-              <span className="text-accent-1">{post.category}</span>
-              <span aria-hidden>·</span>
-              <span>{formatDate(post.date)}</span>
-              <span aria-hidden>·</span>
-              <span>{post.readingMinutes} min read</span>
-            </div>
+            <Rise delay={0.16}>
+              <div className="mt-6 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-wider text-text-low">
+                <span className="text-accent-1">{post.category}</span>
+                <span aria-hidden>·</span>
+                <span>{formatDate(post.date)}</span>
+                <span aria-hidden>·</span>
+                <span>{post.readingMinutes} min read</span>
+              </div>
+            </Rise>
 
-            <h1
-              className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight text-text-hi md:text-4xl"
-              style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.01em" }}
-            >
-              {post.title}
-            </h1>
+            <Rise delay={0.24}>
+              <h1
+                className="mt-4 font-display text-3xl font-bold leading-tight tracking-tight text-text-hi md:text-4xl"
+                style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.01em" }}
+              >
+                {post.title}
+              </h1>
+            </Rise>
 
-            <div className="mt-8 flex flex-col gap-5 text-[15px] leading-relaxed text-text-mid md:text-base">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                {post.body}
-              </ReactMarkdown>
-            </div>
+            <Rise delay={0.34}>
+              <div className="mt-8 flex flex-col gap-5 text-[15px] leading-relaxed text-text-mid md:text-base">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                  {post.body}
+                </ReactMarkdown>
+              </div>
+            </Rise>
 
             {more.length > 0 && (
-              <div className="mt-16 border-t border-white/[0.06] pt-10">
-                <p className="font-mono text-[11px] uppercase tracking-wider text-text-low">
-                  More notes
-                </p>
-                <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  {more.map((p) => (
-                    <PostCard key={p.slug} post={p} />
-                  ))}
+              <Rise delay={0.42}>
+                <div className="mt-16 border-t border-white/[0.06] pt-10">
+                  <p className="font-mono text-[11px] uppercase tracking-wider text-text-low">
+                    More notes
+                  </p>
+                  <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {more.map((p) => (
+                      <PostCard key={p.slug} post={p} />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </Rise>
             )}
           </article>
         </div>

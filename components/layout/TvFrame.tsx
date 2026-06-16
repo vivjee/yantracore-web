@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Briefcase, Info, Volume2, VolumeX } from "lucide-react";
+import { Globe2, Maximize2, Minimize2, Home, Headphones, Mail, Boxes, Info, Volume2, VolumeX } from "lucide-react";
 import {
   TvConsoleIcon,
   UserIcon,
@@ -24,6 +24,7 @@ import { ColorfulLogo } from "@/components/brand/ColorfulLogo";
 import { YantraElectricTitle } from "@/components/typography/YantraElectricTitle";
 import { useAudioPlayer } from "@/lib/audio/AudioPlayerContext";
 import { MusicMiniControls } from "@/components/chrome/MusicMiniControls";
+import { NavLink } from "@/components/chrome/RouteProgress";
 
 /** Seconds → "m:ss" (0:00 for non-finite input). */
 function fmtClock(secs: number): string {
@@ -101,7 +102,7 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
       {showPanel && (
         <div className="tv-music-popover">
           <div className="tv-music-popover__card">
-            {/* Header — animated equalizer + status eyebrow + track title */}
+            {/* Header — animated equalizer + status eyebrow + track title + expand */}
             <div className="flex items-center gap-2.5">
               <span className="tv-music-eq" data-playing={isPlaying ? "true" : "false"} aria-hidden>
                 <i /><i /><i /><i />
@@ -114,6 +115,15 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
                   {currentTrack.title}
                 </p>
               </div>
+              <Link
+                href="/music"
+                aria-label="Open full music console"
+                title="Open full music console"
+                onClick={() => audioSynth.playClick()}
+                className="shrink-0 self-start -mr-0.5 -mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md text-text-low hover:text-accent-2 hover:bg-white/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
             {/* Short description */}
@@ -337,48 +347,42 @@ export function TvFrame({ children }: TvFrameProps) {
               {/* Group 1 — Navigation pages (top bar on tablet/desktop; on phones
                   these move to the bottom tab bar, so this group is CSS-hidden) */}
               <div className="tv-chrome-btn-group tv-chrome-nav-pages">
-                <Link href="/" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/" ? "active" : ""}`} aria-label="Home" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                <NavLink href="/" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/" ? "active" : ""}`} aria-label="Home" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Home className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Home</span>
                   <span className="tooltip">Home <KeyHint id="nav-home" /></span>
-                </Link>
-                <Link href="/projects" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/projects" ? "active" : ""}`} aria-label="Projects" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                </NavLink>
+                <NavLink href="/projects" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/projects" ? "active" : ""}`} aria-label="Projects" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/projects" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Boxes className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Projects</span>
                   <span className="tooltip">Projects</span>
-                </Link>
-                <Link href="/technologies" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/technologies" ? "active" : ""}`} aria-label="Technologies" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                </NavLink>
+                <NavLink href="/technologies" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/technologies" ? "active" : ""}`} aria-label="Technologies" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/technologies" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <StellarOrbitIcon className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Technologies</span>
                   <span className="tooltip">Technologies <KeyHint id="nav-technologies" /></span>
-                </Link>
-                <Link href="/reach" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/reach" ? "active" : ""}`} aria-label="Reach" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                </NavLink>
+                <NavLink href="/reach" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/reach" ? "active" : ""}`} aria-label="Reach" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/reach" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Globe2 className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Reach</span>
                   <span className="tooltip">Reach <KeyHint id="nav-entryport" /></span>
-                </Link>
-                <Link href="/work" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/work" ? "active" : ""}`} aria-label="Work" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
-                  {isPowered && pathname === "/work" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
-                  <Briefcase className="w-5 h-5 relative z-10" />
-                  <span className="tv-console-label">Work</span>
-                  <span className="tooltip">Work</span>
-                </Link>
-                <Link href="/about" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/about" ? "active" : ""}`} aria-label="About" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                </NavLink>
+                <NavLink href="/about" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/about" ? "active" : ""}`} aria-label="About" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/about" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Info className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">About</span>
                   <span className="tooltip">About</span>
-                </Link>
-                <Link href="/contact" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/contact" ? "active" : ""}`} aria-label="Contact" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
+                </NavLink>
+                <NavLink href="/contact" className={`tv-console-btn tv-console-btn--labeled ${pathname === "/contact" ? "active" : ""}`} aria-label="Contact" onMouseEnter={() => isPowered && audioSynth.playHover()} onClick={(e) => { if (!isPowered) e.preventDefault(); else audioSynth.playClick(); }} style={!isPowered ? { opacity: 0.3, cursor: 'not-allowed' } : undefined}>
                   {isPowered && pathname === "/contact" && (<motion.span layoutId="tvActivePill" className={`absolute inset-0 rounded-[7px] bg-accent-1/20 border border-accent-1/40 pointer-events-none ${themeMode === "light" ? "shadow-[0_0_12px_rgba(79,53,255,0.25)]" : "shadow-[0_0_12px_rgba(110,86,255,0.3)]"}`} transition={{ type: "spring", stiffness: 350, damping: 20 }} />)}
                   <Mail className="w-5 h-5 relative z-10" />
                   <span className="tv-console-label">Contact</span>
                   <span className="tooltip">Contact <KeyHint id="nav-contact" /></span>
-                </Link>
+                </NavLink>
               </div>
 
               {/* Group 2 — Theme and Settings */}
@@ -651,7 +655,6 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
     { href: "/projects", label: "Projects", Icon: Boxes },
     { href: "/technologies", label: "Tech", Icon: StellarOrbitIcon },
     { href: "/reach", label: "Reach", Icon: Globe2 },
-    { href: "/work", label: "Work", Icon: Briefcase },
     { href: "/about", label: "About", Icon: Info },
     { href: "/contact", label: "Contact", Icon: Mail },
   ] as const;
@@ -660,7 +663,7 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
       {items.map(({ href, label, Icon }) => {
         const active = pathname === href;
         return (
-          <Link
+          <NavLink
             key={href}
             href={href}
             aria-label={label}
@@ -672,7 +675,7 @@ function TvBottomNav({ isPowered }: { isPowered: boolean }) {
           >
             <Icon className="w-[18px] h-[18px]" />
             <span className="tv-bottom-nav-label">{label}</span>
-          </Link>
+          </NavLink>
         );
       })}
     </nav>

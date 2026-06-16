@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="aether" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3BE0FF"/>
+      <stop offset="1" stop-color="#00B8A0"/>
+    </linearGradient>
+  </defs>
+  <rect x="14" y="14" width="36" height="36" rx="11" stroke="url(#aether)" stroke-width="4"/>
+  <path d="M20 33h7l3.5-7 5 14 3.5-7h5" stroke="url(#aether)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
