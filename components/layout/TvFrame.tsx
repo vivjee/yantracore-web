@@ -101,7 +101,7 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
       {showPanel && (
         <div className="tv-music-popover">
           <div className="tv-music-popover__card">
-            {/* Header — animated equalizer + status eyebrow + track title */}
+            {/* Header — animated equalizer + status eyebrow + track title + expand */}
             <div className="flex items-center gap-2.5">
               <span className="tv-music-eq" data-playing={isPlaying ? "true" : "false"} aria-hidden>
                 <i /><i /><i /><i />
@@ -114,6 +114,15 @@ function TvMusicControl({ isPowered }: { isPowered: boolean }) {
                   {currentTrack.title}
                 </p>
               </div>
+              <Link
+                href="/music"
+                aria-label="Open full music console"
+                title="Open full music console"
+                onClick={() => audioSynth.playClick()}
+                className="shrink-0 self-start -mr-0.5 -mt-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md text-text-low hover:text-accent-2 hover:bg-white/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-2/60"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
             {/* Short description */}
